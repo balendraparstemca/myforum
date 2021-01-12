@@ -2,12 +2,11 @@ import React, { Component } from 'react';
 import { Badge, Modal } from 'react-bootstrap';
 import { AiFillFileAdd } from 'react-icons/ai';
 import { BsFillPlusCircleFill, BsFillTrashFill, BsPencilSquare } from 'react-icons/bs';
-import { GiSaddle } from 'react-icons/gi';
 import { connect } from "react-redux";
-import Select from "react-select";
+
 import { fetchAmenties } from '../../services/action/common';
 import { AddListAmenties, getListAmenties,mapAmentiestoList,unmapAmentiestoList } from '../../services/action/list';
-import Button from '../common/Button';
+
 class Amenities extends Component {
     constructor(props) {
         super(props)
@@ -103,6 +102,7 @@ class Amenities extends Component {
                             </div>
                         </div>
                     </div>
+                    
                 </div>
                 <div className="btn-box mt-4">
                     <button type="submit" className="theme-btn border-0" disabled={this.state.loading}>

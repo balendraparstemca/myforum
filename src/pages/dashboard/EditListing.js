@@ -41,7 +41,8 @@ class EditListing extends Component {
             reason: '',
             listimage: [],
             imgCollection:'',
-            file:  require('../../assets/images/g-img1.jpg')
+            file:  require('../../assets/images/g-img1.jpg'),
+            show:false
         }
     }
 
@@ -74,6 +75,11 @@ class EditListing extends Component {
         })
     }
 
+    toggle = () => {
+        this.setState({ show: !this.state.show })
+
+    }
+
     upload(e) {
         e.preventDefault()
         var formData = new FormData();
@@ -93,7 +99,7 @@ class EditListing extends Component {
                 listName: this.props.listdetail && this.props.listdetail.list_title,
                 listbio: this.props.listdetail && this.props.listdetail.description,
                 address: this.props.listdetail && this.props.listdetail.address,
-                listImg: this.props.listdetail && this.props.listdetail.bannerimg ?  <img src={`http://localhost:7999/api/v1/utilities/${this.props.listdetail.bannerimg}`} alt='list-profile' /> : <img src={this.state.file} alt='default-list-profile' /> ,
+                listImg: this.props.listdetail && this.props.listdetail.bannerimg ?  <img src={`${process.env.REACT_APP_API_KEY}utilities/${this.props.listdetail.bannerimg}`} alt='list-profile' /> : <img src={this.state.file} alt='default-list-profile' /> ,
                 listingid: this.props.listdetail && this.props.listdetail.listing_id,
                 verifiedtxt: this.props.listdetail && this.props.listdetail.approved ? 'Verified list' : 'Not Verified Yet',
                 country: this.props.listdetail && this.props.listdetail.country,
@@ -200,32 +206,23 @@ class EditListing extends Component {
                                                                 </div>
                                                             </div>
                                                             {this.state.listImg}
-                                                          
-                                                            <div className="dropdown">
-                                                                <button
-                                                                    className="theme-btn edit-btn dropdown-toggle border-0 after-none"
-                                                                    type="button" id="editImageMenu"
-                                                                    data-toggle="dropdown" aria-haspopup="true"
-                                                                    aria-expanded="false">
-                                                                    <i className="la la-photo"></i> Edit
-                                                                </button>
-                                                                <div className="dropdown-menu"
-                                                                    aria-labelledby="editImageMenu">
-                                                                    <div className="upload-btn-box">
-                                                                        <form>
-                                                                            <input type="file" name="files[]" id="filer_input" onChange={this.uploadSingleFile}/>
-                                                                            <button className="theme-btn border-0 w-100 button-success" type="button" onClick={this.upload} value="submit">
-                                                                                Save changes
+                                                            <button className="theme-btn border-0 w-100 button-success" type="button" onClick={this.toggle} value="submit">
+                                                                change your pic
+                                                            </button>
+                                                            {
+                                                            this.state.show ? <div className="mb-5" >
+                                                            <div className="upload-btn-box">
+                                                                <form>
+                                                                    <input type="file" className="form-control" name="files[]" id="filer_input" onChange={this.uploadSingleFile} />
+                                                                    <button className="theme-btn border-0 w-100 button-success" type="button" onClick={this.upload} value="submit">
+                                                                        Save changes
                                                                             </button>
-                                                                        </form>
-                                                                    </div>
-                                                                    <div className="btn-box mt-3">
-                                                                        <button className="theme-btn border-0 w-100">Remove
-                                                                        Photo
-                                                                        </button>
-                                                                    </div>
-                                                                </div>
+                                                                </form>
                                                             </div>
+
+                                                        </div> : ''}
+                                                           
+                                                           
                                                         </div>
                                                         <div className="user-details">
                                                             <h2 className="user__name widget-title pb-2">
@@ -254,7 +251,7 @@ class EditListing extends Component {
                                                 <div className="col-lg-8">
                                                     <GeneralInfo listurl={this.props.match.params.listurl} />
                                                     <div className="delete-account-info">
-                                                        <div className="billing-form-item">
+                                                    {/*    <div className="billing-form-item">
                                                             <div className="billing-title-wrap">
                                                                 <h3 className="widget-title pb-0 color-text">Delete Listing</h3>
                                                                 <div className="title-shape margin-top-10px"></div>
@@ -265,7 +262,7 @@ class EditListing extends Component {
                                                                 </p>
                                                                 <Button text="delete my account" url="#" className="delete-account border-0" />
                                                             </div>
-                                                        </div>
+                                                        </div>*/}
                                                     </div>
                                                 </div>
                                             </div>
@@ -278,8 +275,10 @@ class EditListing extends Component {
                                         </TabPanel>
 
                                         <TabPanel>
+                                        <b>please add 750 x 480 size image for better view </b>
                                             <div className="row">
-
+                                          
+                                                          
                                                 {
                                                     this.state.listimage.length === 0 ? (
 
@@ -292,7 +291,7 @@ class EditListing extends Component {
                                                         <div className="col-2" key={id}>
                                                             <div className="user-profile-action">
                                                                 <div className="user-pro-img mb-2">
-                                                                    <img src={`http://localhost:7999/api/v1/utilities/${img.imageurl}`} alt="list" />
+                                                                    <img src={`${process.env.REACT_APP_API_KEY}utilities/${img.imageurl}`} alt="list" />
                                                                     <div className="dropdown">
                                                                         <button
                                                                             className="theme-btn edit-btn dropdown-toggle border-0 after-none"

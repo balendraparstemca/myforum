@@ -11,7 +11,6 @@ import { AiOutlineTags } from 'react-icons/ai'
 import Select from "react-select";
 import { fetchAmenties, fetchCategory } from '../../services/action/common';
 import { Modal } from 'react-bootstrap';
-import { Badge } from 'react-bootstrap';
 import { FiMap } from 'react-icons/fi';
 import { CountryDropdown, RegionDropdown } from 'react-country-region-selector';
 import { CreateListing } from '../../services/action/list';
@@ -32,9 +31,9 @@ class AddListing extends Component {
         this.state = {
             title: '',
             businessname: '',
-            description:'',
-            keywords:'',
-            address:'',
+            description: '',
+            keywords: '',
+            address: '',
             selectedCatOp: null,
             breadcrumbimg: require('../../assets/images/bread-bg.jpg'),
             catid: { label: '', value: null },
@@ -43,28 +42,27 @@ class AddListing extends Component {
             showModal: false,
             country: '',
             region: '',
-            place:'',
-            zipcode:'',
-            ModelContent:'',
-            loading:false
+            place: '',
+            zipcode: '',
+            ModelContent: '',
+            loading: false
         }
     }
 
-    onReset=()=>
-    {
+    onReset = () => {
         this.setState({
             country: '',
             region: '',
-            place:'',
-            zipcode:'',
+            place: '',
+            zipcode: '',
             businessname: '',
-            description:'',
-            keywords:'',
-            address:''
-            
+            description: '',
+            keywords: '',
+            address: ''
+
         })
     }
-    
+
 
     componentDidMount() {
         this.props.dispatch(fetchCategory()).then(() => {
@@ -94,7 +92,7 @@ class AddListing extends Component {
 
     onChangeCity(e) {
         this.setState({
-            place: e.target.value,
+            place: e.target.value.toLocaleLowerCase(),
         });
     }
 
@@ -127,7 +125,7 @@ class AddListing extends Component {
         this.setState({ showModal: true });
     }
 
- 
+
     handleChangeCat = async (catid) => {
         this.setState({ catid });
         await this.props.dispatch(fetchAmenties(catid.value));
@@ -140,50 +138,47 @@ class AddListing extends Component {
             loading: true,
         });
 
-        const obj={
-            list_title:this.state.businessname,
-            description:this.state.description,
-            keywords:this.state.keywords,
-            categoryid:this.state.catid.value,
-            address:this.state.address,
-            country:this.state.country,
-            state:this.state.region,
-            city:this.state.place,
-            zipcode:this.state.zipcode,
-            canonicalurl:this.state.businessname.split(' ', 6).join(' ').toLowerCase().replace(/ /g, '_').replace(/[^\w-]+/g, ''),
-            created_by:this.props.userdetails.id && this.props.userdetails.id
+        const obj = {
+            list_title: this.state.businessname,
+            description: this.state.description,
+            keywords: this.state.keywords,
+            categoryid: this.state.catid.value,
+            categoryname: this.state.catid.label,
+            address: this.state.address,
+            country: this.state.country,
+            state: this.state.region,
+            city: this.state.place,
+            zipcode: this.state.zipcode,
+            canonicalurl: this.state.businessname.split(' ', 6).join(' ').toLowerCase().replace(/ /g, '_').replace(/[^\w-]+/g, ''),
+            created_by: this.props.userdetails.id && this.props.userdetails.id
 
         }
 
-        this.props.dispatch(CreateListing(obj)).then(()=>{
-            if(this.props.isCreated)
-            {
-                this.setState({loading:false})
+        this.props.dispatch(CreateListing(obj)).then(() => {
+            if (this.props.isCreated) {
+                this.setState({ loading: false })
                 this.onReset();
-                this.props.history.push(`/listing-details/hh`);
-			     window.location.reload();
-                
+                this.props.history.push(`/listing-details/${obj.canonicalurl}/edit`);
+                window.location.reload();
+
             }
+            this.setState({ loading: false })
+
+        }, () => {
+            this.setState({ loading: false })
+
         })
-    
+
     }
 
     render() {
-        console.log(this.props.isCreated);
+
         const { country, region, category } = this.state;
         const categories = category && category.length ? category.map(cat => {
             return { value: `${cat.id}`, label: `${cat.name}` };
         }) : [{
             value: 0,
             label: 'no category feched'
-        }];
-
-        const { amenties } = this.props;
-        const items = amenties && amenties.length ? amenties.map(item => {
-            return { id: `${item.amenties_id}`, title: `${item.amenties_name}` };
-        }) : [{
-            id: 0,
-            title: 'no amenties feched'
         }];
 
         return (
@@ -249,7 +244,7 @@ class AddListing extends Component {
                                                     <div className="col-lg-12">
                                                         <div className="input-box">
                                                             <label className="label-text d-flex align-items-center ">Keywords
-                                                             <i className="la tip ml-1" data-toggle="tooltip" data-placement="top"  title="keywords related with your business it may">
+                                                             <i className="la tip ml-1" data-toggle="tooltip" data-placement="top" title="keywords related with your business it may">
                                                                     <BsQuestion />
                                                                 </i>
                                                             </label>
@@ -281,7 +276,7 @@ class AddListing extends Component {
                                                                             <span className="la form-icon">
                                                                                 <FiMap />
                                                                             </span>
-                                                                            <input className="form-control" value={this.state.address} onChange={this.onChangeAddress} type="text" name="address"  required="required" placeholder="Your address" />
+                                                                            <input className="form-control" value={this.state.address} onChange={this.onChangeAddress} type="text" name="address" required="required" placeholder="Your address" />
                                                                         </div>
                                                                     </div>
                                                                 </div>
@@ -311,7 +306,7 @@ class AddListing extends Component {
                                                                             <span className="la form-icon">
                                                                                 <BsFileCode />
                                                                             </span>
-                                                                            <input className="form-control" type="text" value={this.state.place} onChange={this.onChangeCity} name="place"  required="required" placeholder="(city or place name)" />
+                                                                            <input className="form-control" type="text" value={this.state.place} onChange={this.onChangeCity} name="place" required="required" placeholder="(city or place name)" />
                                                                         </div>
                                                                     </div>
                                                                 </div>
@@ -338,17 +333,21 @@ class AddListing extends Component {
                                                 <div className="billing-form-item p-0 border-0 mb-0 shadow-none">
                                                     <div className="billing-content p-0">
                                                         <div className="custom-checkbox d-block mr-0">
-                                                            <input type="checkbox" id="privacy" />
+                                                        <div className="form-group">
+                                                            <input  className="form-control"  type="checkbox" id="privacy" required="required"/>
                                                             <label htmlFor="privacy">I Agree to Dirto's <Link to="#" onClick={this.open} className="color-text">Privacy Policy</Link></label>
+                                                       </div>
                                                         </div>
                                                         <div className="custom-checkbox d-block mr-0">
-                                                            <input type="checkbox" id="terms" />
+                                                        <div className="form-group">
+                                                            <input type="checkbox" className="form-control"   id="terms" required="required" />
                                                             <label htmlFor="terms">I Agree to Dirto's <Link to="#" onClick={this.open} className="color-text">Terms of Services</Link>
                                                             </label>
+                                                            </div>
                                                         </div>
                                                         <div className="btn-box mt-4">
-                                                            <button type="submit" className="theme-btn border-0" disabled={this.state.loading}>  
-                                                            {this.state.loading && (
+                                                            <button type="submit" className="theme-btn border-0" disabled={this.state.loading}>
+                                                                {this.state.loading && (
                                                                     <span className="spinner-border spinner-border-sm"></span>
                                                                 )} submit listing</button>
                                                         </div>
@@ -370,7 +369,7 @@ class AddListing extends Component {
                         <Modal.Title>{this.state.title}</Modal.Title>
                     </Modal.Header>
                     <Modal.Body>
-                   {this.state.ModelContent}
+                        {this.state.ModelContent}
 
                     </Modal.Body>
                     <Modal.Footer>
@@ -393,12 +392,12 @@ class AddListing extends Component {
 
 
 function mapStateToProps(state) {
-    const { isLoggedIn,userdetails } = state.auth;
+    const { isLoggedIn, userdetails } = state.auth;
     const { isCreated } = state.list;
     const { amenties, category } = state.common;
     return {
-        isLoggedIn, category, amenties,userdetails,isCreated
-    
+        isLoggedIn, category, amenties, userdetails, isCreated
+
     };
 }
 export default connect(mapStateToProps)(AddListing);

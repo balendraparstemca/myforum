@@ -1,8 +1,8 @@
 import React, { Component } from 'react'
-import { RiBuilding4Line, RiHotelBedLine, RiPlaneLine } from 'react-icons/ri';
+import { RiBuilding4Line} from 'react-icons/ri';
 import { GiChickenOven } from 'react-icons/gi';
-import { BsMusicNoteBeamed } from 'react-icons/bs';
-import { MdFitnessCenter } from 'react-icons/md';
+import { Link } from 'react-router-dom';
+
 
 export default class BannerOneCategories extends Component {
     state = {
@@ -10,42 +10,23 @@ export default class BannerOneCategories extends Component {
         title: 'browse featured categories:',
         items: [
             {
-                path: "#",
-                title: "Apartments",
+                path: "/listing-list",
+                title: "Listing",
                 icon: <RiBuilding4Line />
             },
             {
-                path: "#",
-                title: "Restaurants",
+                path: "forum/home",
+                title: "Forums",
                 icon: <GiChickenOven />
             },
-            {
-                path: "#",
-                title: "Travel",
-                icon: <RiPlaneLine />
-            },
-            {
-                path: "#",
-                title: "Events",
-                icon: <BsMusicNoteBeamed />
-            },
-            {
-                path: "#",
-                title: "Fitness",
-                icon: <MdFitnessCenter />
-            },
-            {
-                path: "#",
-                title: "Hotels",
-                icon: <RiHotelBedLine />
-            }
+           
         ]
     };
     render() {
         return (
             <>
                 <div className="highlighted-categories">
-                    <h4 className="highlighted-element">{this.state.connector}</h4>
+                 
                     <h5 className="highlighted__title">
                         {this.state.title}
                     </h5>
@@ -53,10 +34,10 @@ export default class BannerOneCategories extends Component {
                         {this.state.items.map((item, index) => {
                             return (
                                 <div className="category-item" key={index}>
-                                    <a href={item.path} className="d-block">
+                                    <Link to={item.path} className="d-block">
                                         <span className="icon-element">{item.icon}</span>
                                         {item.title}
-                                    </a>
+                                    </Link>
                                 </div>
                             )
                         })}

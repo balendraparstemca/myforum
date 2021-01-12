@@ -9,15 +9,15 @@ class FooterContactWidget extends Component {
         lists: [
             {
                 icon: <AiOutlineHome />,
-                text: '12345 Little Baker St, Melbourne'
+                text: '500034'
             },
             {
                 icon: <FiHeadphones />,
-                text: '+ 61 23 8093 3400'
+                text: '+ 9424703403'
             },
             {
                 icon: <FaRegEnvelope />,
-                text: 'dirto@gmail.com'
+                text: 'casualdesi@gmail.com'
             }
         ]
     }

@@ -24,10 +24,7 @@ class FooterQuickLinkWidget extends Component {
                 path: '/contact',
                 text: 'contact us'
             },
-            {
-                path: '/pricing',
-                text: 'pricing'
-            }
+           
         ]
     }
     render() {

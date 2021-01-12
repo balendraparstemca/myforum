@@ -1,7 +1,7 @@
 import React, {Component} from 'react'
-import BannerOneHeroHeading from './BannerOneHeroHeading'
-import BannerOneSearchInput from './BannerOneSearchInput'
 import BannerOneCategories from './BannerOneCategories'
+import BannerOneHeroHeading from './BannerOneHeroHeading'
+
 
 export default class BannerOne extends Component {
     render() {
@@ -17,10 +17,9 @@ export default class BannerOne extends Component {
                                 <BannerOneHeroHeading />
 
                                 {/* Banner One Search Input */}
-                                <BannerOneSearchInput />
-
-                                {/* Banner One Categories */}
                                 <BannerOneCategories />
+
+                               
 
                             </div>
                         </div>

@@ -1,0 +1,146 @@
+import axios from "axios";
+
+
+const API_URL = process.env.REACT_APP_API_KEY
+
+class PostService {
+  createPost(obj) {
+    return axios.post(API_URL + "createpost", obj).then((response) => {
+      
+
+      return response.data;
+    });
+  }
+
+
+  createPostwithimage(obj) {
+    return axios.post(API_URL + "utilities/createpost_upload", obj).then((response) => {
+      
+
+      return response;
+    });
+  }
+
+  updatePost(obj) {
+    return axios.post(API_URL + "updatepost", obj).then((response) => {
+      
+
+      return response.data;
+    });
+  }
+
+  savePost(obj) {
+    return axios.post(API_URL + "save_post", obj).then((response) => {
+      
+
+      return response.data;
+    });
+  }
+
+  CommentVote(obj) {
+    return axios.post(API_URL + "commentvote", obj).then((response) => {
+      
+
+      return response.data;
+    });
+  }
+
+  reportPost(obj) {
+    return axios.post(API_URL + "report_post", obj).then((response) => {
+      
+
+      return response.data;
+    });
+  }
+
+  PostComment(obj) {
+    return axios.post(API_URL + "post_comment", obj).then((response) => {
+      
+      return response.data;
+    });
+  }
+
+  getCommunityPost(id) {
+    return axios.get(API_URL + "community_posts/" + id).then((response) => {
+      
+
+      return response.data;
+    });
+  }
+
+  getUserPost(id) {
+    return axios.get(API_URL + "user_posts/" + id).then((response) => {
+      
+
+      return response.data;
+    });
+  }
+
+  getHomePost(obj) {
+    return axios.post(API_URL + "home_posts",obj).then((response) => {
+      return response.data;
+    });
+  }
+
+  getPopularPost() {
+    return axios.get(API_URL + "popular_posts").then((response) => {
+      return response.data;
+    });
+  }
+
+  getPostDetail(obj) {
+    return axios.post(API_URL + "post_detail", obj).then((response) => {
+      
+
+      return response.data;
+    });
+  }
+
+
+  getPostComment(postid) {
+    return axios.get(API_URL + "fetchpost-comment/" + postid).then((response) => {
+      
+
+      return response.data;
+    });
+  }
+
+  postUpvote(obj) {
+    return axios.post(API_URL + "upvote", obj).then((response) => {
+      
+
+      return response.data;
+    });
+  }
+
+  postDownvote(obj) {
+    return axios.post(API_URL + "downvote", obj).then((response) => {
+      
+
+      return response.data;
+    });
+  }
+
+  postRemovevote(obj) {
+    return axios.post(API_URL + "removevote", obj).then((response) => {
+      
+
+      return response.data;
+    });
+  }
+
+
+
+  postRemoveComment(commentid) {
+    return axios.get(API_URL + "delete_comment/" + commentid).then((response) => {
+      
+
+      return response.data;
+    });
+  }
+
+
+
+}
+
+export default new PostService();
