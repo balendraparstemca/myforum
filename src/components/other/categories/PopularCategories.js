@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Link } from "react-router-dom";
-import { GiChickenOven} from 'react-icons/gi'
+import { GiChickenOven } from 'react-icons/gi'
 import { connect } from "react-redux";
 import { gethomeList } from '../../../services/action/list';
 
@@ -10,7 +10,8 @@ class PopularCategories extends Component {
         super(props)
         this.state = {
             alllists: [],
-            category: []
+            category: [],
+            img: require('../../../assets/images/bg.png')
         }
     }
     componentDidMount() {
@@ -33,7 +34,7 @@ class PopularCategories extends Component {
         const array = this.state.alllists;
         const result = [];
         const map = new Map();
-        
+
         for (const item of array) {
             if (map.has(item.listing.categoryname)) {
                 let objIndex = result.findIndex((obj => obj.title === item.listing.categoryname));
@@ -62,28 +63,50 @@ class PopularCategories extends Component {
     render() {
         return (
             <>
-                {this.state.category && this.state.category.map((item, index) => {
-                    return (
-                        <div className="col-lg-3 column-td-6" key={index}>
-                            <div className="category-item mb-4 mt-0 ml-0 mr-0 p-0">
-                                <figure className="category-fig m-0">
-                                    <img src={item.img} alt="category" className="cat-img" />
-                                    <figcaption className="fig-caption">
-                                        <Link to={`/listing-list/${item.id}`} className="cat-fig-box">
-                                            <div className="icon-element mb-3">
-                                                {item.icon}
-                                            </div>
-                                            <div className="cat-content">
-                                                <h4 className="cat__title mb-3">{item.title}</h4>
-                                                <span className="badge">{item.stitle} Listing</span>
-                                            </div>
-                                        </Link>
-                                    </figcaption>
-                                </figure>
+                <div className="row">
+                    {this.props.category && this.props.category.slice(0, 7).map((item, index) => {
+                        return (
+                            <div className="col-lg-3 column-td-6" key={index}>
+                                <div className="category-item mb-4 mt-0 ml-0 mr-0 p-0">
+                                    <figure className="category-fig m-0">
+                                        <img src={item.imgsrc ? `${process.env.REACT_APP_API_KEY}utilities/${item.imgsrc}` : this.state.img} alt="" width="200px" height="200px" className="cat-img" />
+                                        <figcaption className="fig-caption">
+                                            <Link to={`/categories/${item.canonical_url}`} className="cat-fig-box">
+                                                <div className="icon-element mb-3">
+                                                    <i className={`${item.icon}`}></i>
+                                                </div>
+                                                <div className="cat-content">
+                                                    <h4 className="cat__title mb-3">{item.name}</h4>
+
+                                                </div>
+                                            </Link>
+                                        </figcaption>
+                                    </figure>
+                                </div>
                             </div>
+                        )
+                    })}
+
+                    <div className="col-lg-3 column-td-6" >
+                        <div className="category-item mb-4 mt-0 ml-0 mr-0 p-0">
+                            <figure className="category-fig m-0">
+                                <img src={this.state.img} alt="" width="200px" height="200px" className="cat-img" />
+                                <figcaption className="fig-caption">
+                                    <Link to={`/categories`} className="cat-fig-box">
+                                        <div className="icon-element mb-3">
+                                            <i className={``}></i>...
+                                        </div>
+                                        <div className="cat-content">
+                                            <h4 className="cat__title mb-3">more</h4>
+
+                                        </div>
+                                    </Link>
+                                </figcaption>
+                            </figure>
                         </div>
-                    )
-                })}
+                    </div>
+
+                </div>
             </>
         );
     }
@@ -92,8 +115,9 @@ class PopularCategories extends Component {
 function mapStateToProps(state) {
     const { isLoggedIn, userdetails } = state.auth;
     const { lists, categorylists } = state.list;
+    const { category } = state.common;
     return {
-        isLoggedIn, userdetails, lists, categorylists,
+        isLoggedIn, userdetails, lists, categorylists, category
 
     };
 }

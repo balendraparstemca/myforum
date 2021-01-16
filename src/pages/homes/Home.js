@@ -16,6 +16,7 @@ import { fetchCategory, getAddress } from '../../services/action/common';
 import PopularPosts from '../../components/places/popularposts';
 import { getpeopleviewList } from '../../services/action/list';
 import { fetchHomePost } from '../../services/action/post';
+import { Link } from 'react-router-dom';
 class Home extends Component {
 
 
@@ -32,31 +33,30 @@ class Home extends Component {
     fetchcurrentlocation = async () => {
         navigator.geolocation.getCurrentPosition(
             async function (position) {
-                const result =await getAddress(position.coords.latitude, position.coords.longitude)
-                if(result)
-                {
-                    console.log(result.results[0].formatted_address)
-                    const addressArray =  result.results[0].address_components;
-                     console.log(addressArray)
-                  
+                const result = await getAddress(position.coords.latitude, position.coords.longitude)
+                if (result) {
+
+                    const addressArray = result.results[0].address_components;
+
+
                 }
-               
+
             }, function (error) {
-                 }
+            }
         );
     }
 
-    fetchtoplistnear= async () => {
+    fetchtoplistnear = async () => {
         const obj = {
             "city": '',
             "country": '',
             "state": ''
         }
-      return await this.props.dispatch(getpeopleviewList(obj));
+        return await this.props.dispatch(getpeopleviewList(obj));
     }
 
-    fetchtoppostsnearyou =  () => {
-          this.props.dispatch(fetchHomePost({place: 'India' }))
+    fetchtoppostsnearyou = () => {
+        this.props.dispatch(fetchHomePost({ place: 'India' }))
     }
 
     render() {
@@ -73,7 +73,11 @@ class Home extends Component {
                 <section className="cat-area padding-top-10px padding-bottom-10px">
                     <div className="container">
                         <div className="row section-title-width text-center">
-                            <SectionsHeading title="Browse by Categories" desc="Morbi convallis bibendum urna ut viverra. Maecenas quis consequat libero, a feugiat eros. Nunc ut lacinia tortors." />
+                            <div className="section-heading">
+                                 <Link to="/categories"><b className="sec__title">Browse By Category</b></Link>
+                                
+                              </div>
+
                         </div>
                         <div className="row mt-5">
 

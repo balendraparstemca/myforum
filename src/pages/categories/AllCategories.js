@@ -8,18 +8,21 @@ import { gethomeList } from '../../services/action/list';
 import { connect } from "react-redux";
 import { Link } from 'react-router-dom';
 import { GiChickenOven } from 'react-icons/gi';
+import { fetchCategory } from '../../services/action/common';
 class AllCategories extends Component {
     constructor(props) {
         super(props)
         this.state = {
             breadcrumbImg: require('../../assets/images/bread-bg.jpg'),
             alllists: [],
-            category: []
+            category: [],
+            img: require('../../assets/images/img1.jpg')
         }
     }
     componentDidMount() {
 
         this.fetchHomelists();
+        this.props.dispatch(fetchCategory())
 
     }
 
@@ -63,6 +66,7 @@ class AllCategories extends Component {
     }
 
     render() {
+      
         return (
             <main className="all-categories">
                 {/* Header */}
@@ -74,20 +78,20 @@ class AllCategories extends Component {
                 <section className="cat-area padding-top-40px padding-bottom-80px">
                     <div className="container">
                         <div className="row">
-                            {this.state.category && this.state.category.map((item, index) => {
+                            {this.props.category && this.props.category.map((item, index) => {
                                 return (
                                     <div className="col-lg-3 column-td-6" key={index}>
                                         <div className="category-item mb-4 mt-0 ml-0 mr-0 p-0">
                                             <figure className="category-fig m-0">
-                                                <img src={item.img} alt="category" className="cat-img" />
+                                                <img src={item.imgsrc ? `${process.env.REACT_APP_API_KEY}utilities/${item.imgsrc}` : this.state.img } alt=""  width="200px" height="200px" className="cat-img" />
                                                 <figcaption className="fig-caption">
-                                                    <Link to={`/listing-list/${item.id}`} className="cat-fig-box">
+                                                    <Link to={`/categories/${item.canonical_url}`} className="cat-fig-box">
                                                         <div className="icon-element mb-3">
-                                                            {item.icon}
+                                                        <i className={`${item.icon}`}></i>
                                                         </div>
                                                         <div className="cat-content">
-                                                            <h4 className="cat__title mb-3">{item.title}</h4>
-                                                            <span className="badge">{item.stitle}  Listing</span>
+                                                            <h4 className="cat__title mb-3">{item.name}</h4>
+                                                          
                                                         </div>
                                                     </Link>
                                                 </figcaption>
@@ -117,9 +121,12 @@ class AllCategories extends Component {
 function mapStateToProps(state) {
     const { isLoggedIn, userdetails } = state.auth;
     const { lists, categorylists } = state.list;
+    const { category } = state.common;
     return {
-        isLoggedIn, userdetails, lists, categorylists,
+        isLoggedIn, userdetails, lists, categorylists,category
 
     };
 }
+
+
 export default connect(mapStateToProps)(AllCategories);

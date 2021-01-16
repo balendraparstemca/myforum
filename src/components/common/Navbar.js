@@ -27,9 +27,9 @@ export default function Navbar() {
                         <li>
                             <Link to="/listing-list">listings <FiChevronDown /></Link>
                             <ul className="dropdown-menu-item">
-                                <li><Link to="/add-listing">listing</Link></li>
+                                <li><Link to="/listing-list">listing</Link></li>
                                 <li><Link to="/add-listing">add listing</Link></li>
-                                <li><Link to="/all-categories">listing categories</Link></li>
+                                <li><Link to="/categories">listing categories</Link></li>
                                
                             </ul>
                         </li>

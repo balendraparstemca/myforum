@@ -1,6 +1,6 @@
-import { FETCH_AMENTIES, FETCH_CATEGORY, FETCH_FLAIR_SUCCESS, FETCH_RULE_SUCCESS } from "../actionType";
+import { FETCH_AMENTIES, FETCH_CATEGORY, FETCH_FLAIR_SUCCESS, FETCH_RULE_SUCCESS, GET_SUBCATEGORY } from "../actionType";
 
-const initialState = { amenties: [], isFetched: false, category: [],flair:[], rule:[]};
+const initialState = { amenties: [], isFetched: false, category: [],subcategory:[], flair: [], rule: [] };
 
 export default function (state = initialState, action) {
     const { type, payload } = action;
@@ -12,6 +12,13 @@ export default function (state = initialState, action) {
                 ...state,
                 category: payload.category,
             }
+
+        case GET_SUBCATEGORY:
+            return {
+                ...state,
+                subcategory: payload.subcategory,
+
+            };
 
         case FETCH_AMENTIES:
             return {

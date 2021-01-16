@@ -1,5 +1,5 @@
 import { toast } from 'react-toastify';
-import {GET_NOTIFICATION, ADD_NOTIFICATION, REMOVE_NOTIFICATION, FETCH_AMENTIES, FETCH_CATEGORY, FETCH_COMMUNITYLIST, FETCH_FLAIR_SUCCESS, FETCH_JOINED_COMMUNITYLIST, FETCH_RULE_FAILED, FETCH_RULE_SUCCESS, FETCH_USER_COMMUNITYLIST, SET_MESSAGE } from "../actionType";
+import {GET_NOTIFICATION, ADD_NOTIFICATION, REMOVE_NOTIFICATION, FETCH_AMENTIES, FETCH_CATEGORY, FETCH_COMMUNITYLIST, FETCH_FLAIR_SUCCESS, FETCH_JOINED_COMMUNITYLIST, FETCH_RULE_FAILED, FETCH_RULE_SUCCESS, FETCH_USER_COMMUNITYLIST, SET_MESSAGE, GET_SUBCATEGORY } from "../actionType";
 import CommonService from "../restapi/commonService";
 import communityService from '../restapi/communityService';
 import Compress from 'image-compressor';
@@ -27,8 +27,8 @@ export const getAddress = async (latitude, longitude) => {
 
 }
 
-export const fetchCategory = () => (dispatch) => {
-  return CommonService.getCategory().then((response) => {
+export const fetchCategory = (obj) => (dispatch) => {
+  return CommonService.getCategory(obj).then((response) => {
 
     if (response.status === 'SUCCESS') {
 
@@ -66,6 +66,43 @@ export const fetchCategory = () => (dispatch) => {
 
       return Promise.reject();
     }
+  );
+
+}
+
+
+export const getAllSubCategory = (obj) => (dispatch) => {
+  return CommonService.getSubCategory(obj).then(
+      (response) => {
+
+       
+          if (response.status === 'SUCCESS') {
+
+              dispatch({
+                  type: GET_SUBCATEGORY,
+                  payload: { subcategory: response.data }
+              });
+          }
+          else {
+
+              toast.error(response.message)
+          }
+
+          return Promise.resolve();
+      },
+      (error) => {
+
+          const message =
+              (error.response &&
+                  error.response.data &&
+                  error.response.data.message) ||
+              error.message ||
+              error.toString();
+          toast.error(message)
+
+
+          return Promise.reject();
+      }
   );
 
 }

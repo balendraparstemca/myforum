@@ -4,9 +4,14 @@ const API_URL = process.env.REACT_APP_API_KEY
 
 class CommonService {
 
-    getCategory() {
-        return axios.get(API_URL + "common/category").then((response) => {
-            
+    getCategory(obj) {
+        return axios.post(API_URL + "common/category", obj).then((response) => {
+            return response.data;
+        });
+    }
+
+    getSubCategory(obj) {
+        return axios.post(API_URL + "common/get_subcategory",obj).then((response) => {
             return response.data;
         });
     }

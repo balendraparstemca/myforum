@@ -5009,12 +5009,12 @@ body {
       display: block; }
     .category-fig .fig-caption .cat__title {
       font-size: 16px;
-      font-weight: 600;
+      font-weight: 800;
       text-transform: capitalize; }
     .category-fig .fig-caption .badge {
       background-color: transparent;
       padding: 6px 11px;
-      font-weight: 600;
+      font-weight: 800;
       border: 2px solid #ff6b6b;
       -webkit-border-radius: 30px;
       -moz-border-radius: 30px;
@@ -5032,7 +5032,7 @@ body {
       left: 0;
       width: 100%;
       height: 100%;
-      opacity: 0.8;
+      opacity: 0.5;
       background-color: #333f57;
       -webkit-border-radius: 4px;
       -moz-border-radius: 4px;

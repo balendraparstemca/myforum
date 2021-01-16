@@ -15,7 +15,7 @@ import { FaRegCalendarCheck } from "react-icons/fa";
 import $ from 'jquery'
 import Button from "../../components/common/Button";
 import moment from 'moment';
-import { fetchAmenties } from '../../services/action/common';
+import { fetchAmenties, getAllSubCategory } from '../../services/action/common';
 import { getCategorylist, gethomeList, likeList } from '../../services/action/list';
 import { connect } from "react-redux";
 import { BsEye } from 'react-icons/bs';
@@ -83,7 +83,9 @@ class ListHeader extends Component {
             selectedCountryby: null,
             selectedRegion: null,
             showregion: false,
-            countryname: ''
+            countryname: '',
+            subcatdetail:[],
+            subcatname:''
 
 
         }
@@ -94,7 +96,8 @@ class ListHeader extends Component {
     componentDidMount() {
         if (this.props.match.params.category) {
             this.setState({ paramid: this.props.match.params.category });
-            this.fetchCategorylists(this.props.match.params.category)
+            this.fetchsubcategorydetail()
+            //this.fetchCategorylists(this.props.match.params.category)
         } else {
             this.fetchHomelists();
 
@@ -130,8 +133,8 @@ class ListHeader extends Component {
         if (this.state.paramid !== this.props.match.params.category) {
             this.setState({ paramid: this.props.match.params.category });
             if (this.props.match.params.category) {
-
-                this.fetchCategorylists(this.props.match.params.category)
+                this.fetchsubcategorydetail()
+                //this.fetchCategorylists(this.props.match.params.category)
             } else {
                 this.fetchHomelists();
 
@@ -381,7 +384,22 @@ class ListHeader extends Component {
         }
     }
 
-    fetchCategorylists = (id) => {
+    fetchsubcategorydetail() {
+        this.setState({ loading: true })
+        let obj = { canonical_url: this.props.match.params.category }
+        this.props.dispatch(getAllSubCategory(obj)).then(() => {
+            if (this.props.subcategory.length > 0) {
+                 this.setState({ loading: false, subcatdetail:this.props.subcategory,subcatname:this.props.subcategory[0].name,breadcrumbimg:this.props.subcategory[0].imgsrc ? `${process.env.REACT_APP_API_KEY}utilities/${this.props.subcategory[0].imgsrc}` : this.state.breadcrumbimg })
+             }
+            else {
+                this.props.history.push("/error");
+                window.location.reload();
+            }
+        })
+
+    }
+
+    /*fetchCategorylists = (id) => {
         this.props.dispatch(getCategorylist(id)).then(() => {
             this.setState({
                 alllists: this.props.categorylists, mainlists: this.props.categorylists, loading: false
@@ -394,7 +412,7 @@ class ListHeader extends Component {
             this.handleChangeCountryby({ value: "All", label: 'All' })
         });
 
-    }
+    }*/
 
     fetchHomelists = () => {
         this.props.dispatch(gethomeList()).then(() => {
@@ -425,8 +443,6 @@ class ListHeader extends Component {
             return Number(b.listing.likes) - Number(a.listing.likes);
         });
 
-
-
         this.setState({ alllists: arr })
 
     }
@@ -437,9 +453,6 @@ class ListHeader extends Component {
         let arr = lists.sort(function (a, b) {
             return Number(b.listing.creating_time) - Number(a.listing.creating_time);
         });
-
-
-
         this.setState({ alllists: arr })
 
     }
@@ -541,16 +554,7 @@ class ListHeader extends Component {
 
     }
 
-
-
-
-
-
-
-
-
     render() {
-
 
         return (
             <>
@@ -560,7 +564,7 @@ class ListHeader extends Component {
                     <GeneralHeader />
 
                     {/* Breadcrumb */}
-                    <Breadcrumb CurrentPgTitle="Listing List" MenuPgTitle="Listings" img={this.state.breadcrumbimg} />
+                    <Breadcrumb CurrentPgTitle={this.state.subcatname} MenuPgTitle="Listings" img={this.state.breadcrumbimg} />
 
                     <div className="container">
                         <Tabs>
@@ -703,9 +707,9 @@ class ListHeader extends Component {
                                                         <div className="col-lg-12">
                                                             <div className="button-shared text-center">
                                                                 {this.state.visible < this.state.alllists.length &&
-                                                                     <Badge pill variant="danger" onClick={this.loadMore} className="border-0">
+                                                                    <Badge pill variant="danger" onClick={this.loadMore} className="border-0">
                                                                         <span className="d-inline-block">
-                                                                          load more  <FiRefreshCw />
+                                                                            load more  <FiRefreshCw />
                                                                         </span>
                                                                     </Badge>
                                                                 }
@@ -981,9 +985,10 @@ class ListHeader extends Component {
 function mapStateToProps(state) {
     const { isLoggedIn, userdetails } = state.auth;
     const { lists, categorylists } = state.list;
-    const { amenties } = state.common;
+    const { amenties, subcategory} = state.common;
+   
     return {
-        isLoggedIn, userdetails, lists, categorylists, amenties
+        isLoggedIn, userdetails, lists, categorylists, amenties, subcategory
 
     };
 }

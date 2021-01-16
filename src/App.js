@@ -34,6 +34,7 @@ import ChangePassword from './pages/changepassword';
 import { connect } from "react-redux";
 import PopularForums from './pages/blogs/popularForums';
 import listheadertwo from './components/common/listheadertwo';
+import BlogGrid from './pages/blogs/BlogGrid';
 
 
 
@@ -46,7 +47,8 @@ function App(props) {
         <Switch>
           <Route exact path="/" component={Home} />
           <Route exact path="/home" component={Home} />
-          <Route exact path="/all-categories" component={AllCategories} />
+          <Route exact path="/categories" component={AllCategories} />
+          <Route exact path="/categories/:catname" component={BlogGrid} />
           <Route exact path="/all-location" component={AllLocations} />
           <Route exact path="/listing-list" component={ListHeader} />
           <Route exact path="/listing-list/search" component={listheadertwo} />

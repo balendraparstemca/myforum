@@ -4,6 +4,7 @@ import { FiSearch } from 'react-icons/fi';
 import { connect } from "react-redux";
 import Select from "react-select";
 import { withRouter } from "react-router-dom";
+import { fetchCategory } from '../../../services/action/common';
 
 class BannerOneHeroHeading extends Component {
     constructor(props) {
@@ -26,6 +27,10 @@ class BannerOneHeroHeading extends Component {
             searchitem:'',
             desc: 'Discover the best places to stay, eat, shop & visit the city nearest to you.'
         }
+    }
+    componentDidMount()
+    {
+        this.props.dispatch(fetchCategory())
     }
 
 
@@ -57,6 +62,7 @@ class BannerOneHeroHeading extends Component {
 
 
     render() {
+      
 
         let category = [];
         let categorytwo = [{ value: "All", label: "All" }];
@@ -79,7 +85,10 @@ class BannerOneHeroHeading extends Component {
             return { value: `${cat.name}`, label: `${cat.name}` };
         }) : [{ value: "All", label: "All" }])
 
+    
+
         return (
+     
             <>
                 <div className="hero-heading">
                     <div className="section-heading">
@@ -108,7 +117,7 @@ class BannerOneHeroHeading extends Component {
                                         <FiSearch />
                                     </span>
                                     <input className="form-control" type="text" value={this.state.searchitem} onChange={this.onChangeSearch}  placeholder="What are you looking for?" />
-                                </div>
+                            </div>
                             </form>
                         </div>
                     </div>
