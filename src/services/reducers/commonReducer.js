@@ -1,6 +1,6 @@
-import { FETCH_AMENTIES, FETCH_CATEGORY, FETCH_FLAIR_SUCCESS, FETCH_RULE_SUCCESS, GET_SUBCATEGORY } from "../actionType";
+import { FETCH_AMENTIES, FETCH_CATEGORY, FETCH_FLAIR_SUCCESS, FETCH_RULE_SUCCESS, FETCH_TOP_CATEGORY, GET_PAGESEO, GET_SUBCATEGORY } from "../actionType";
 
-const initialState = { amenties: [], isFetched: false, category: [],subcategory:[], flair: [], rule: [] };
+const initialState = { mylocation: undefined, pageinfo: [], steplist: { ishide: false, listiid: null, subcat_id: '' }, amenties: [], isFetched: false, category: [], topcategory: [], subcategory: [], flair: [], rule: [] };
 
 export default function (state = initialState, action) {
     const { type, payload } = action;
@@ -11,6 +11,33 @@ export default function (state = initialState, action) {
             return {
                 ...state,
                 category: payload.category,
+            }
+
+        case 'NEXT':
+            return {
+                ...state,
+                steplist: { ishide: true, listid: payload.listingid, subcat_id: payload.subcat_id },
+            }
+
+
+        case 'CURRENT_LOCATION':
+            return {
+                ...state,
+                mylocation: payload.mylocation
+            }
+
+        case GET_PAGESEO: {
+
+            return {
+                ...state,
+                pageinfo: payload.pageinfo
+            }
+        }
+
+        case FETCH_TOP_CATEGORY:
+            return {
+                ...state,
+                topcategory: payload.topcategory,
             }
 
         case GET_SUBCATEGORY:

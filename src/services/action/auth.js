@@ -108,7 +108,7 @@ export const Logoutuser = (obj) => (dispatch) => {
     return AuthService.logoutUser(obj).then(
         (response) => {
             if (response.status === 'SUCCESS') {
-               
+
                 dispatch({
                     type: LOGOUT,
                 });
@@ -132,6 +132,39 @@ export const Logoutuser = (obj) => (dispatch) => {
                 error.message ||
                 error.toString();
             toast.error(message)
+
+            return Promise.reject();
+        }
+    );
+
+};
+
+export const Logintrack = (email) => (dispatch) => {
+    return AuthService.logintrack(email).then(
+        
+        (response) => {
+        
+            if (response.status === 'FAILURE') {
+                
+                dispatch({
+                    type: LOGOUT,
+                });
+                localStorage.removeItem("user");
+                
+             
+            }
+         
+            return Promise.resolve();
+        },
+        (error) => {
+
+            const message =
+                (error.response &&
+                    error.response.data &&
+                    error.response.data.message) ||
+                error.message ||
+                error.toString();
+           // toast.error(message)
 
             return Promise.reject();
         }
@@ -169,7 +202,7 @@ export const addImageprofile = (formdata, userid) => (dispatch) => {
 export const userUpdate = (obj) => (dispatch) => {
     return AuthService.updateProfile(obj).then(
         (response) => {
-            
+
 
             if (response.status === 'SUCCESS') {
 
@@ -203,7 +236,7 @@ export const userUpdate = (obj) => (dispatch) => {
 export const userVerify = (obj) => (dispatch) => {
     return AuthService.userverification(obj).then(
         (response) => {
-            
+
 
             if (response.status === 'SUCCESS') {
 

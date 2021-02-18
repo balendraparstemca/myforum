@@ -6,6 +6,12 @@ import { BrowserRouter as Router } from 'react-router-dom'
 import * as serviceWorker from './serviceWorker';
 import { Provider } from "react-redux";
 import store from "./store";
+import "../node_modules/bootstrap/dist/css/bootstrap.min.css";
+import "@fortawesome/fontawesome-free/css/all.min.css";
+import { Logintrack } from './services/action/auth';
+
+const userdetails = JSON.parse(localStorage.getItem("user"));
+let result=(userdetails) ? store.dispatch(Logintrack(userdetails.emailId)):''
 
 
 ReactDOM.render(

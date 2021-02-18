@@ -73,9 +73,9 @@ export default function Navbar() {
                            
                         </li>
                         <li>
-                            <Link to="/listing-list">listings <FiChevronDown /></Link>
+                            <Link>listings <FiChevronDown /></Link>
                             <ul className="dropdown-menu-item">
-                                <li><Link to="/add-listing">listing</Link></li>
+                                <li><Link to="/listing-list">listing</Link></li>
                                 <li><Link to="/add-listing">add listing</Link></li>
                                 <li><Link to="/all-categories">listing categories</Link></li>
                                 <li><Link to="/all-locations">listing locations</Link></li>
@@ -83,9 +83,9 @@ export default function Navbar() {
                             </ul>
                         </li>
                         <li>
-                            <Link to="/forum">Forums <FiChevronDown /></Link>
+                            <Link>Forums <FiChevronDown /></Link>
                             <ul className="dropdown-menu-item">
-                                <li><Link to="/forum">Home</Link></li>
+                                <li><Link to="/forum/home">Home</Link></li>
                                 <li><Link to="/forum/popular">Popular</Link></li>
                                 <li><Link to="/forum/community">All Community</Link></li>
                                 <li><Link to="/forum/newcommunity">New Community</Link></li>
@@ -93,7 +93,7 @@ export default function Navbar() {
                             </ul>
                         </li>
                         <li>
-                            <Link to="/about">about <FiChevronDown /></Link>
+                            <Link>about <FiChevronDown /></Link>
                             <ul className="dropdown-menu-item">
                                 <li><Link to="/about">about</Link></li>
                                 <li><Link to="/faq">faq</Link></li>

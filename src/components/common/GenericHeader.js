@@ -9,12 +9,13 @@ import { postUpvote, postDownvote, savePost, reportPost } from '../../services/a
 import { DeletePosts } from '../../services/action/user';
 import moment from 'moment';
 import SweetAlert from 'react-bootstrap-sweetalert'
-import { BsFillAlarmFill, BsFillBookmarkFill, BsFillExclamationCircleFill, BsLink45Deg, BsPeopleCircle,  BsPersonFill } from 'react-icons/bs';
+import { BsFillAlarmFill, BsFillBookmarkFill, BsFillExclamationCircleFill, BsLink45Deg, BsPeopleCircle, BsPersonFill } from 'react-icons/bs';
 import { AiFillDelete } from 'react-icons/ai';
 import { Button } from 'react-bootstrap';
 import { FiRefreshCw } from 'react-icons/fi';
 import { Badge } from 'react-bootstrap';
 import { Dropdown } from 'react-bootstrap';
+import LoadingOverlay from 'react-loading-overlay';
 
 const shortby = [
     {
@@ -42,6 +43,7 @@ class PostHeader extends Component {
         this.onChangeReport = this.onChangeReport.bind(this);
         this.state = {
             isloading: true,
+            loading: true,
             community: '',
             reporttext: "",
             img: require('../../assets/images/post.png'),
@@ -64,17 +66,18 @@ class PostHeader extends Component {
 
     componentWillReceiveProps() {
         if (this.state.cmid !== this.props.urlid) {
-            this.setState({ cmid: this.props.urlid});
+            this.setState({ cmid: this.props.urlid });
             this.fetch();
         }
     }
 
     componentDidMount() {
         if (this.props.posts.length > 0) {
-            this.setState({ allpost: this.props.posts, mainposts: this.props.posts }, () => this.tags())
+            this.setState({ allpost: this.props.posts, mainposts: this.props.posts, loading: false }, () => this.tags())
 
-            this.setState({ isLoading: false })
-
+        }
+        else{
+            this.setState({loading: false})
         }
 
     }
@@ -82,8 +85,11 @@ class PostHeader extends Component {
 
 
     fetch = async () => {
+        this.setState({ loading: true })
         await this.props.updatepostaftervote().then(() => {
-            this.setState({ allpost: this.props.posts, mainposts: this.props.posts }, () => this.tags())
+            if (this.props.posts) {
+                this.setState({ allpost: this.props.posts, mainposts: this.props.posts, loading: false }, () => this.tags())
+            }
         })
     }
 
@@ -107,6 +113,7 @@ class PostHeader extends Component {
 
     upvote = async (postid) => {
         if (this.props.isLoggedIn) {
+            this.setState({loading:true})
             const obj = { 'post_id': postid, 'upvote_by': this.props.userdetails.id };
             await this.props.dispatch(postUpvote(obj));
             this.fetch()
@@ -119,6 +126,7 @@ class PostHeader extends Component {
     downvote = async (postid) => {
 
         if (this.props.isLoggedIn) {
+            this.setState({loading:true})
             const obj = { 'post_id': postid, 'downvote_by': this.props.userdetails.id };
             await this.props.dispatch(postDownvote(obj));
             this.fetch()
@@ -362,13 +370,11 @@ class PostHeader extends Component {
 
         return (
             <> <div className="container">
-
-                {this.state.isLoading ? (
-                    <div className="d-flex justify-content-center margin-top-200px text-primary">
-
-                        <span className="spinner-border spinner-border-sm"></span>
-                    </div>
-                ) : (<> <Tabs>
+                <LoadingOverlay
+                    active={this.state.loading}
+                    spinner
+                   
+                >  <Tabs>
                     <div className="row">
                         <div className="col-lg-12">
                             <div className="generic-header margin-bottom-30px">
@@ -391,7 +397,7 @@ class PostHeader extends Component {
                                         options={shortby}
                                     />
                                 </div>
-                                <TabList className="nav nav-tabs border-0" id="nav-tab">
+                                <TabList className="nav nav-tabs border-0 short-option mr-1" id="nav-tab">
 
 
                                     <Tab>
@@ -488,8 +494,10 @@ class PostHeader extends Component {
 
                                                             </div>
                                                         </div>
-                                                        <hr></hr>
+
                                                     </div>
+                                                    <div className=" row section-block-2 margin-top-25px margin-bottom-25px"></div>
+
 
                                                 </div>
 
@@ -500,9 +508,9 @@ class PostHeader extends Component {
                                                 <div className="button-shared text-center margin-top-30px">
                                                     {this.state.visible < this.state.allpost.length &&
                                                         <Badge pill variant="danger" onClick={this.loadMore} className="border-0">
-                                                           <h5> <span className="d-inline-block">
+                                                            <b> <span className="d-inline-block">
                                                                 Load More <FiRefreshCw />
-                                                            </span></h5>
+                                                            </span></b>
                                                         </Badge>
                                                     }
                                                 </div>
@@ -547,46 +555,48 @@ class PostHeader extends Component {
                                                         </Dropdown>
 
                                                         <div className="row">
-                                                            <div className="col-1">
+                                                            <div className="col-2">
                                                                 <p className="upvote" onClick={() => this.upvote(item.post_id)}>  <span className="la"><b><FaArrowAltCircleUp /></b></span> </p><p>{item.vote}</p><p className="downvote" onClick={() => this.downvote(item.post_id)}> <span className="la"><b><FaArrowAltCircleDown /></b></span> </p>
 
                                                             </div>
-                                                            <div className="col-11">
+                                                            <div className="col-10">
+
+                                                                <ul className="post-author">
+                                                                    <li>
+                                                                        <Link to={`/forum/user/${item.username}`}>  <img src={this.state.userimg} alt="Author" />
+                                                                            <span className="by__text"> By</span>
+                                                                            <span> {item.username}</span></Link>
+                                                                    </li>
+                                                                    <li>
+
+                                                                    </li>
+                                                                </ul>
+                                                                <Link to={`/forum/post/${item.canonicalurl}`} className="card-image-wrap">
+
+                                                                    <div className="card-image">
+                                                                        {item.imgSrc ? <img src={`${process.env.REACT_APP_API_KEY}utilities/${item.imgSrc}`} alt={item.imgSrc} className="card__img" /> : ''}
+                                                                    </div>
+                                                                </Link>
                                                                 <div>
-                                                                    <ul className="post-author d-flex align-items-center">
-                                                                        <li>
-                                                                            <Link to={`/forum/user/${item.username}`}>  <img src={this.state.userimg} alt="Author" />
-                                                                                <span className="by__text"> By</span>
-                                                                                <span> {item.username}</span></Link>
-                                                                        </li>
-                                                                        <li>
-
-                                                                        </li>
-                                                                    </ul>
-                                                                    <Link to={`/forum/post/${item.canonicalurl}`} className="card-image-wrap">
-
-                                                                        <div className="card-image">
-                                                                            {item.imgSrc ? <img src={`${process.env.REACT_APP_API_KEY}utilities/${item.imgSrc}`} alt={item.imgSrc} className="card__img" width="400px" height="400px" /> : ''}
-                                                                        </div>
-                                                                    </Link>
                                                                     <div>
-                                                                        <div>
-                                                                            <Link to={{ pathname: `/forum/post/${item.canonicalurl}`, aboutProps: { postid: item.post_id } }} style={{ textDecoration: 'none', color: 'black' }} className="thumbnail self" >
-                                                                                <b> {item.title}</b></Link>
-                                                                            <a target="_blank" href={item.url} rel="noopener noreferrer"> {item.url.replace(/^https?\:\/\/www\./i, "").split('/')[0]}... <i className="fa fa-external-link" aria-hidden="true"></i></a> <span className="badge badge-secondary badge-pill">{item.flare_tag}</span>
+                                                                        <Link to={{ pathname: `/forum/post/${item.canonicalurl}`, aboutProps: { postid: item.post_id } }} style={{ textDecoration: 'none', color: 'black' }} className="thumbnail self" >
+                                                                            <b> {item.title}</b></Link>
+                                                                        <a target="_blank" href={item.url} rel="noopener noreferrer"> {item.url.replace(/^https?\:\/\/www\./i, "").split('/')[0]}... <i className="fa fa-external-link" aria-hidden="true"></i></a> <span className="badge badge-secondary badge-pill">{item.flare_tag}</span>
 
-                                                                            <p>
-                                                                                <Link to={`/forum/r/${item.com_name}`}><b> <BsPeopleCircle /> r/{item.com_name}</b></Link> <BsFillAlarmFill /> <span>{moment(Number(item.post_time)).fromNow()}</span>
-                                                                            </p>
-
-                                                                        </div>
-
-
+                                                                        <p>
+                                                                            <Link to={`/forum/r/${item.com_name}`}><b> <BsPeopleCircle /> r/{item.com_name}</b></Link> <BsFillAlarmFill /> <span>{moment(Number(item.post_time)).fromNow()}</span>
+                                                                        </p>
 
                                                                     </div>
+
+
+
+
                                                                 </div>
                                                             </div>
                                                         </div>
+                                                        <div className=" row section-block-2 margin-top-25px margin-bottom-25px"></div>
+
                                                     </div>
                                                 )
                                             })}
@@ -595,9 +605,9 @@ class PostHeader extends Component {
                                                 <div className="button-shared text-center margin-top-30px">
                                                     {this.state.visible < this.state.allpost.length &&
                                                         <Badge pill variant="danger" onClick={this.loadMore} className="border-0">
-                                                            <h5><span className="d-inline-block">
+                                                            <b><span className="d-inline-block">
                                                                 Load More <FiRefreshCw />
-                                                            </span></h5>
+                                                            </span></b>
                                                         </Badge>
                                                     }
                                                 </div>
@@ -609,8 +619,8 @@ class PostHeader extends Component {
                             </div>
                         </div>
                     </div>
-                </Tabs></>)
-                }
+                </Tabs></LoadingOverlay>
+
             </div>
 
 

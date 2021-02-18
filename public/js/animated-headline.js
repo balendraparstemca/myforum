@@ -116,6 +116,7 @@ jQuery(document).ready(function ($) {
     function hideLetter($letter, $word, $bool, $duration) {
         $letter.removeClass('in').addClass('out');
 
+
         if (!$letter.is(':last-child')) {
             setTimeout(function () { hideLetter($letter.next(), $word, $bool, $duration); }, $duration);
         } else if ($bool) {

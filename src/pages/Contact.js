@@ -9,13 +9,57 @@ import { FaRegEnvelope } from 'react-icons/fa'
 import { GoLocation } from 'react-icons/go'
 import Footer from "../components/common/footer/Footer";
 import ScrollTopBtn from "../components/common/ScrollTopBtn";
+import MetaTag from './metainfo';
+import { getDefaultMeta, getPageinfo } from '../services/action/common';
+import { connect } from "react-redux";
 
 class Contact extends Component {
     state = {
-        breadcrumbimg: require('../assets/images/bread-bg.jpg'),
+        breadcrumbimg: require('../assets/images/hero-bg.jpg'),
+        metainfo: null,
+        defaultMetaTag: null,
     }
+
+    componentDidMount()
+    {
+        this.getpageseo({ page_type: 'contact' })
+    }
+
+
+
+    getpageseo = (obj) => {
+        this.props.dispatch(getPageinfo(obj)).then(() => {
+            if (this.props.pageinfo.length > 0) {
+                this.setState({
+                    metainfo: {
+                        title: this.props.pageinfo[0].meta_title,
+                        canonicalURL: `https://www.casualdesi.com/contact || ''}`,
+                        meta: [{
+                            attribute: 'name',
+                            value: 'description',
+                            content: this.props.pageinfo[0].meta_description
+                        },
+                        {
+                            attribute: 'name',
+                            value: 'keywords',
+                            content: this.props.pageinfo[0].meta_keywords
+                        }]
+                    }
+                })
+
+            } else {
+
+                this.setState({
+                    defaultMetaTag: getDefaultMeta()
+                })
+            }
+        })
+    }
+
     render() {
-        return (
+        return (<>
+           { this.state.metainfo ? <MetaTag metaTag={this.state.metainfo || getDefaultMeta() }></MetaTag> : ''}
+
             <main className="contact-page">
                 {/* Header */}
                 <GeneralHeader />
@@ -27,7 +71,7 @@ class Contact extends Component {
                     <div className="container">
                         <div className="row">
                             <div className="col-lg-7">
-                                <AskQuestionField title="Get in touch" />
+                                <AskQuestionField/>
                             </div>
 
                             <div className="col-lg-5">
@@ -38,27 +82,27 @@ class Contact extends Component {
                 </section>
 
                 <div className="gmaps">
-                    <GeneralMap />
+                    <GeneralMap  lat="17.444529871100663" lang="78.43372183862219"/>
                     <div className="map-address-box">
                         <ul className="map-address">
                             <li>
                                 <span className="la"><GoLocation /></span>
                                 <h5 className="map__title">address</h5>
                                 <p className="map__desc">
-                                    Melbourne, Australia, 105 South <br /> Park Avenue
+                                5605 N MacArthur Blvd <br />Suite 740 <br/>Irving, TX 75038
                                 </p>
                             </li>
                             <li>
                                 <span className="la"><FiPhone /></span>
                                 <h5 className="map__title">phone</h5>
-                                <p className="map__desc">Local: 2800 256 508</p>
-                                <p className="map__desc">Local: 666 777 888</p>
+                                <p className="map__desc">Local: 703-829-5141</p>
+                              
                             </li>
                             <li>
                                 <span className="la"><FaRegEnvelope /></span>
                                 <h5 className="map__title">email</h5>
-                                <p className="map__desc">needhelp@dirto.com</p>
-                                <p className="map__desc">inquiry@dirto.com</p>
+                                <p className="map__desc">ears@casualdesi.com</p>
+                                
                             </li>
                         </ul>
                     </div>
@@ -69,9 +113,17 @@ class Contact extends Component {
 
                 <ScrollTopBtn />
 
-            </main>
+            </main></>
         );
     }
 }
 
-export default Contact;
+
+function mapStateToProps(state) {
+    const { pageinfo } = state.common;
+    return {
+      pageinfo
+       
+    };
+}
+export default connect(mapStateToProps)(Contact);

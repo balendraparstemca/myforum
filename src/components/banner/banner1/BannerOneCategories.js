@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import { Link } from 'react-router-dom';
 import { connect } from "react-redux";
 import { withRouter } from "react-router-dom";
+
 class BannerOneCategories extends Component {
     state = {
         connector: 'or',
@@ -12,7 +13,7 @@ class BannerOneCategories extends Component {
       
         let categorytwo = [];
         categorytwo = this.props.category && this.props.category.length > 0 ? this.props.category.map(cat => {
-            return { path: `${cat.canonical_url}`, title: `${cat.name}`, icon: <i class={`${cat.icon}`}></i> };
+            return { path: `${cat.canonical_url}`, title: `${cat.name}`, icon: <i className={`${cat.icon}`}></i> };
         }) : [{ path: "", title: "no category" }]
 
         return (

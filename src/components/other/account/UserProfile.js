@@ -4,7 +4,7 @@ import Breadcrumb from "../../common/Breadcrumb";
 import { IoIosCheckmarkCircle, IoIosLink } from "react-icons/io";
 import { FiCheck, FiHeart, FiPhone } from "react-icons/fi";
 import { FaRegCalendarCheck } from "react-icons/fa";
-import { AiFillQuestionCircle } from "react-icons/ai";
+import { AiFillQuestionCircle, AiOutlineEye } from "react-icons/ai";
 import { Link } from "react-router-dom";
 import NewsLetter from "../cta/NewsLetter";
 import Footer from "../../common/footer/Footer";
@@ -13,6 +13,7 @@ import { userdetails } from '../../../services/action/user';
 import { connect } from "react-redux";
 import { getuserlist, likeList } from '../../../services/action/list';
 import moment from 'moment';
+import ReactStars from "react-rating-stars-component";
 class UserProfile extends Component {
 
     constructor(props) {
@@ -20,6 +21,7 @@ class UserProfile extends Component {
         this.state = {
             userdetail: null,
             img: require('../../../assets/images/testi-img2.jpg'),
+            listimg: require('../../../assets/images/img24.jpg'),
             name: '',
             date: 'Joined 4 years ago',
             message: '',
@@ -85,7 +87,7 @@ class UserProfile extends Component {
     }
 
     render() {
-   
+
         return (
             <main className="user-profile">
                 {/* Header */}
@@ -138,7 +140,7 @@ class UserProfile extends Component {
                                                 <div className="card-item">
                                                     <Link to={`/listing-details/${item.listing.canonicalurl}`} className="card-image-wrap">
                                                         <div className="card-image">
-                                                            <img src={item.listing.bannerimg ? `${process.env.REACT_APP_API_KEY}utilities/${item.listing.bannerimg}` : item.listing.listimage} width="200px" height="200px" className="card__img" alt={item.listing.list_title} />
+                                                            <img src={item.listing.bannerimg ? `${process.env.REACT_APP_API_KEY}utilities/${item.listing.bannerimg}` : this.state.listimg} width="200px" height="200px" className="card__img" alt={item.listing.list_title} />
                                                             <span className='badge'>{this.state.bedge}</span>
                                                             <span className="badge-toggle" data-toggle="tooltip" data-placement="bottom" title={item.likes}>
                                                                 <FiHeart />
@@ -147,9 +149,9 @@ class UserProfile extends Component {
                                                     </Link>
                                                     <div className="card-content-wrap">
                                                         <div className="card-content">
-                                                            <Link to={`/listing-list/${item.listing.categoryid}`}>
+                                                            <Link to={`/listing-list/${item.listing.canonical_url}`}>
                                                                 <h5 className="card-meta">
-                                                                    <span></span> {item.listing.categoryname}
+                                                                <span><i className={item.listing.icon}></i></span> {item.listing.categoryname}
                                                                 </h5>
                                                             </Link>
 
@@ -163,7 +165,7 @@ class UserProfile extends Component {
                                                                 </p>
                                                             </Link>
                                                             <Link to={`/user-profile/${item.listing.username}`} className="author-img" >
-                                                                <img src={item.listing.profileimg ? `${process.env.REACT_APP_API_KEY}utilities/${item.listing.profileimg}` : this.state.author} alt="author-img" />
+                                                                <img src={item.listing.profileimg ? `${process.env.REACT_APP_API_KEY}utilities/${item.listing.profileimg}` : this.state.img} alt="author-img" />
                                                             </Link>
                                                             <ul className="info-list padding-top-20px">
                                                                 <li><span className="la d-inline-block"><FiPhone /></span> {item.listing.phone}</li>
@@ -178,16 +180,23 @@ class UserProfile extends Component {
                                                         </div>
                                                         <div className="rating-row">
                                                             <div className="rating-rating">
+                                                                <span> <ReactStars
+                                                                    count={5}
+                                                                    size={24}
+                                                                    value={item.rating[0].rating ? parseFloat(item.rating[0].rating).toFixed(1) : 0}
+                                                                    isHalf={true} /> </span><span> - </span>
+                                                                <span className="rating-count"> {parseFloat(item.rating[0].rating).toFixed(1)}</span>
+
 
                                                             </div>
                                                             <div className="listing-info">
                                                                 <ul>
-                                                                    <li><span className="info__count"></span> {item.listing.likes}</li>
-                                                                    <li>
-                                                                        <span onClick={() => this.like(item.listing.listing_id)} className="info__save" title="Bookmark">
-                                                                            <FiHeart />
-                                                                        </span>
+                                                                    <li><span className="info__count"><AiOutlineEye /></span> {item.listing.view}</li>
+
+                                                                    <li onClick={() => this.like(item.listing.listing_id)}>
+                                                                        <span className="info__count">   <FiHeart /></span> {item.listing.likes}
                                                                     </li>
+
                                                                 </ul>
                                                             </div>
                                                         </div>

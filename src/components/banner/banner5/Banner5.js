@@ -23,8 +23,8 @@ class Banner5 extends Component {
                             <div className="row">
                                 <div className="col-lg-8">
                                     <div className="breadcrumb-content">
-                                        <h2 className="breadcrumb__title mb-0">Dirto connects people <br /> with great
-                                            local <br /> businesses</h2>
+                                        <h2 className="breadcrumb__title mb-0">Casual Desi connects people <br /> with great
+                                            local Desi <br /> businesses</h2>
                                     </div>
                                 </div>
                                 <div className="col-lg-4 text-right">

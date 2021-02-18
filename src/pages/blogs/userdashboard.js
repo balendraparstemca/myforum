@@ -17,7 +17,7 @@ import { connect } from "react-redux";
 import moment from 'moment';
 import { Dropdown } from 'react-bootstrap';
 import { fetchJoinedCommunityList, fetchUserCommunityList } from '../../services/action/common';
-
+import LoadingOverlay from 'react-loading-overlay';
 
 class UserDashboard extends Component {
     constructor(props) {
@@ -89,12 +89,17 @@ class UserDashboard extends Component {
                 this.props.history.push("/error");
                 window.location.reload();
             }
+        },(error)=>{
+            this.props.history.push("/error");
+          
+            this.setState({ loading: false })
+
         })
     }
 
     fetchuserpost = async () => {
         let obj = { "userName": this.props.match.params.username }
-        return await this.props.dispatch(userdetails(obj)).then(() => {
+           return await this.props.dispatch(userdetails(obj)).then(() => {
             this.props.dispatch(fetchUserPost(this.props.udetails && this.props.udetails[0].id))
 
         })
@@ -110,6 +115,10 @@ class UserDashboard extends Component {
 
     }
 
+    createMarkup = (content) => {
+        return { __html: content };
+    }
+
 
     DeleteComment = (id) => {
         this.props.dispatch(Deletecomments(id)).then(() => {
@@ -120,16 +129,16 @@ class UserDashboard extends Component {
     render() {
         const user = this.props.userdetails && this.props.userdetails;
         return (
+            <LoadingOverlay
+            active={this.state.loading}
+            spinner
+            text='Loading your content...'
+        >
             <main className="List-map-view2">
                 {/* Header */}
                 <GeneralHeader />
-                { this.state.loading ? (
-                    <div className="d-flex justify-content-center margin-top-200px margin-bottom-200px text-primary">
-
-                        <span className="spinner-border spinner-border-lg"></span>
-                    </div>
-                ) : (
-                <section className="dashboard-area padding-top-140px padding-bottom-90px">
+             
+                <section className="dashboard-area padding-top-180px padding-bottom-90px">
                     <div className="container">
                         <Tabs>
                             <div className="row">
@@ -185,10 +194,12 @@ class UserDashboard extends Component {
                                                 </Link> : '') : ''
                                                     }
                                                 </Tab>
+                                                <Tab>
 
-                                                <div className="btn-box">
+                                               
                                                     <Link to="/forum/submit" className="theme-btn"><span className="la"><AiOutlinePlusCircle /></span> create posts</Link>
-                                                </div>
+                                                
+                                                </Tab>
                                                 {this.props.isLoggedIn ? (
                                                     this.state.userdetail && this.state.userdetail.id === user.id ?
                                                         <div className="btn-box">
@@ -285,7 +296,7 @@ class UserDashboard extends Component {
                                                                                                             </span>
                                                                                                             <i className="fa fa-reply"></i>
                                                                                                         </div>
-                                                                                                        <p>{post.text}
+                                                                                                        <p dangerouslySetInnerHTML={this.createMarkup(post.text)}>
                                                                                                         </p>
                                                                                                     </div>
 
@@ -507,7 +518,7 @@ class UserDashboard extends Component {
                             </div>
                         </Tabs>
                     </div>
-                </section>)}
+                </section>
 
                 {/* Newsletter */}
                 <NewsLetter />
@@ -546,7 +557,7 @@ class UserDashboard extends Component {
 
 
             </main>
-
+            </LoadingOverlay>
 
         );
     }

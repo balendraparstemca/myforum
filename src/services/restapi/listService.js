@@ -186,6 +186,12 @@ class ListService {
         });
     }
 
+    getmyList(userid) {
+        return axios.get(API_URL + "list/getmy_list/" + userid).then((response) => {
+            return response.data;
+        });
+    }
+
     getusersavedList(userid) {
         return axios.get(API_URL + "list/getuser_save_list/" + userid).then((response) => {
             return response.data;
@@ -208,6 +214,12 @@ class ListService {
 
     getCategoryList(catid) {
         return axios.get(API_URL + "list/getcategory_list/" + catid).then((response) => {
+            return response.data;
+        });
+    }
+
+    getmainCategoryList(catid) {
+        return axios.get(API_URL + "list/getmaincategory_list/" + catid).then((response) => {
             return response.data;
         });
     }

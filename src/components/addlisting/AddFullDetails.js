@@ -1,14 +1,14 @@
 import React, { Component } from 'react';
-import { AiOutlineUser, AiOutlineFacebook, AiOutlineTwitter, AiOutlineLinkedin } from 'react-icons/ai'
+import { AiOutlineUser, AiOutlineFacebook, AiOutlineTwitter, AiOutlineLinkedin, AiFillYoutube } from 'react-icons/ai'
 import { FaRegEnvelope } from 'react-icons/fa'
 import { FiPhone } from 'react-icons/fi'
 import { BsLink45Deg } from 'react-icons/bs'
 import { TiSocialGooglePlus } from 'react-icons/ti'
 import { getListFullDetail, UpdateListingdetail } from '../../services/action/list';
 import { connect } from "react-redux";
+import LoadingOverlay from 'react-loading-overlay';
 class AddFullDetails extends Component {
-    constructor(props)
-    {
+    constructor(props) {
         super(props)
         this.handleListingdetail = this.handleListingdetail.bind(this);
         //this.onReset = this.onReset.bind(this);
@@ -17,52 +17,80 @@ class AddFullDetails extends Component {
         this.onChangePhone = this.onChangePhone.bind(this);
         this.onChangeWebsite = this.onChangeWebsite.bind(this);
         this.onChangeFacebooklink = this.onChangeFacebooklink.bind(this);
-        this.onChangeTwitterlink= this.onChangeTwitterlink.bind(this);
-        this.onChangeGoogleplus= this.onChangeGoogleplus.bind(this);
-        this.onChangeLinkedin= this.onChangeLinkedin.bind(this);
+        this.onChangeTwitterlink = this.onChangeTwitterlink.bind(this);
+        this.onChangeGoogleplus = this.onChangeGoogleplus.bind(this);
+        this.onChangeLinkedin = this.onChangeLinkedin.bind(this);
+        this.onChangeVideolink = this.onChangeVideolink.bind(this);
 
-        this.state={
-            loading:false,
-            ownername:'',
-            email:'',
-            phone:'',
-            website:'',
-            facebooklink:'',
-            twitterlink:'',
-            googleplus:'',
-            linkedin:'',
-            listid:null
+        this.state = {
+            loading: true,
+            ownername: '',
+            email: '',
+            phone: '',
+            website: '',
+            facebooklink: '',
+            twitterlink: '',
+            googleplus: '',
+            linkedin: '',
+            listid: null,
+            videolink: '',
+
 
         }
     }
-    componentWillMount(){
-       this.fetchlistfullDeatil()
+    componentWillMount() {
+        this.fetchlistfullDeatil()
     }
 
     fetchlistfullDeatil = async () => {
-        let obj = { "listing_id": this.props.listid && this.props.listid}
-        this.props.dispatch(getListFullDetail(obj)).then(() => {
-            this.setState({
-                ownername: this.props.listfulldetail && this.props.listfulldetail.owner_name,
-                email: this.props.listfulldetail &&this.props.listfulldetail.email,
-                phone:this.props.listfulldetail && this.props.listfulldetail.phone,
-                website: this.props.listfulldetail&& this.props.listfulldetail.website,
-                facebooklink: this.props.listfulldetail &&this.props.listfulldetail.facebooklink,
-                twitterlink: this.props.listfulldetail && this.props.listfulldetail.twitterlink,
-                googleplus: this.props.listfulldetail && this.props.listfulldetail.googleplus,
-                linkedin: this.props.listfulldetail && this.props.listfulldetail.linkedin,
+        if (this.props.listid && this.props.listid) {
+            let obj = { "listing_id": this.props.listid && this.props.listid }
 
-            })
+            this.props.dispatch(getListFullDetail(obj)).then(() => {
+                this.setState({
+                    loading: false
+                })
 
-        });
+                if (this.props.listfulldetail) {
+                    this.setState({
+                        ownername: this.props.listfulldetail && this.props.listfulldetail.owner_name,
+                        email: this.props.listfulldetail && this.props.listfulldetail.email,
+                        phone: this.props.listfulldetail && this.props.listfulldetail.phone,
+                        website: this.props.listfulldetail && this.props.listfulldetail.website,
+                        facebooklink: this.props.listfulldetail && this.props.listfulldetail.facebooklink,
+                        twitterlink: this.props.listfulldetail && this.props.listfulldetail.twitterlink,
+                        googleplus: this.props.listfulldetail && this.props.listfulldetail.googleplus,
+                        linkedin: this.props.listfulldetail && this.props.listfulldetail.linkedin,
+                        videolink: this.props.listfulldetail && this.props.listfulldetail.video_link,
+                    })
+                } else {
+                    this.setState({
+                        loading: false
+                    })
+                }
+
+            }, (error) => {
+                this.setState({
+                    loading: false
+                })
+
+            });
+        }
 
     }
-   
+
     onChangeOwnername(e) {
         this.setState({
             ownername: e.target.value,
         });
     }
+
+    onChangeVideolink(e) {
+        this.setState({
+            videolink: e.target.value,
+        });
+    }
+
     onChangeEmail(e) {
         this.setState({
             email: e.target.value,
@@ -107,8 +135,8 @@ class AddFullDetails extends Component {
         });
 
         const obj = {
-            listing_id:this.props.listid && this.props.listid,
-            userid:this.props.userdetails.id,
+            listing_id: this.props.listid && this.props.listid,
+            userid: this.props.userdetails.id,
             owner_name: this.state.ownername,
             email: this.state.email,
             phone: this.state.phone,
@@ -116,129 +144,161 @@ class AddFullDetails extends Component {
             facebooklink: this.state.facebooklink,
             twitterlink: this.state.twitterlink,
             googleplus: this.state.googleplus,
-            linkedin: this.state.googleplus
+            linkedin: this.state.googleplus,
+            video_link: this.state.videolink
         }
-        console.log(obj)
+
+
 
         this.props.dispatch(UpdateListingdetail(obj)).then(() => {
-            this.setState({ loading: false })
+            this.setState({ loading: true })
             this.fetchlistfullDeatil()
         })
 
     }
 
     render() {
-    
+
         return (
             <>
-                <div className="billing-form-item">
-                    <div className="billing-title-wrap">
-                        <h3 className="widget-title pb-0">Full Details</h3>
-                        <div className="title-shape margin-top-10px"></div>
-                    </div>
-                    <div className="billing-content">
-                        <div className="contact-form-action">
-                            <form method="post" onSubmit={this.handleListingdetail}>
-                                <div className="row">
-                                    <div className="col-lg-6">
-                                        <div className="input-box">
-                                            <label className="label-text">Owner Name</label>
-                                            <div className="form-group">
-                                                <span className="la form-icon">
-                                                    <AiOutlineUser />
-                                                </span>
-                                                <input className="form-control" type="text" value={this.state.ownername} onChange={this.onChangeOwnername} name="ownername" required="required" placeholder="ownerName" />
+                <LoadingOverlay
+                    active={this.state.loading}
+                    spinner
+                    text='Loading your content...'
+                >
+                    <div className="billing-form-item">
+                        <div className="billing-title-wrap">
+                            <h3 className="widget-title pb-0">Full Details</h3>
+                            <div className="title-shape margin-top-10px"></div>
+                        </div>
+                        <div className="billing-content">
+                            <div className="contact-form-action">
+                                <form method="post" onSubmit={this.handleListingdetail}>
+                                    <div className="row">
+                                        <div className="col-lg-6">
+                                            <div className="input-box">
+                                                <label className="label-text">Owner Name *</label>
+                                                <div className="form-group">
+                                                    <span className="la form-icon">
+                                                        <AiOutlineUser />
+                                                    </span>
+                                                    <input className="form-control" type="text" value={this.state.ownername} onChange={this.onChangeOwnername} name="ownername" required="required" placeholder="ownerName" />
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                    <div className="col-lg-6">
-                                        <div className="input-box">
-                                            <label className="label-text">Email</label>
-                                            <div className="form-group">
-                                                <span className="la form-icon">
-                                                    <FaRegEnvelope />
-                                                </span>
-                                                <input className="form-control" type="email" name="email" value={this.state.email} onChange={this.onChangeEmail}  required="required"placeholder="Email address" />
+                                        <div className="col-lg-6">
+                                            <div className="input-box">
+                                                <label className="label-text">Email<span className="text-muted">*</span></label>
+                                                <div className="form-group">
+                                                    <span className="la form-icon">
+                                                        <FaRegEnvelope />
+                                                    </span>
+                                                    <input className="form-control" type="email" name="email" value={this.state.email} onChange={this.onChangeEmail} required="required" placeholder="Email address" />
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                    <div className="col-lg-6">
-                                        <div className="input-box">
-                                            <label className="label-text">Phone <span className="text-muted">(optional)</span></label>
-                                            <div className="form-group">
-                                                <span className="la form-icon">
-                                                    <FiPhone />
-                                                </span>
-                                                <input className="form-control" type="text" name="phone"  value={this.state.phone} onChange={this.onChangePhone} required="required"placeholder="Number" />
+                                        <div className="col-lg-6">
+                                            <div className="input-box">
+                                                <label className="label-text">Phone <span className="text-muted">*</span></label>
+                                                <div className="form-group">
+                                                    <span className="la form-icon">
+                                                        <FiPhone />
+                                                    </span>
+                                                    <input className="form-control" type="text" name="phone" value={this.state.phone} onChange={this.onChangePhone} required="required" placeholder="Number" />
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                    <div className="col-lg-6">
-                                        <div className="input-box">
-                                            <label className="label-text">Website <span className="text-muted">(optional)</span></label>
-                                            <div className="form-group">
-                                                <span className="la form-icon">
-                                                    <BsLink45Deg />
-                                                </span>
-                                                <input className="form-control" type="url" name="website" value={this.state.website} onChange={this.onChangeWebsite}   placeholder="website url" />
+                                        <div className="col-lg-6">
+                                            <div className="input-box">
+                                                <label className="label-text">Website <span className="text-muted">*</span></label>
+                                                <div className="form-group">
+                                                    <span className="la form-icon">
+                                                        <BsLink45Deg />
+                                                    </span>
+                                                    <input className="form-control" type="url" name="website" value={this.state.website} onChange={this.onChangeWebsite} required="required" placeholder="website url" />
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                    <div className="col-lg-6">
-                                        <div className="input-box">
-                                            <label className="label-text">Facebook Link <span className="text-muted">(optional)</span></label>
-                                            <div className="form-group">
-                                                <span className="la form-icon">
-                                                    <AiOutlineFacebook />
-                                                </span>
-                                                <input className="form-control" type="url" value={this.state.facebooklink} onChange={this.onChangeFacebooklink} name="facebook"  placeholder="facebook url" />
+                                        <div className="col-lg-12">
+                                        <h3 className="widget-title pb-0 margin-top-15px">optional Details</h3>
+                                            <div className="section-block-2 margin-top-15px margin-bottom-35px"> </div>
+                                           
+                                        </div>
+                                        <div className="col-lg-6">
+                                            <div className="input-box">
+                                                <label className="label-text">Facebook Link <span className="text-muted">(optional)</span></label>
+                                                <div className="form-group">
+                                                    <span className="la form-icon">
+                                                        <AiOutlineFacebook />
+                                                    </span>
+                                                    <input className="form-control" type="url" value={this.state.facebooklink} onChange={this.onChangeFacebooklink} name="facebook" placeholder="facebook url" />
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                    <div className="col-lg-6">
-                                        <div className="input-box">
-                                            <label className="label-text">Twitter Link <span className="text-muted">(optional)</span></label>
-                                            <div className="form-group">
-                                                <span className="la form-icon">
-                                                    <AiOutlineTwitter />
-                                                </span>
-                                                <input className="form-control" type="url" value={this.state.twitterlink} onChange={this.onChangeTwitterlink} name="twitter"  placeholder="twitter" />
+                                        <div className="col-lg-6">
+                                            <div className="input-box">
+                                                <label className="label-text">Twitter Link <span className="text-muted">(optional)</span></label>
+                                                <div className="form-group">
+                                                    <span className="la form-icon">
+                                                        <AiOutlineTwitter />
+                                                    </span>
+                                                    <input className="form-control" type="url" value={this.state.twitterlink} onChange={this.onChangeTwitterlink} name="twitter" placeholder="twitter" />
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                    <div className="col-lg-6">
-                                        <div className="input-box">
-                                            <label className="label-text">Google Plus <span className="text-muted">(optional)</span></label>
-                                            <div className="form-group">
-                                                <span className="la form-icon">
-                                                    <TiSocialGooglePlus />
-                                                </span>
-                                                <input className="form-control" type="url" value={this.state.googleplus} onChange={this.onChangeGoogleplus} name="googleplus" placeholder="google plus" />
+                                        <div className="col-lg-6">
+                                            <div className="input-box">
+                                                <label className="label-text">Google Plus <span className="text-muted">(optional)</span></label>
+                                                <div className="form-group">
+                                                    <span className="la form-icon">
+                                                        <TiSocialGooglePlus />
+                                                    </span>
+                                                    <input className="form-control" type="url" value={this.state.googleplus} onChange={this.onChangeGoogleplus} name="googleplus" placeholder="google plus" />
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                    <div className="col-lg-6">
-                                        <div className="input-box">
-                                            <label className="label-text">Linkedin Link <span className="text-muted">(optional)</span></label>
-                                            <div className="form-group">
-                                                <span className="la form-icon">
-                                                    <AiOutlineLinkedin />
-                                                </span>
-                                                <input className="form-control" type="url" value={this.state.linkedin} onChange={this.onChangeLinkedin} name="linkedin"  placeholder="linkedin url" />
+                                        <div className="col-lg-6">
+                                            <div className="input-box">
+                                                <label className="label-text">Linkedin Link <span className="text-muted">(optional)</span></label>
+                                                <div className="form-group">
+                                                    <span className="la form-icon">
+                                                        <AiOutlineLinkedin />
+                                                    </span>
+                                                    <input className="form-control" type="url" value={this.state.linkedin} onChange={this.onChangeLinkedin} name="linkedin" placeholder="linkedin url" />
+                                                </div>
                                             </div>
                                         </div>
+
+                                        <div className="col-lg-8">
+                                            <div className="input-box">
+                                                <label className="label-text">Video Link <span className="text-muted">(optional)</span></label>
+                                                <div className="form-group">
+                                                    <span className="la form-icon">
+                                                        <AiFillYoutube />
+                                                    </span>
+                                                    <input className="form-control" type="url" value={this.state.videolink} onChange={this.onChangeVideolink} name="video link" placeholder="video url" />
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div className="col-lg-4">
+
+                                        </div>
+
+
+
+                                        <div className="btn-box mt-4">
+                                            <button type="submit" className="theme-btn border-0" disabled={this.state.loading}>
+                                                {this.state.loading && (
+                                                    <span className="spinner-border spinner-border-sm"></span>
+                                                )} update listing</button>
+                                        </div>
                                     </div>
-                                    <div className="btn-box mt-4">
-                                        <button type="submit" className="theme-btn border-0" disabled={this.state.loading}>
-                                            {this.state.loading && (
-                                                <span className="spinner-border spinner-border-sm"></span>
-                                            )} update listing</button>
-                                    </div>
-                                </div>
-                            </form>
+                                </form>
+                            </div>
                         </div>
                     </div>
-                </div>
+                </LoadingOverlay>
             </>
         );
     }
@@ -247,9 +307,9 @@ class AddFullDetails extends Component {
 
 function mapStateToProps(state) {
     const { isLoggedIn, userdetails } = state.auth;
-    const { listfulldetail} = state.list;
+    const { listfulldetail } = state.list;
     return {
-        isLoggedIn,userdetails,listfulldetail
+        isLoggedIn, userdetails, listfulldetail
 
     };
 }

@@ -9,12 +9,22 @@ import { connect } from "react-redux";
 import { BsPencilSquare, BsQuestion, BsPencil, BsFileCode } from 'react-icons/bs'
 import { AiOutlineTags } from 'react-icons/ai'
 import Select from "react-select";
-import { fetchAmenties, fetchCategory } from '../../services/action/common';
+import { fetchCategory, fetchRules, getAllSubCategory, getDefaultMeta, getPageinfo } from '../../services/action/common';
 import { Modal } from 'react-bootstrap';
 import { FiMap } from 'react-icons/fi';
 import { CountryDropdown, RegionDropdown } from 'react-country-region-selector';
 import { CreateListing } from '../../services/action/list';
-
+import { withRouter } from 'react-router';
+import FullDetailListing from '../listings/FulldetailsListing';
+import {
+    Accordion,
+    AccordionItem,
+    AccordionItemHeading,
+    AccordionItemButton,
+    AccordionItemPanel,
+} from 'react-accessible-accordion';
+import { FaPlus, FaMinus } from 'react-icons/fa'
+import MetaTag from '../metainfo';
 
 class AddListing extends Component {
     constructor(props) {
@@ -27,6 +37,7 @@ class AddListing extends Component {
         this.onChangeCity = this.onChangeCity.bind(this);
         this.onChangeDescription = this.onChangeDescription.bind(this);
         this.onChangeZipcode = this.onChangeZipcode.bind(this);
+        this.onChangeSubcat = this.onChangeSubcat.bind(this);
 
         this.state = {
             title: '',
@@ -36,8 +47,10 @@ class AddListing extends Component {
             address: '',
             selectedCatOp: null,
             breadcrumbimg: require('../../assets/images/bread-bg.jpg'),
-            catid: { label: '', value: null },
+            catid: { label: 'select a service', value: null, id: '' },
+            subcat: { label: 'select a subcategory', value: '', text: '' },
             category: [],
+            subcategory: [],
             amenties: [],
             showModal: false,
             country: '',
@@ -45,7 +58,18 @@ class AddListing extends Component {
             place: '',
             zipcode: '',
             ModelContent: '',
-            loading: false
+            loading: false,
+            privacychecked: false,
+            termschecked: false,
+            msg: '',
+            ischecked: false,
+            rule: [],
+            plus: <FaPlus />,
+            minus: <FaMinus />,
+            cardClass: 'mb-3',
+            showFulldetail: false,
+            countryPriorities: ['IN', "US", "CA", "GB", "AU", "NO", "NL", "FR", "CH", "AE", "SG", "KW", "SA", "QA", "MY", "LK"],
+
         }
     }
 
@@ -58,19 +82,89 @@ class AddListing extends Component {
             businessname: '',
             description: '',
             keywords: '',
-            address: ''
+            address: '',
+            metainfo: null,
+            defaultMetaTag: null,
 
         })
     }
 
 
     componentDidMount() {
-        this.props.dispatch(fetchCategory()).then(() => {
+        this.getpageseo({ page_type: 'listing' })
+        this.props.dispatch(fetchCategory({ for: 'LISTING', status: true })).then(() => {
             this.setState({
                 category: this.props.category
             })
         });
+
+        this.props.dispatch(fetchRules({ com_id: 2 })).then(() => {
+            this.setState({
+                rule: this.props.rule
+            })
+        })
     }
+
+    getpageseo = (obj) => {
+        this.props.dispatch(getPageinfo(obj)).then(() => {
+            if (this.props.pageinfo.length > 0) {
+                this.setState({
+                    metainfo: {
+                        title: this.props.pageinfo[0].meta_title,
+                        canonicalURL: `https://www.casualdesi.com/add-listing || ''}`,
+                        meta: [{
+                            attribute: 'name',
+                            value: 'description',
+                            content: this.props.pageinfo[0].meta_description
+                        },
+                        {
+                            attribute: 'name',
+                            value: 'keywords',
+                            content: this.props.pageinfo[0].meta_keywords
+                        }]
+                    }
+                })
+
+            }
+        })
+    }
+
+
+    handlePrivacyCheck = () => {
+        this.setState({ privacychecked: !this.state.privacychecked });
+
+    }
+
+    /* handleTermsCheck = () => {
+         this.setState({ termschecked: !this.state.termschecked });
+ 
+     }*/
+
+    onChangeSubcat = (subcat) => {
+        this.setState({ subcat })
+
+    }
+
+    getsubcategory = (catid) => {
+        const obj = { cat_id: catid }
+
+        this.props.dispatch(getAllSubCategory(obj)).then(() => {
+            if (this.props.subcategory && this.props.subcategory.length > 0) {
+                this.setState({
+                    subcategory: this.props.subcategory
+
+                })
+
+            } else {
+                this.setState({
+                    subcategory: []
+                })
+            }
+
+        })
+
+    }
+
 
     onChangeBusinessname(e) {
         this.setState({
@@ -88,24 +182,40 @@ class AddListing extends Component {
         this.setState({
             address: e.target.value,
         });
+
     }
 
     onChangeCity(e) {
-        this.setState({
-            place: e.target.value.toLocaleLowerCase(),
-        });
+        if (!this.state.country || !this.state.region) {
+            alert("please  select country and region first")
+            this.setState({ ischecked: true })
+        } else {
+            this.setState({
+                place: e.target.value.toLocaleLowerCase(), ischecked: false
+            });
+        }
     }
 
     onChangeZipcode(e) {
-        this.setState({
-            zipcode: e.target.value,
-        });
+        if (!this.state.country || !this.state.region) {
+            alert("please  select country and region first")
+            this.setState({ ischecked: true })
+        } else {
+            this.setState({
+                zipcode: e.target.value, ischecked: false, msg: 'please check privacy policy and terms condition before submitting'
+            });
+        }
     }
 
     onChangeDescription(e) {
-        this.setState({
-            description: e.target.value,
-        });
+        if (!this.state.catid.value || !this.state.subcat.value) {
+            alert("please  select category and services first")
+            this.setState({ ischecked: true })
+        } else {
+            this.setState({
+                description: e.target.value, ischecked: false
+            });
+        }
     }
 
     selectCountry(val) {
@@ -121,6 +231,11 @@ class AddListing extends Component {
         this.setState({ showModal: false });
     }
 
+    closetwo = () => {
+        this.setState({ showFulldetail: !this.state.showFulldetail });
+        this.props.history.push("/dashboard");
+    }
+
     open = () => {
         this.setState({ showModal: true });
     }
@@ -128,60 +243,78 @@ class AddListing extends Component {
 
     handleChangeCat = async (catid) => {
         this.setState({ catid });
-        await this.props.dispatch(fetchAmenties(catid.value));
+        this.getsubcategory(catid.id);
 
     }
 
     handleListing(e) {
         e.preventDefault();
-        this.setState({
-            loading: true,
-        });
 
-        const obj = {
-            list_title: this.state.businessname,
-            description: this.state.description,
-            keywords: this.state.keywords,
-            categoryid: this.state.catid.value,
-            categoryname: this.state.catid.label,
-            address: this.state.address,
-            country: this.state.country,
-            state: this.state.region,
-            city: this.state.place,
-            zipcode: this.state.zipcode,
-            canonicalurl: this.state.businessname.split(' ', 6).join(' ').toLowerCase().replace(/ /g, '_').replace(/[^\w-]+/g, ''),
-            created_by: this.props.userdetails.id && this.props.userdetails.id
-
+        if (!this.state.privacychecked) {
+            alert("please  select category")
         }
+        else {
+            this.setState({
+                loading: true,
+            });
 
-        this.props.dispatch(CreateListing(obj)).then(() => {
-            if (this.props.isCreated) {
-                this.setState({ loading: false })
-                this.onReset();
-                this.props.history.push(`/listing-details/${obj.canonicalurl}/edit`);
-                window.location.reload();
+            const obj = {
+                list_title: this.state.businessname,
+                description: this.state.description,
+                keywords: this.state.keywords,
+                categoryid: this.state.catid.value,
+                subcat_id: this.state.subcat.value,
+                categoryname: this.state.subcat.label,
+                address: this.state.address,
+                country: this.state.country,
+                state: this.state.region,
+                city: this.state.place,
+                zipcode: this.state.zipcode,
+                canonicalurl: this.state.businessname.split(' ', 6).join(' ').toLowerCase().replace(/ /g, '_').replace(/[^\w-]+/g, ''),
+                created_by: this.props.userdetails.id && this.props.userdetails.id,
+                useremail: this.props.userdetails.emailId && this.props.userdetails.emailId,
+                username: this.props.userdetails.userName && this.props.userdetails.userName
+
 
             }
-            this.setState({ loading: false })
 
-        }, () => {
-            this.setState({ loading: false })
+            this.props.dispatch(CreateListing(obj)).then(() => {
+                if (this.props.isCreated) {
+                    this.setState({ loading: false, showFulldetail: true })
+                    this.onReset();
 
-        })
+                }
+                this.setState({ loading: false })
+
+            }, () => {
+                this.setState({ loading: false })
+
+            })
+        }
 
     }
 
     render() {
 
-        const { country, region, category } = this.state;
-        const categories = category && category.length ? category.map(cat => {
-            return { value: `${cat.id}`, label: `${cat.name}` };
+
+        const { country, region, category, subcategory } = this.state;
+        const categories = category && category.length > 0 ? category.map(cat => {
+            return { value: `${cat.id}`, label: `${cat.name}`, id: `${cat.cat_id}` };
         }) : [{
             value: 0,
             label: 'no category feched'
         }];
 
-        return (
+        const subcategories = subcategory && subcategory.length > 0 ? subcategory.map(cat => {
+            return { value: `${cat.subcat_id}`, label: `${cat.name}`, text: `Enter ${cat.name} name` };
+        }) : [{
+            value: '',
+            label: 'no subcategory feched'
+        }];
+
+        return (<>
+            { this.state.metainfo ? <MetaTag metaTag={this.state.metainfo || getDefaultMeta()}></MetaTag> : ''}
+
 
             <main className="add-listing">
                 {/* Header */}
@@ -198,16 +331,46 @@ class AddListing extends Component {
 
                                 <div className="billing-form-item">
                                     <div className="billing-title-wrap">
-                                        <h3 className="widget-title pb-0">Tell us your business details</h3>
+                                        <h3 className="widget-title pb-0">Tell us your Listing details</h3>
                                         <div className="title-shape margin-top-10px"></div>
                                     </div>
                                     <div className="billing-content">
                                         <div className="contact-form-action">
                                             <form method="post" onSubmit={this.handleListing}>
                                                 <div className="row">
+
                                                     <div className="col-lg-6">
                                                         <div className="input-box">
-                                                            <label className="label-text">Business Name</label>
+                                                            <label className="label-text">Select Category</label>
+                                                            <div className="form-group mb-2">
+                                                                <Select
+                                                                    value={this.state.catid}
+                                                                    onChange={this.handleChangeCat}
+                                                                    placeholder="Select a Category"
+                                                                    options={categories}
+                                                                    required={true}
+                                                                />
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <div className="col-lg-6">
+                                                        <div className="input-box">
+                                                            <label className="label-text">Service you Offer</label>
+                                                            <div className="form-group mb-2">
+                                                                <Select
+                                                                    value={this.state.subcat}
+                                                                    onChange={this.onChangeSubcat}
+                                                                    placeholder="Select a Category"
+                                                                    options={subcategories}
+                                                                    required={true}
+                                                                />
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div className="col-lg-8">
+                                                        <div className="input-box">
+                                                            <label className="label-text">{this.state.subcat.text}</label>
                                                             <div className="form-group">
                                                                 <span className="la form-icon">
                                                                     <BsPencilSquare />
@@ -216,28 +379,15 @@ class AddListing extends Component {
                                                             </div>
                                                         </div>
                                                     </div>
-                                                    <div className="col-lg-6">
-                                                        <div className="input-box">
-                                                            <label className="label-text">Service you Offer</label>
-                                                            <div className="form-group mb-0">
-                                                                <Select
-                                                                    value={this.state.catid}
-                                                                    onChange={this.handleChangeCat}
-                                                                    placeholder="Select a Category"
-                                                                    options={categories}
-                                                                />
-                                                            </div>
-                                                        </div>
-                                                    </div>
 
                                                     <div className="col-lg-12">
                                                         <div className="input-box">
-                                                            <label className="label-text">Description</label>
+                                                            <label className="label-text">Description (Enter All Details that you feel are necessary)</label>
                                                             <div className="form-group">
                                                                 <span className="la form-icon">
                                                                     <BsPencil />
                                                                 </span>
-                                                                <textarea className="message-control form-control" value={this.state.description} onChange={this.onChangeDescription} name="description" required="required" placeholder="Write your Business description"></textarea>
+                                                                <textarea className="message-control form-control" value={this.state.description} onChange={this.onChangeDescription} name="description" required="required" placeholder="Write  description"></textarea>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -276,7 +426,7 @@ class AddListing extends Component {
                                                                             <span className="la form-icon">
                                                                                 <FiMap />
                                                                             </span>
-                                                                            <input className="form-control" value={this.state.address} onChange={this.onChangeAddress} type="text" name="address" required="required" placeholder="Your address" />
+                                                                            <input className="form-control" value={this.state.address} onChange={this.onChangeAddress} type="text" name="address" required="required" placeholder="full address" />
                                                                         </div>
                                                                     </div>
                                                                 </div>
@@ -284,6 +434,7 @@ class AddListing extends Component {
                                                                     <label className="label-text">Country</label>
                                                                     <div className="form-group">
                                                                         <CountryDropdown
+                                                                            priorityOptions={this.state.countryPriorities}
                                                                             value={country}
                                                                             onChange={(val) => this.selectCountry(val)} />
                                                                     </div>
@@ -333,20 +484,25 @@ class AddListing extends Component {
                                                 <div className="billing-form-item p-0 border-0 mb-0 shadow-none">
                                                     <div className="billing-content p-0">
                                                         <div className="custom-checkbox d-block mr-0">
-                                                        <div className="form-group">
-                                                            <input  className="form-control"  type="checkbox" id="privacy" required="required"/>
-                                                            <label htmlFor="privacy">I Agree to Dirto's <Link to="#" onClick={this.open} className="color-text">Privacy Policy</Link></label>
-                                                       </div>
+                                                            <div className="form-group">
+                                                                <input className="form-control" type="checkbox" id="privacy" onChange={this.handlePrivacyCheck} defaultChecked={this.state.privacychecked} required="required" />
+                                                                <label htmlFor="privacy">I Agree to Casual Desi  <Link to="#" onClick={this.open} className="color-text">Privacy Policy</Link></label>
+                                                            </div>
                                                         </div>
+                                                        {/* {<div className="custom-checkbox d-block mr-0">
+                                                            <div className="form-group">
+                                                                <input type="checkbox" className="form-control" id="terms" onChange={this.handleTermsCheck} defaultChecked={this.state.termschecked} required="required" />
+                                                                <label htmlFor="terms">I Agree to Casual Desi <Link to="#" onClick={this.open} className="color-text">Terms of Services</Link>
+                                                                </label>
+                                                            </div>
+                                                        </div> */}
                                                         <div className="custom-checkbox d-block mr-0">
-                                                        <div className="form-group">
-                                                            <input type="checkbox" className="form-control"   id="terms" required="required" />
-                                                            <label htmlFor="terms">I Agree to Dirto's <Link to="#" onClick={this.open} className="color-text">Terms of Services</Link>
-                                                            </label>
+                                                            <div className="form-group">
+                                                                <label className="label-text">  {this.state.msg} </label>
                                                             </div>
                                                         </div>
                                                         <div className="btn-box mt-4">
-                                                            <button type="submit" className="theme-btn border-0" disabled={this.state.loading}>
+                                                            <button type="submit" className="theme-btn border-0" disabled={this.state.loading || this.state.ischecked}>
                                                                 {this.state.loading && (
                                                                     <span className="spinner-border spinner-border-sm"></span>
                                                                 )} submit listing</button>
@@ -364,18 +520,55 @@ class AddListing extends Component {
                     </div>
                 </section>
 
-                <Modal show={this.state.showModal} onHide={this.close}>
+                <Modal show={this.state.showModal} onHide={this.close} size="lg">
                     <Modal.Header closeButton>
                         <Modal.Title>{this.state.title}</Modal.Title>
                     </Modal.Header>
                     <Modal.Body>
-                        {this.state.ModelContent}
+
+                        <div className="billing-form-item ">
+                            <div className="billing-title-wrap">
+                                <h3 className="widget-title pb-0">
+                                    Privacy Policy
+                                            </h3>
+                                <div className="title-shape margin-top-10px"></div>
+                            </div>
+
+                            <Accordion className="accordion accordion-item pr-4  margin-top-10px" id="accordionExample">
+
+                                {this.state.rule && this.state.rule.map((item, i) => {
+                                    return (
+                                        <div className={'card ' + this.state.cardClass} key={i}>
+                                            <AccordionItem>
+                                                <AccordionItemHeading className="card-header">
+                                                    <AccordionItemButton className="btn btn-link d-flex align-items-center justify-content-between">
+                                                        {item.title}
+                                                        <i className="minus">{this.state.minus}</i>
+                                                        <i className="plus">{this.state.plus}</i>
+                                                    </AccordionItemButton>
+                                                </AccordionItemHeading>
+                                                <AccordionItemPanel>
+                                                    <div className="card-body">
+                                                        {item.description}
+                                                    </div>
+                                                </AccordionItemPanel>
+                                            </AccordionItem>
+                                        </div>
+                                    )
+                                })}
+
+                            </Accordion>
+
+                        </div>
+
 
                     </Modal.Body>
                     <Modal.Footer>
                         <span onClick={this.close}>Close</span>
                     </Modal.Footer>
                 </Modal>
+
+
 
                 {/* Newsletter */}
                 <NewsLetter />
@@ -386,6 +579,21 @@ class AddListing extends Component {
                 <ScrollTopBtn />
 
             </main>
+            <Modal show={this.state.showFulldetail} onHide={this.closetwo} dialogClassName="modal-90w">
+                <Modal.Header>
+                    <Modal.Title></Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+
+
+                    <FullDetailListing closee={this.closetwo} />
+
+                </Modal.Body>
+                <Modal.Footer>
+
+                </Modal.Footer>
+            </Modal>
+        </>
         );
     }
 }
@@ -394,10 +602,11 @@ class AddListing extends Component {
 function mapStateToProps(state) {
     const { isLoggedIn, userdetails } = state.auth;
     const { isCreated } = state.list;
-    const { amenties, category } = state.common;
+    const { amenties, steplist, category, subcategory, rule,pageinfo } = state.common;
+
     return {
-        isLoggedIn, category, amenties, userdetails, isCreated
+        isLoggedIn,pageinfo, category, steplist, subcategory, amenties, userdetails, isCreated, rule
 
     };
 }
-export default connect(mapStateToProps)(AddListing);
+export default withRouter(connect(mapStateToProps)(AddListing));

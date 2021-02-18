@@ -6,45 +6,58 @@ import Footer from "../../components/common/footer/Footer";
 import ScrollTopBtn from "../../components/common/ScrollTopBtn";
 import ForumCategory from '../../components/sidebars/widgets/forumCategory';
 import CommunityList from '../../components/blogs/communityList';
-import { fetchCommunityList } from '../../services/action/common';
 import { connect } from "react-redux";
+import { getDefaultMeta, getPageinfo } from '../../services/action/common';
+import MetaTag from '../metainfo';
 class BlogLeftSidebar extends Component {
 
-    constructor(props)
-    {
+    constructor(props) {
         super(props)
         this.state = {
             breadcrumbimg: require('../../assets/images/bread-bg.jpg'),
+            metainfo: null,
+            defaultMetaTag: null,
         }
     }
-
-    componentDidMount()
-    {
-        let obj = {
-            'category': this.props.match.params.categoryid
-        };
-        if (this.props.match.params.categoryid) {
-
-
-            this.props.dispatch(fetchCommunityList(obj)).then(() => {
-                this.setState({
-                    community: this.props.communitylist
-                })
-            });
-        }
-        else {
-            this.props.dispatch(fetchCommunityList()).then(() => {
-                this.setState({
-                    community: this.props.communitylist
-                })
-            });
-
-        }
+    componentDidMount() {
+        this.getpageseo({ page_type: 'community' })
+       
+      
     }
-   
+
+        
+    getpageseo = (obj) => {
+        this.props.dispatch(getPageinfo(obj)).then(() => {
+            if (this.props.pageinfo.length > 0) {
+                this.setState({
+                    metainfo: {
+                        title: this.props.pageinfo[0].meta_title,
+                        canonicalURL: `https://www.casualdesi.com/forum/community`,
+                        meta: [{
+                            attribute: 'name',
+                            value: 'description',
+                            content: this.props.pageinfo[0].meta_description
+                        },
+                        {
+                            attribute: 'name',
+                            value: 'keywords',
+                            content: this.props.pageinfo[0].meta_keywords
+                        }]
+                    }
+                })
+
+            } 
+        })
+    }
+
+    
+
     render() {
-        console.log(this.props.match.params.categoryid)
-        return (
+
+        return (<>
+          { this.state.metainfo ? <MetaTag metaTag={this.state.metainfo || getDefaultMeta() }></MetaTag> : ''}
+
+      
             <main className="blog-left-sidebar-page">
                 {/* Header */}
                 <GeneralHeader />
@@ -57,23 +70,23 @@ class BlogLeftSidebar extends Component {
                         <div className="row">
                             <div className="col-lg-4">
                                 <div className="sidebar section-bg">
-                                   
+
                                     <ForumCategory />
-                                   
-                                   
+
+
                                 </div>
                             </div>
                             <div className="col-lg-4">
-                                <CommunityList categoryLink={this.props.match.params.categoryid}/>
+                                <CommunityList categoryLink={this.props.match.params.categoryid} />
                             </div>
 
                             <div className="col-lg-4">
-                                
+
                             </div>
                         </div>
                         <div className="row">
                             <div className="col-lg-12">
-                               
+
                             </div>
                         </div>
                     </div>
@@ -88,6 +101,7 @@ class BlogLeftSidebar extends Component {
                 <ScrollTopBtn />
 
             </main>
+            </>
         );
     }
 }
@@ -95,10 +109,11 @@ class BlogLeftSidebar extends Component {
 
 function mapStateToProps(state) {
     const { communitylist } = state.community;
+    const { pageinfo } = state.common;
     const { message } = state.message;
 
     return {
-        communitylist,
+        communitylist, pageinfo,
         message
     };
 }

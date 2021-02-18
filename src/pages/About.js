@@ -1,22 +1,27 @@
-import React, {Component} from 'react';
+import React, { Component } from 'react';
 import GeneralHeader from "../components/common/GeneralHeader";
 import Banner5 from "../components/banner/banner5/Banner5";
-import ImageBox from "../components/about/ImageBox";
+// import ImageBox from "../components/about/ImageBox";
 import About2 from "../components/about/About2";
 import FunFactsThree from "../components/other/funfacts/FunFactsThree";
-import {Link} from "react-router-dom";
+import { Link } from "react-router-dom";
 import { FiPlus } from 'react-icons/fi'
 import SectionsHeading from "../components/common/SectionsHeading";
-import Testimonial from "../components/sliders/Testimonial";
+// import Testimonial from "../components/sliders/Testimonial";
 import HowItWork4 from "../components/hiw/HowItWork4";
 import TeamOne from "../components/team/TeamOne";
 import Button from "../components/common/Button";
 import NewsLetter from "../components/other/cta/NewsLetter";
 import Footer from "../components/common/footer/Footer";
 import ScrollTopBtn from "../components/common/ScrollTopBtn";
+import { getDefaultMeta, getPageinfo } from '../services/action/common';
+import MetaTag from './metainfo';
+import { connect } from "react-redux";
 
 class About extends Component {
     state = {
+        metainfo: null,
+        defaultMetaTag: null,
         tmimage: [
             {
                 tmimg: require('../assets/images/testi-img1.jpg')
@@ -35,11 +40,54 @@ class About extends Component {
             },
             {
                 tmimg: require('../assets/images/testi-img6.jpg')
+            },
+            {
+                tmimg: require('../assets/images/testi-img6.jpg')
+            },
+            {
+                tmimg: require('../assets/images/testi-img6.jpg')
             }
         ]
     }
+
+    componentDidMount()
+    {
+        this.getpageseo({ page_type: 'about' })
+    }
+
+    getpageseo = (obj) => {
+        this.props.dispatch(getPageinfo(obj)).then(() => {
+            if (this.props.pageinfo.length > 0) {
+                this.setState({
+                    metainfo: {
+                        title: this.props.pageinfo[0].meta_title,
+                        canonicalURL: `https://www.casualdesi.com/about || ''}`,
+                        meta: [{
+                            attribute: 'name',
+                            value: 'description',
+                            content: this.props.pageinfo[0].meta_description
+                        },
+                        {
+                            attribute: 'name',
+                            value: 'keywords',
+                            content: this.props.pageinfo[0].meta_keywords
+                        }]
+                    }
+                })
+
+            } else {
+
+                this.setState({
+                    defaultMetaTag: getDefaultMeta()
+                })
+            }
+        })
+    }
+
     render() {
-        return (
+        return (<>
+          { this.state.metainfo ? <MetaTag metaTag={this.state.metainfo || getDefaultMeta()}></MetaTag> : ''}
+
             <main className="about-page">
                 {/* Header */}
                 <GeneralHeader />
@@ -47,11 +95,7 @@ class About extends Component {
                 {/* Banner */}
                 <Banner5 />
 
-                <section className="blog-area padding-top-50px padding-bottom-80px before-none after-none">
-                    <div className="container">
-                        <ImageBox />
-                    </div>
-                </section>
+
 
                 <section className="about-area padding-bottom-100px">
                     <div className="container">
@@ -61,6 +105,9 @@ class About extends Component {
 
                 <section className="funfact-area section-bg before-none after-none padding-top-100px padding-bottom-100px text-center">
                     <div className="container">
+                        <div className="row section-title-width text-center mb-5">
+                            <SectionsHeading title="Casual Desi" desc="We at Casual Desi are trying to be a single source of help and information for all Indian needs across the globe by matching 30+ million consumers with 50,000 listings across 200 categories in about 290 cities in 67 countries. "/>
+                        </div>
                         <div className="row">
                             <FunFactsThree />
                         </div>
@@ -77,7 +124,7 @@ class About extends Component {
                 </section>
 
                 {/* Testimonial */}
-                <section className="testimonial-area padding-top-100px padding-bottom-100px text-center">
+                {/* <section className="testimonial-area padding-top-100px padding-bottom-100px text-center">
                     {this.state.tmimage.map((tmimg, index) => {
                         return (
                             <img key={index} src={tmimg.tmimg} alt="testimonial" className="random-img" />
@@ -93,12 +140,12 @@ class About extends Component {
                             </div>
                         </div>
                     </div>
-                </section>
+                </section> */}
 
                 <section className="hiw-area padding-top-100px padding-bottom-90px after-none text-center section-bg">
                     <div className="container">
                         <div className="row section-title-width text-center">
-                            <SectionsHeading title="Why Choose Us" desc="Morbi convallis bibendum urna ut viverra. Maecenas quis consequat libero, a feugiat eros. Nunc ut lacinia tortors." />
+                            <SectionsHeading title="Why Choose Us" desc="The service is free to use for consumers and business as well. If any further help is needed by any Indian from any service provider we encourage to contact the service provider / business directly and strike a deal. " />
                         </div>
                         <div className="row mt-5">
                             <HowItWork4 />
@@ -110,7 +157,7 @@ class About extends Component {
                 <section className="team-area padding-top-100px padding-bottom-70px">
                     <div className="container">
                         <div className="row section-title-width text-center">
-                            <SectionsHeading title="Our Expert Team Members" desc="Morbi convallis bibendum urna ut viverra. Maecenas quis consequat libero, a feugiat eros. Nunc ut lacinia tortors." />
+                            <SectionsHeading title="Our Expert Team Members" desc="Casual Desi is owned and operated by 3 Guys Global Inc., headquartered in Irving, Texas, United States started its digital service operations in the year 2020." />
                         </div>
 
                         <div className="row mt-5">
@@ -143,9 +190,17 @@ class About extends Component {
 
                 <ScrollTopBtn />
 
-            </main>
+            </main></>
         );
     }
 }
 
-export default About;
+
+function mapStateToProps(state) {
+    const { pageinfo } = state.common;
+    return {
+      pageinfo
+       
+    };
+}
+export default connect(mapStateToProps)(About);

@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import Select from "react-select";
 import { addListShedule, getListShedule } from '../../services/action/list';
 import { connect } from "react-redux";
+import LoadingOverlay from 'react-loading-overlay';
 const shortby = [
     {
         value: 'closed',
@@ -107,8 +108,11 @@ const shortby = [
 
 const days =
     [{
-        value: 'sun',
-        label: 'sunday'
+        value: 'everyday',
+        label: 'Everydays'
+    },{
+        value: 'weekly',
+        label: 'Weekly'
     },
     {
         value: 'mon',
@@ -136,34 +140,46 @@ const days =
     }
     ]
 class OpeningHours extends Component {
-   constructor(props)
-   {
-       super(props)
-       this.state = {
-        op: { label: '', value: '' },
-        cl: { label: '', value: '' },
-        dayname: { label: '', value: '' },
-        title: 'Opening Hours',
-        stitle: 'now open',
-        listshedulelist:[]
-       
-    }
-   }
+    constructor(props) {
+        super(props)
+        this.onChangeDate = this.onChangeDate.bind(this);
+        this.state = {
+            op: { label: '', value: '' },
+            cl: { label: '', value: '' },
+            dayname: { label: '', value: '' },
+            title: 'Opening Hours',
+            stitle: 'now open',
+            listshedulelist: [],
+            loading:true,
+            edate:null
 
-   componentDidMount()
-   {
-    this.fetchlistshedule()
-   }
-
-   fetchlistshedule=()=>
-   {
-    this.props.dispatch(getListShedule({listing_id:this.props.listid && this.props.listid})).then(()=>{
-        if(this.props.shedulelist.length > 0){
-            this.setState({ listshedulelist:this.props.shedulelist})
         }
-    
-    })
-   }
+    }
+
+    onChangeDate(e) {
+      
+        this.setState({
+            edate: e.target.value,
+        });
+    }
+
+    componentDidMount() {
+        this.fetchlistshedule()
+    }
+
+    fetchlistshedule = () => {
+        if (this.props.listid && this.props.listid) {
+            this.props.dispatch(getListShedule({ listing_id: this.props.listid && this.props.listid })).then(() => {
+                this.setState({loading:false})
+                if (this.props.shedulelist.length > 0) {
+                    this.setState({ listshedulelist: this.props.shedulelist })
+                }
+
+            })
+
+        }
+
+    }
 
 
     handleChangedays = async (dayname) => {
@@ -181,108 +197,124 @@ class OpeningHours extends Component {
         const obj = {
             open: this.state.op.value,
             close: this.state.cl.value,
-            day: this.state.dayname.value,
+            day: this.state.dayname.value ?  this.state.dayname.value : this.state.edate,
             listing_id: this.props.listid && this.props.listid
         }
-        this.props.dispatch(addListShedule(obj)).then(()=>{
+        console.log(obj)
+
+        this.props.dispatch(addListShedule(obj)).then(() => {
             this.fetchlistshedule();
         })
 
     }
     render() {
-      
+
         return (
             <>
-            <div className="row"> <div className="col-4">
-            <div className="sidebar-widget">
-                    <div className="opening-hours">
-                        <div className="listing-badge d-flex justify-content-between align-items-center">
-                            <div>
-                                <h3 className="widget-title">
-                                    {this.state.title}
-                                </h3>
-                                   <div className="title-shape"></div>
-                            </div>
-                            <p><span className="theme-btn button-success">
-                                {this.state.stitle}
-                            </span></p>
-                        </div>
-                        <ul className="list-items padding-top-30px">
-                            {this.state.listshedulelist.map((item, i) => {
-                                return (
-                                    <li key={i} className="d-flex justify-content-between">
-                                        {item.day} <strong>{item.open}-{item.close}</strong>
-                                    </li>
-                                )
-                            })}
-                        </ul>
-                    </div>
-                </div>
-                </div>
-                <div className="col-8">
-                <div className="billing-form-item">
-                    <div className="billing-title-wrap">
-                        <h3 className="widget-title pb-0">{this.state.title}</h3>
-                        <p>you can add update opening or closing time by selecting below </p>
-                             
-                        <div className="title-shape margin-top-10px"></div>
-                    </div>
-                    <div className="billing-content">
-                        <div className="contact-form-action">
-                            <form method="post">
-                                <div className="row">
-                                    <div className="col-lg-4">
-                                        <div className="form-group"> Days
-                                            <Select
-                                                value={this.state.dayname}
-                                                onChange={this.handleChangedays}
-                                                placeholder="days"
-                                                options={days}
-                                            />
-
-                                        </div>
-                                    </div>
+             <LoadingOverlay
+                active={this.state.loading}
+                spinner
+                text='Loading your content...'
+            >
+                <div className="row"> <div className="col-4">
+                    <div className="sidebar-widget">
+                        <div className="opening-hours">
+                            <div className="listing-badge d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h3 className="widget-title">
+                                        {this.state.title}
+                                    </h3>
+                                    <div className="title-shape"></div>
                                 </div>
-                                <div className="row">
-                                    <div className="col-lg-5">
-                                        <p>opening Time</p>
-                                        <div className="form-group">
+                                <p><span className="theme-btn button-success">
+                                    {this.state.stitle}
+                                </span></p>
+                            </div>
+                            <ul className="list-items padding-top-30px">
+                                {this.state.listshedulelist.map((item, i) => {
+                                    return (
+                                        <li key={i} className="d-flex justify-content-between">
+                                            {item.day} <strong>{item.open}-{item.close}</strong>
+                                        </li>
+                                    )
+                                })}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                    <div className="col-8">
+                        <div className="billing-form-item">
+                            <div className="billing-title-wrap">
+                                <h3 className="widget-title pb-0">{this.state.title}</h3>
+                                <p>you can add update opening or closing time by selecting below </p>
+
+                                <div className="title-shape margin-top-10px"></div>
+                            </div>
+                            <div className="billing-content">
+                                <div className="contact-form-action">
+                                    <form method="post">
+                                        <div className="row">
+                                            <div className="col-lg-4">
+                                                <div className="form-group"> Days
                                             <Select
-                                                id='moop'
-                                                value={this.state.op}
-                                                onChange={this.handleChangeopening}
-                                                placeholder="Opening Time"
-                                                options={shortby}
-                                            />
-                                        </div>
-                                    </div>
-                                    <div className="col-lg-5">
-                                    <p>closing Time</p>
-                                        <div className="form-group">
-                                            <Select
-                                                value={this.state.cl}
-                                                onChange={this.handleChangeclosing}
-                                                placeholder="Closing Time"
-                                                options={shortby}
-                                            />
-                                        </div>
-                                    </div>
-                                    <div className="col-lg-2">
-                                    <p>-</p>
-                                        <div className="form-group">
-                                            <div className="btn-box">
-                                                <button type="button" onClick={() => this.submit()} className="theme-btn border-0">
-                                                    save </button>
+                                                        value={this.state.dayname}
+                                                        onChange={this.handleChangedays}
+                                                        placeholder="days"
+                                                        options={days}
+                                                    />
+
+                                                </div>
+                                            </div>
+                                            <div className="col-lg-1"> <div className="form-group">Or</div></div>
+
+                                            <div className="col-lg-4">
+                                                <div className="form-group"> Date
+                                               <input  className="form-control"  value={this.state.edate} onChange={this.onChangeDate} type="date"></input>
+
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                </div>
+                                        <div className="row">
+                                            <div className="col-lg-5">
+                                                <p>opening Time</p>
+                                                <div className="form-group">
+                                                    <Select
+                                                        id='moop'
+                                                        value={this.state.op}
+                                                        onChange={this.handleChangeopening}
+                                                        placeholder="Opening Time"
+                                                        options={shortby}
+                                                    />
+                                                </div>
+                                            </div>
+                                            <div className="col-lg-5">
+                                                <p>closing Time</p>
+                                                <div className="form-group">
+                                                    <Select
+                                                        value={this.state.cl}
+                                                        onChange={this.handleChangeclosing}
+                                                        placeholder="Closing Time"
+                                                        options={shortby}
+                                                    />
+                                                </div>
+                                            </div>
+                                            <div className="col-lg-2">
+                                                <p>-</p>
+                                                <div className="form-group">
+                                                    <div className="btn-box">
+                                                        <button type="button" onClick={() => this.submit()} className="theme-btn border-0">
+                                                            save </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
 
-                            </form>
+                                    </form>
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                </div>
-                </div></div>
+                    </div></div>
+                    </LoadingOverlay>
             </>
         );
     }
@@ -291,12 +323,12 @@ class OpeningHours extends Component {
 
 function mapStateToProps(state) {
 
-    const { listdetail,shedulelist} = state.list;
+    const { listdetail, shedulelist } = state.list;
 
     return {
-        listdetail,shedulelist
+        listdetail, shedulelist
 
     };
-    
+
 }
 export default connect(mapStateToProps)(OpeningHours);

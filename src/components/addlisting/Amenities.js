@@ -3,10 +3,9 @@ import { Badge, Modal } from 'react-bootstrap';
 import { AiFillFileAdd } from 'react-icons/ai';
 import { BsFillPlusCircleFill, BsFillTrashFill, BsPencilSquare } from 'react-icons/bs';
 import { connect } from "react-redux";
-
-import { fetchAmenties } from '../../services/action/common';
-import { AddListAmenties, getListAmenties,mapAmentiestoList,unmapAmentiestoList } from '../../services/action/list';
-
+import { fetchAmenties, getAllSubCategory } from '../../services/action/common';
+import { AddListAmenties, getListAmenties, mapAmentiestoList, unmapAmentiestoList } from '../../services/action/list';
+import LoadingOverlay from 'react-loading-overlay';
 class Amenities extends Component {
     constructor(props) {
         super(props)
@@ -15,14 +14,24 @@ class Amenities extends Component {
         this.onChangeAmentiesname = this.onChangeAmentiesname.bind(this);
         this.state = {
             showModal: false,
-            amentiesname: ''
+            amentiesname: '',
+            subcatid: null,
+            loading: true
         }
 
     }
 
 
     componentDidMount() {
-        this.props.dispatch(fetchAmenties(this.props.categoryid));
+        let obj = { subcat_id: this.props.subcategoryid }
+        this.props.dispatch(getAllSubCategory(obj)).then(() => {
+            this.setState({ loading: false })
+            if (this.props.subcategory.length > 0) {
+                this.setState({ subcatid: this.props.subcategory[0].id })
+                this.props.dispatch(fetchAmenties(this.props.subcategory[0].id));
+
+            }
+        });
         this.props.dispatch(getListAmenties({ "listing_id": this.props.listid && this.props.listid }));
     }
 
@@ -39,31 +48,31 @@ class Amenities extends Component {
         });
         const obj = {
             amenties_name: this.state.amentiesname,
-            categoryid: this.props.categoryid,
+            categoryid: this.state.subcatid,
             listing_id: this.props.listid && this.props.listid
         }
         this.props.dispatch(AddListAmenties(obj)).then(() => {
-            this.props.dispatch(fetchAmenties(this.props.categoryid));
+            this.props.dispatch(fetchAmenties(this.state.subcatid));
             this.props.dispatch(getListAmenties({ "listing_id": this.props.listid && this.props.listid }));
 
-            this.setState({ loading: false, showModal: false })
+            this.setState({ loading: false, showModal: false, amentiesname: '' })
         }, () => { this.setState({ loading: false, showModal: false }) });
     }
 
     unmapAmenties = (sid) => {
-        const obj={id:sid}
+        const obj = { id: sid }
         this.props.dispatch(unmapAmentiestoList(obj));
         this.props.dispatch(getListAmenties({ "listing_id": this.props.listid && this.props.listid }));
 
     }
 
     mapAmenties = (id) => {
-        const obj={ listing_id: this.props.listid && this.props.listid,amentiesid:id}
-        this.props.dispatch(mapAmentiestoList(obj)).then(()=>{
+        const obj = { listing_id: this.props.listid && this.props.listid, amentiesid: id }
+        this.props.dispatch(mapAmentiestoList(obj)).then(() => {
             this.props.dispatch(getListAmenties({ "listing_id": this.props.listid && this.props.listid }));
 
         });
-        
+
     }
 
     close = () => {
@@ -77,7 +86,7 @@ class Amenities extends Component {
 
 
     render() {
-        console.log(this.props.categoryid);
+
         const { amenties } = this.props;
         const items = amenties && amenties.length ? amenties.map(item => {
             return { id: `${item.amenties_id}`, title: `${item.amenties_name}` };
@@ -102,7 +111,7 @@ class Amenities extends Component {
                             </div>
                         </div>
                     </div>
-                    
+
                 </div>
                 <div className="btn-box mt-4">
                     <button type="submit" className="theme-btn border-0" disabled={this.state.loading}>
@@ -115,63 +124,69 @@ class Amenities extends Component {
         </div>)
         return (
             <>
-                <div className="billing-form-item">
-                    <div className="billing-title-wrap">
-                        <p className="widge pb-0"><span><b>please select what service you offer to see or(add new amenties service)</b></span> <span className="float-right">
-                            <Badge variant="danger" onClick={this.open}><BsFillPlusCircleFill />Add New services</Badge></span></p>
-                        <div className="title-shape margin-top-10px"></div>
+                <LoadingOverlay
+                    active={this.state.loading}
+                    spinner
+                    text='Loading your content...'
+                >
+                    <div className="billing-form-item">
+                        <div className="billing-title-wrap">
+                            <p className="widge pb-0"><span><b>please select what service you offer to see or(add new amenties service)</b></span> <span className="float-right">
+                                <h5><Badge variant="danger" onClick={this.open}><BsFillPlusCircleFill /> Add New services</Badge></h5></span></p>
+                            <div className="title-shape margin-top-10px"></div>
+                        </div>
+                        <div className="row">
+                            <div className="billing-content col">
+                                <h5>you can add these amenties by clicking </h5>
+                                <hr></hr>
+                                {items.map(item => {
+                                    return (
+                                        <div key={item.id}>
+                                            <span><AiFillFileAdd /></span>
+                                            <span onClick={() => this.mapAmenties(item.id)}> <label htmlFor={'chb' + item.id}> {item.title}</label></span>
+                                        </div>
+                                    )
+                                })}
+
+                            </div>
+
+
+
+                            <div className="billing-content col">
+                                <h5>added amenties in this business list </h5>
+                                <hr></hr>
+
+                                {this.props.listamenties.length === 0 ?
+                                    (<div className="custom-checkbox">
+
+                                        <label>there is no amenties please add </label>
+                                    </div>)
+                                    : this.props.listamenties.map(item => {
+                                        return (
+                                            <div key={item.id}>
+                                                <label onClick={() => this.unmapAmenties(item.id)}> {item.amenties_name} <span><BsFillTrashFill /></span></label>
+                                            </div>
+                                        )
+                                    })}
+
+
+                            </div>
+                        </div>
                     </div>
-                    <div className="row">
-                    <div className="billing-content col">
-                        <h5>you can add these amenties by clicking </h5>
-                        <hr></hr>
-                        {items.map(item => {
-                            return (
-                                <div key={item.id}>
-                                    <span><AiFillFileAdd/></span>
-                                   <span onClick={()=>this.mapAmenties(item.id)}> <label htmlFor={'chb' + item.id}> {item.title}</label></span>
-                                </div>
-                            )
-                        })}
 
-                    </div>
+                    <Modal show={this.state.showModal} onHide={this.close}>
+                        <Modal.Header closeButton>
+                            <Modal.Title>{this.state.title}</Modal.Title>
+                        </Modal.Header>
+                        <Modal.Body>
+                            {addAmenties}
 
-         
-  
-                    <div className="billing-content col">
-                    <h5>added amenties in this business list </h5>
-                    <hr></hr>
-
-                        {this.props.listamenties.length === 0 ?
-                            (<div className="custom-checkbox">
-
-                                <label>there is no amenties please add </label>
-                            </div>)
-                            : this.props.listamenties.map(item => {
-                                return (
-                                    <div key={item.id}>
-                                        <label onClick={()=>this.unmapAmenties(item.id)}> {item.amenties_name} <span><BsFillTrashFill /></span></label>
-                                    </div>
-                                )
-                            })}
-
-                   
-                </div>
-                </div>
-                </div>
-
-                <Modal show={this.state.showModal} onHide={this.close}>
-                    <Modal.Header closeButton>
-                        <Modal.Title>{this.state.title}</Modal.Title>
-                    </Modal.Header>
-                    <Modal.Body>
-                        {addAmenties}
-
-                    </Modal.Body>
-                    <Modal.Footer>
-                        <span onClick={this.close}>Close</span>
-                    </Modal.Footer>
-                </Modal>
+                        </Modal.Body>
+                        <Modal.Footer>
+                            <span onClick={this.close}>Close</span>
+                        </Modal.Footer>
+                    </Modal>
+                </LoadingOverlay>
             </>
         );
     }
@@ -179,10 +194,10 @@ class Amenities extends Component {
 
 
 function mapStateToProps(state) {
-    const { amenties } = state.common;
+    const { amenties, subcategory } = state.common;
     const { listamenties } = state.list;
     return {
-        amenties, listamenties
+        amenties, listamenties, subcategory
 
     };
 }

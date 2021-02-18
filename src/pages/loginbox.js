@@ -5,10 +5,11 @@ import NewsLetter from "../components/other/cta/NewsLetter";
 import Footer from "../components/common/footer/Footer";
 import ScrollTopBtn from "../components/common/ScrollTopBtn";
 import SweetAlert from 'react-bootstrap-sweetalert';
-import { Helmet } from "react-helmet";
 import { connect } from "react-redux";
 import { login } from '../services/action/auth';
 import Login from './Login';
+import { getDefaultMeta, getPageinfo } from '../services/action/common';
+import MetaTag from './metainfo';
 class LoginBox extends Component {
     constructor(props) {
         super(props);
@@ -23,9 +24,15 @@ class LoginBox extends Component {
             password: "",
             loading: false,
             successfull: false,
-            breadcrumbimg: require('../assets/images/bread-bg.jpg')
+            breadcrumbimg: require('../assets/images/bread-bg.jpg'),
+            metainfo: null,
+            defaultMetaTag: null
 
         };
+    }
+
+    componentDidMount() {
+        this.getpageseo({ page_type: 'login' })
     }
 
     onReset = () => {
@@ -96,25 +103,54 @@ class LoginBox extends Component {
 
     }
 
+    getpageseo = (obj) => {
+        this.props.dispatch(getPageinfo(obj)).then(() => {
+            if (this.props.pageinfo.length > 0) {
+                this.setState({
+                    metainfo: {
+                        title: this.props.pageinfo[0].meta_title,
+                        canonicalURL: `https://www.casualdesi.com/login}`,
+                        meta: [{
+                            attribute: 'name',
+                            value: 'description',
+                            content: this.props.pageinfo[0].meta_description
+                        },
+                        {
+                            attribute: 'name',
+                            value: 'keywords',
+                            content: this.props.pageinfo[0].meta_keywords
+                        }]
+                    }
+                })
+
+            } else {
+
+                this.setState({
+                    defaultMetaTag: getDefaultMeta()
+                })
+            }
+        })
+    }
+
 
 
     render() {
 
-        return (
+
+
+        return (<>
+            { this.state.metainfo ? <MetaTag metaTag={ this.state.metainfo || getDefaultMeta() }></MetaTag> : ''}
+
+
             <main className="login-page">
 
-                <Helmet>
-                    <title>Login</title>
-                    <meta name="description" content="login page for casual desi" />
-                    <meta name="keywords" content="casual desi,desi yaaro,sitarafoods,discussion forum ,information" />
-                </Helmet>
                 {/* Header */}
                 <GeneralHeader />
 
                 {/* Breadcrumb */}
                 <Breadcrumb CurrentPgTitle="Login" img={this.state.breadcrumbimg} />
 
-                <Login/>
+                <Login />
                 {/* Newsletter */}
                 <NewsLetter />
 
@@ -124,6 +160,7 @@ class LoginBox extends Component {
                 <ScrollTopBtn />
 
             </main>
+        </>
         );
     }
 }
@@ -131,9 +168,10 @@ class LoginBox extends Component {
 function mapStateToProps(state) {
     const { isLoggedIn } = state.auth;
     const { message } = state.message;
+    const { pageinfo } = state.common;
     return {
         isLoggedIn,
-        message
+        message, pageinfo
     };
 }
 export default connect(mapStateToProps)(LoginBox);

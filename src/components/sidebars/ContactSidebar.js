@@ -6,14 +6,14 @@ import { FaRegEnvelope } from 'react-icons/fa'
 class ContactSidebar extends Component {
     state = {
         title: 'Our Office',
-        img: require('../../assets/images/img27.jpg'),
-        desc: 'Mauris aliquet eu quam id ornare. Morbi ac quam enim. Cras vitae nulla condimentum, semper dolor non, faucibus dolor. Praesent eros turpis, commodo vel justo at',
-        address: 'USA 27TH Brooklyn NY',
-        phoneNum: '+7(111)123456789',
-        email: 'contact@dirto.com',
-        opendays: 'Monday To Friday',
+        img: require('../../assets/images/bread-bg.jpg'),
+        desc: 'You can ask us anything and suggest us any new things that we can add to help a fellow Indian in any country, we are all ears for you.',
+        address: '5605 N MacArthur Blvd Suite 740 Irving, TX 75038',
+        phoneNum: '703-829-5141',
+        email: 'ears@casualdesi.com',
+        opendays: 'Monday To Saturday',
         opendaytime: '9am - 7pm',
-        closeday: 'Saturday To Sunday'
+        closeday: 'Sunday'
     }
     render() {
         return (

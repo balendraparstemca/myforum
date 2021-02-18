@@ -777,7 +777,14 @@ xzoom
     -webkit-perspective: 300px;
     -moz-perspective: 300px;
     perspective: 300px;
+	
 }
+  @media only screen and (min-width: 320px) and (max-width: 479px) {
+      .cd-headline.zoom .cd-words-wrapper {
+        -webkit-perspective: 300px;
+    -moz-perspective: 300px;
+    perspective: 300px;
+	font-size:12px;} }
 .cd-headline.zoom b {
     opacity: 0;
 }

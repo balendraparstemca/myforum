@@ -1,75 +1,84 @@
-import React, {Component} from 'react';
-import Button from "../../common/Button";
-import { BsEye, BsMusicNoteBeamed } from 'react-icons/bs'
-import { RiBuilding4Line, RiPlaneLine, RiHotelBedLine } from 'react-icons/ri'
-import { GiChickenOven } from 'react-icons/gi'
-import { IoMdFitness } from 'react-icons/io'
-import {Link} from "react-router-dom";
+import React, { Component } from 'react'
+import { Link } from 'react-router-dom';
+import { connect } from "react-redux";
+import { withRouter } from "react-router-dom";
 
-class HighlightedCategory extends Component {
+import { fetchCategory } from '../../../services/action/common';
+
+class  HighlightedCategory extends Component {
     state = {
-        categories: [
-            {
-                path: '#',
-                text: 'apartments',
-                icon: <RiBuilding4Line />
-            },
-            {
-                path: '#',
-                text: 'Restaurants',
-                icon: <GiChickenOven />
-            },
-            {
-                path: '#',
-                text: 'travel',
-                icon: <RiPlaneLine />
-            },
-            {
-                path: '#',
-                text: 'Events',
-                icon: <BsMusicNoteBeamed />
-            },
-            {
-                path: '#',
-                text: 'Fitness',
-                icon: <IoMdFitness />
-            },
-            {
-                path: '#',
-                text: 'Hotels',
-                icon: <RiHotelBedLine />
-            }
-        ]
+        connector: 'or',
+        title: 'browse featured categories:',
+     
+      
+    };
+
+    componentDidMount()
+    {
+
+        this.props.dispatch(fetchCategory({for:'LISTING',status:true}))
     }
+    
+
+
     render() {
+        
+      
+        let categorytwo = [];
+        categorytwo = this.props.category && this.props.category.length > 0 ? this.props.category.map(cat => {
+            return { path: `${cat.canonical_url}`, title: `${cat.name}`, icon: <i className={`${cat.icon}`}></i> };
+        }) : [{ path: "", title: "no category" }]
+
         return (
             <>
-                <div className="highlighted-categories">
-                    <div className="highlight-lists d-flex">
-                        {this.state.categories.map((list, index) => {
+                <div className="highlighted-categories my-wrapper card">
+
+                  
+                    <div className="highlight-lists d-flex  mt-4">
+                        {  categorytwo  &&  categorytwo.length === 0 ? (
+                            <div className="category-item float-center">
+                                <Link to='' className="d-block">
+                                    <span className="icon-element"></span>
+                                 no categories fetched
+                             </Link>
+                            </div>
+                        ) :  categorytwo.slice(0, 9).map((item, index) => {
                             return (
-                                <div className="category-item radius-rounded" key={index}>
-                                    <Link to={list.path} className="d-block">
-                                        <span className="icon-element">{list.icon}</span>
-                                        {list.text}
+                                <div className="category-item" key={index}>
+                                    <Link to={`/categories/${item.path}`} className="d-block">
+                                        <span className="icon-element">{item.icon}</span>
+                                        {item.title}
                                     </Link>
                                 </div>
                             )
-                        })}
-                    </div>
+                        })
 
-                    <div className="highlight-btn mt-4">
-                        <Button text="view more categories" className="radius-rounded" url="/all-categories">
-                            <span className="la la-eye">
-                                <BsEye />
-                            </span>
-                        </Button>
-                    </div>
+                        }
 
+                        <div className="category-item float-center">
+                            <Link to='/categories' className="d-block">
+                                <span className="icon-element">...</span>
+                                 more
+                             </Link>
+                        </div>
+
+
+                    </div>
                 </div>
             </>
-        );
+        )
     }
 }
 
-export default HighlightedCategory;
+
+function mapStateToProps(state) {
+    const { isLoggedIn, userdetails } = state.auth;
+    const { category } = state.common;
+    return {
+        isLoggedIn, category, userdetails
+
+    };
+}
+export default withRouter(connect(mapStateToProps)(HighlightedCategory));
+
+

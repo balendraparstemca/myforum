@@ -1,22 +1,31 @@
 import { toast } from 'react-toastify';
-import { ADD_LIST_AMENTIES, CREATE_LISTING, GET_LIST_IMAGE, GET_LIST_AMENTIES, GET_LIST_DETAIL, GET_LIST_FULLDETAIL, SET_MESSAGE, UPDATE_LISTINGDETAIL, ADD_LIST_SHEDULE, GET_LIST_SHEDULE, POST_LIST_REVIEW, GET_LIST_REVIEW, GET_USER_LIST, GET_USER_SAVE_LIST, GET_HOME_LIST, GET_CATEGORY_LIST, GET_PEOPLE_VIEWED_LIST, GET_SIMILAR_LIST, GET_SEARCH_LIST } from '../actionType';
+import { ADD_LIST_AMENTIES, CREATE_LISTING, GET_LIST_IMAGE, GET_LIST_AMENTIES, GET_LIST_DETAIL, GET_LIST_FULLDETAIL, SET_MESSAGE, UPDATE_LISTINGDETAIL, ADD_LIST_SHEDULE, GET_LIST_SHEDULE, POST_LIST_REVIEW, GET_LIST_REVIEW, GET_USER_LIST, GET_USER_SAVE_LIST, GET_HOME_LIST, GET_CATEGORY_LIST, GET_PEOPLE_VIEWED_LIST, GET_SIMILAR_LIST, GET_SEARCH_LIST, GET_MAINCATEGORY_LIST } from '../actionType';
 import ListService from "../restapi/listService";
 
+
 export const CreateListing = (obj) => (dispatch) => {
+
 
     return ListService.createList(obj).then(
         (response) => {
             if (response.status === 'SUCCESS') {
+             
+               
                 dispatch({
                     type: CREATE_LISTING,
                     payload: { list: response.data }
+                });
+
+                dispatch({
+                    type: 'NEXT',
+                    payload: { listingid: response.data ? response.data.listing_id:null, subcat_id:response.data.subcat_id }
                 });
 
                 toast.success(response.message)
 
             }
             else {
-                toast.warning(response.message)
+                toast.error(response.message)
 
                 dispatch({
                     type: SET_MESSAGE,
@@ -240,6 +249,7 @@ export const getListFullDetail = (obj) => (dispatch) => {
 
     return ListService.getlistfulldetail(obj).then(
         (response) => {
+            
             if (response.status === 'SUCCESS') {
                 dispatch({
                     type: GET_LIST_FULLDETAIL,
@@ -909,6 +919,43 @@ export const getuserlist = (id) => (dispatch) => {
 }
 
 
+export const getmylist = (id) => (dispatch) => {
+
+    return ListService.getmyList(id).then(
+        (response) => {
+            if (response.status === 'SUCCESS') {
+
+                dispatch({
+                    type: GET_USER_LIST,
+                    payload: { userlist: response.data }
+                });
+              
+
+            }
+            else {
+                toast.error(response.message)
+
+            }
+
+            return Promise.resolve();
+        },
+        (error) => {
+
+            const message =
+                (error.response &&
+                    error.response.data &&
+                    error.response.data.message) ||
+                error.message ||
+                error.toString();
+            toast.error(message)
+
+            return Promise.reject();
+        }
+    );
+
+}
+
+
 
 
 export const getusersavedlist = (id) => (dispatch) => {
@@ -960,6 +1007,43 @@ export const getCategorylist = (id) => (dispatch) => {
                 dispatch({
                     type: GET_CATEGORY_LIST,
                     payload: { catlist: response.data }
+                });
+               
+
+            }
+            else {
+                toast.error(response.message)
+
+            }
+
+            return Promise.resolve();
+        },
+        (error) => {
+
+            const message =
+                (error.response &&
+                    error.response.data &&
+                    error.response.data.message) ||
+                error.message ||
+                error.toString();
+            toast.error(message)
+
+            return Promise.reject();
+        }
+    );
+
+}
+
+export const getMainCategorylist = (id) => (dispatch) => {
+
+    return ListService.getmainCategoryList(id).then(
+        (response) => {
+            console.log(response.data)  
+            if (response.status === 'SUCCESS') {
+
+                dispatch({
+                    type: GET_MAINCATEGORY_LIST,
+                    payload: { maincatlist: response.data }
                 });
                
 

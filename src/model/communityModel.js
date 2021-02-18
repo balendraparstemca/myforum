@@ -3,6 +3,7 @@ export const communityModel={
     community_title:"",
     community_about:"",
     community_category:"",
+    community_categoryid:"",
     community_des:"",
     community_type:"",
     community_admin:null,

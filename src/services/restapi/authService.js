@@ -19,6 +19,15 @@ class AuthService {
     });
   }
 
+  logintrack(emailid) {
+    return axios
+      .post(API_URL + "users/login_track", {email_id:emailid})
+      .then((response) => {
+        return response.data;
+      });
+  }
+
+
   register(first_name, last_name, user_name, email_id, password) {
     return axios.post(API_URL + "signup", {
       first_name,

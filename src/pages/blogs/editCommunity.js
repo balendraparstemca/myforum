@@ -37,8 +37,8 @@ class EditCommunity extends Component {
 
     }
     componentDidMount() {
-        this.props.dispatch(fetchCategory())
-        this.props.communitydetails.length > 0 && (this.setState({ communityid: this.props.communitydetails[0].com_id, name: this.props.communitydetails[0].communityName, catid: { label: this.props.communitydetails[0].category }, title: this.props.communitydetails[0].communityTitle, about: this.props.communitydetails[0].about, country: this.props.communitydetails[0].country, place: this.props.communitydetails[0].place, description: this.props.communitydetails[0].cammunityDes, Socialmedia: this.props.communitydetails[0].socialMedia, accessmodifier: this.props.communitydetails[0].communityType }))
+        this.props.dispatch(fetchCategory({ for:'FORUM',status:true}))
+        this.props.communitydetails.length > 0 && (this.setState({ communityid: this.props.communitydetails[0].com_id, name: this.props.communitydetails[0].communityName, catid: { label: this.props.communitydetails[0].category,value:this.props.communitydetails[0].categoryid }, title: this.props.communitydetails[0].communityTitle, about: this.props.communitydetails[0].about, country: this.props.communitydetails[0].country, place: this.props.communitydetails[0].place, description: this.props.communitydetails[0].cammunityDes, Socialmedia: this.props.communitydetails[0].socialMedia, accessmodifier: this.props.communitydetails[0].communityType }))
     }
 
     selectCountry(val) {
@@ -56,7 +56,7 @@ class EditCommunity extends Component {
     onChangeTitle(e) {
         this.setState({
             title: e.target.value.toLowerCase().replace(/\b(\w)/g, s => s.toUpperCase()),
-            name: e.target.value.toLocaleLowerCase().replace(/\s/g, ''),
+         
         });
     }
     onChangeAbout(e) {
@@ -101,6 +101,7 @@ class EditCommunity extends Component {
         communityModel.community_title = this.state.title;
         communityModel.community_about = this.state.about;
         communityModel.community_category = this.state.catid.label;
+        communityModel.community_categoryid = this.state.catid.value;
         communityModel.community_country = this.state.country;
         communityModel.community_place = this.state.place;
         communityModel.community_admin = this.props.userdetails.id
@@ -147,7 +148,7 @@ class EditCommunity extends Component {
         const { country } = this.state;
         const { category } = this.props;
         const categories = category && category.length ? category.map(cat => {
-            return { value: `${cat.id}`, label: `${cat.name}` };
+            return { value: `${cat.cat_id}`, label: `${cat.name}` };
         }) : [{
             value: 0,
             label: 'no category feched'

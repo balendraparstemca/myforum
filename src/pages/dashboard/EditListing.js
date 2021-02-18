@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import GeneralHeader from "../../components/common/GeneralHeader";
 import Breadcrumb from "../../components/common/Breadcrumb";
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
-import { Link } from "react-router-dom";
+import { Link, withRouter } from "react-router-dom";
 import { BsListCheck, BsBookmark, BsCheckCircle } from 'react-icons/bs'
 import { FaGlobeAmericas } from 'react-icons/fa'
 import { GiPositionMarker } from 'react-icons/gi'
@@ -20,8 +20,7 @@ import Amenities from '../../components/addlisting/Amenities';
 import GeneralInfo from '../../components/addlisting/GeneralInfo';
 import { addImageList, addImageListprofile, getListDetail, getlistimage, removeImageList } from '../../services/action/list';
 import { connect } from "react-redux";
-
-
+import LoadingOverlay from 'react-loading-overlay';
 
 class EditListing extends Component {
     constructor(props) {
@@ -40,9 +39,11 @@ class EditListing extends Component {
             verifiedtxt: " n",
             reason: '',
             listimage: [],
-            imgCollection:'',
-            file:  require('../../assets/images/g-img1.jpg'),
-            show:false
+            imgCollection: '',
+            file: require('../../assets/images/g-img1.jpg'),
+            show: false,
+            uniqid: '',
+            loading: true
         }
     }
 
@@ -70,8 +71,8 @@ class EditListing extends Component {
     uploadSingleFile(e) {
         this.setState({
             imgCollection: e.target.files,
-            listImg:<img src={URL.createObjectURL(e.target.files[0])} alt='default-list-profile' /> 
-            
+            listImg: <img src={URL.createObjectURL(e.target.files[0])} alt='default-list-profile' />
+
         })
     }
 
@@ -87,7 +88,7 @@ class EditListing extends Component {
             formData.append('image', this.state.imgCollection[key])
 
         }
-       this.props.dispatch(addImageListprofile(formData,this.state.listingid));
+        this.props.dispatch(addImageListprofile(formData, this.state.listingid));
     }
 
 
@@ -95,44 +96,62 @@ class EditListing extends Component {
     fetchlistDeatil = async () => {
         let obj = { "canonicalurl": this.props.match.params.listurl }
         this.props.dispatch(getListDetail(obj)).then(() => {
-            this.setState({
-                listName: this.props.listdetail && this.props.listdetail.list_title,
-                listbio: this.props.listdetail && this.props.listdetail.description,
-                address: this.props.listdetail && this.props.listdetail.address,
-                listImg: this.props.listdetail && this.props.listdetail.bannerimg ?  <img src={`${process.env.REACT_APP_API_KEY}utilities/${this.props.listdetail.bannerimg}`} alt='list-profile' /> : <img src={this.state.file} alt='default-list-profile' /> ,
-                listingid: this.props.listdetail && this.props.listdetail.listing_id,
-                verifiedtxt: this.props.listdetail && this.props.listdetail.approved ? 'Verified list' : 'Not Verified Yet',
-                country: this.props.listdetail && this.props.listdetail.country,
-                reason: this.props.listdetail && this.props.listdetail.reason,
-                website: this.props.listdetail && this.props.listdetail.approved ? <Link to={`/listing-details/${this.props.listdetail.canonicalurl}`}>preview your list detail</Link> : '',
-             
+            this.setState({ loading: false })
+            if (this.props.listdetail) {
+                if (this.props.listdetail.created_by === this.props.userdetails.id) {
 
-            })
+                    this.setState({
+                        uniqid: this.props.listdetail && this.props.listdetail.listid,
+                        listName: this.props.listdetail && this.props.listdetail.list_title,
+                        listbio: this.props.listdetail && this.props.listdetail.description,
+                        address: this.props.listdetail && this.props.listdetail.address,
+                        listImg: this.props.listdetail && this.props.listdetail.bannerimg ? <img src={`${process.env.REACT_APP_API_KEY}utilities/${this.props.listdetail.bannerimg}`} alt='list-profile' /> : <img src={this.state.file} alt='default-list-profile' />,
+                        listingid: this.props.listdetail && this.props.listdetail.listing_id,
+                        verifiedtxt: this.props.listdetail && this.props.listdetail.approved ? 'Verified list' : 'Not Verified Yet',
+                        country: this.props.listdetail && this.props.listdetail.country,
+                        reason: this.props.listdetail && this.props.listdetail.reason,
+                        website: this.props.listdetail && this.props.listdetail.approved ? <Link to={`/listing-details/${this.props.listdetail.canonicalurl}`}>preview your list detail</Link> : '',
 
-            this.fetchImage(this.props.listdetail && this.props.listdetail.listing_id)
-     
+
+                    })
+
+                    this.fetchImage(this.props.listdetail && this.props.listdetail.listing_id)
+
+                } else {
+                     this.props.history.push("/error");
+                     window.location.reload();
+                }
+
+            } else {
+                this.props.history.push("/error");
+                window.location.reload();
+            }
 
         });
 
     }
 
     fetchImage = (list_id) => {
+
         this.props.dispatch(getlistimage({ listing_id: list_id })).then(() => {
             this.setState({
-                listimage: this.props.listallimage && this.props.listallimage
+                listimage: this.props.listallimage && this.props.listallimage, loading: false
             })
         })
     }
 
     addimageinlist = (formdata) => {
+        this.setState({
+            loading: true
+        })
         this.props.dispatch(addImageList(formdata, this.state.listingid)).then(() => {
             this.fetchImage(this.state.listingid);
         });
 
     }
 
-    removeImage = (imgid,imagepath) => {
-        this.props.dispatch(removeImageList({id:imgid,image:imagepath})).then(() => {
+    removeImage = (imgid, imagepath) => {
+        this.props.dispatch(removeImageList({ id: imgid, image: imagepath })).then(() => {
             this.fetchImage(this.state.listingid);
         });
 
@@ -140,118 +159,126 @@ class EditListing extends Component {
 
 
     render() {
+console.log(this.props.listdetail)
 
-       
         return (
-            <main className="blog-fullwidth-page">
-                {/* Header */}
-                <GeneralHeader />
+            <LoadingOverlay
+                active={this.state.loading}
+                spinner
+                text='Loading your content...'
+            >
+                <main className="blog-fullwidth-page">
+                    {/* Header */}
+                    <GeneralHeader />
 
-                {/* Breadcrumb */}
-                <Breadcrumb CurrentPgTitle="Dashboard" MenuPgTitle="pages" img={this.state.breadcrumbimg} />
+                    {/* Breadcrumb */}
+                    <Breadcrumb CurrentPgTitle="Edit Listing" img={this.state.breadcrumbimg} />
 
-                <section className="dashboard-area padding-top-40px padding-bottom-90px">
-                    <div className="container">
-                        <Tabs>
-                            <div className="row">
-                                <div className="col-lg-12">
-                                    <div className="dashboard-nav d-flex justify-content-between align-items-center mb-4">
-                                        <TabList className="nav nav-tabs border-0" id="nav-tab">
-                                            <Tab>
-                                                <Link className="nav-item nav-link theme-btn pt-0 pb-0 mr-1" to="#">
-                                                    <span className="la"><BsListCheck /></span> Edit Listings
+                    <section className="dashboard-area padding-top-40px padding-bottom-90px">
+                        <div className="container">
+                            <Tabs>
+                                <div className="row">
+                                    <div className="col-lg-12">
+                                        <div className="dashboard-nav d-flex justify-content-between align-items-center mb-4">
+                                            <TabList className="nav nav-tabs border-0" id="nav-tab">
+                                                <Tab>
+                                                    <Link className="nav-item nav-link theme-btn pt-0 pb-0 mr-1" to="#">
+                                                        <span className="la"><BsListCheck /></span> Edit Listings
                                                 </Link>
-                                            </Tab>
-                                            <Tab>
-                                                <Link className="nav-item nav-link theme-btn pt-0 pb-0 mr-1" to="#">
-                                                    <span className="la"><BsBookmark /></span> Add Full Details
+                                                </Tab>
+                                                <Tab>
+                                                    <Link className="nav-item nav-link theme-btn pt-0 pb-0 mr-1" to="#">
+                                                        <span className="la"><BsBookmark /></span> Add Full Details
                                                 </Link>
-                                            </Tab>
-                                            <Tab>
-                                                <Link className="nav-item nav-link theme-btn pt-0 pb-0 mr-1" to="#">
-                                                    <span className="la"><AiOutlineUser /></span> Add Amenties
+                                                </Tab>
+                                                <Tab>
+                                                    <Link className="nav-item nav-link theme-btn pt-0 pb-0 mr-1" to="#">
+                                                        <span className="la"><AiOutlineUser /></span> Add Amenties
                                                 </Link>
-                                            </Tab>
-                                            <Tab>
-                                                <Link className="nav-item nav-link theme-btn pt-0 pb-0 mr-1" to="#">
-                                                    <span className="la"><BsBookmark /></span> Add Images
+                                                </Tab>
+                                                <Tab>
+                                                    <Link className="nav-item nav-link theme-btn pt-0 pb-0 mr-1" to="#">
+                                                        <span className="la"><BsBookmark /></span> Add Images
                                                 </Link>
-                                            </Tab>
+                                                </Tab>
 
-                                            <Tab>
-                                                <Link className="nav-item nav-link theme-btn pt-0 pb-0 mr-1" to="#">
-                                                    <span className="la"><BsBookmark /></span> Add shedule
+                                                <Tab>
+                                                    <Link className="nav-item nav-link theme-btn pt-0 pb-0 mr-1" to="#">
+                                                        <span className="la"><BsBookmark /></span> Add shedule
                                                 </Link>
-                                            </Tab>
+                                                </Tab>
 
 
-                                        </TabList>
+                                            </TabList>
 
+                                        </div>
                                     </div>
-                                </div>
-                                <div className="col-lg-12">
-                                    <div className="tab-content" id="nav-tabContent">
+                                    <div className="col-lg-12">
+                                        <div className="tab-content" id="nav-tabContent">
 
-                                        <TabPanel>
-                                            <div className="row">
-                                                <div className="col-lg-4">
-                                                    <div className="user-profile-action">
-                                                        <div className="user-pro-img mb-4">
-                                                            <div className="user-edit-form mt-4">
-                                                                <div className="author-verified-badge margin-bottom-20px">
-                                                                    <div className="author__verified-badge" data-toggle="tooltip" data-placement="top" title="Listing has been verified and belongs the business owner or manager">
-                                                                        <span className="d-inline-block"> <BsCheckCircle /></span> {this.state.verifiedtxt}
+                                            <TabPanel>
+                                                <div className="row">
+                                                    <div className="col-lg-4">
+                                                        <div className="user-profile-action">
+                                                            <div className="user-pro-img mb-4">
+                                                                <div className="user-edit-form mt-4">
+                                                                    <div className="author-verified-badge margin-bottom-20px">
+                                                                        <div className="author__verified-badge" data-toggle="tooltip" data-placement="top" title="Listing has been verified and belongs the business owner or manager">
+                                                                            <span className="d-inline-block"> <BsCheckCircle /></span> {this.state.verifiedtxt}
+                                                                        </div>
+                                                                        <p><b>{this.state.reason}</b></p>
                                                                     </div>
-                                                                    <p><b>{this.state.reason}</b></p>
                                                                 </div>
-                                                            </div>
-                                                            {this.state.listImg}
-                                                            <button className="theme-btn border-0 w-100 button-success" type="button" onClick={this.toggle} value="submit">
-                                                                change your pic
+                                                                {this.state.listImg}
+                                                                <button className="theme-btn border-0 w-100 button-success" type="button" onClick={this.toggle} value="submit">
+                                                                    change your pic
                                                             </button>
-                                                            {
-                                                            this.state.show ? <div className="mb-5" >
-                                                            <div className="upload-btn-box">
-                                                                <form>
-                                                                    <input type="file" className="form-control" name="files[]" id="filer_input" onChange={this.uploadSingleFile} />
-                                                                    <button className="theme-btn border-0 w-100 button-success" type="button" onClick={this.upload} value="submit">
-                                                                        Save changes
+                                                                {
+                                                                    this.state.show ? <div className="mb-5" >
+                                                                        <div className="upload-btn-box">
+                                                                            <form>
+                                                                                <input type="file" className="form-control" name="files[]" id="filer_input" onChange={this.uploadSingleFile} />
+                                                                                <button className="theme-btn border-0 w-100 button-success" type="button" onClick={this.upload} value="submit">
+                                                                                    Save changes
                                                                             </button>
-                                                                </form>
-                                                            </div>
+                                                                            </form>
+                                                                        </div>
 
-                                                        </div> : ''}
-                                                           
-                                                           
-                                                        </div>
-                                                        <div className="user-details">
-                                                            <h2 className="user__name widget-title pb-2">
-                                                                {this.state.listName}
-                                                            </h2>
-                                                            <div className="section-heading">
-                                                                <p className="sec__desc font-size-15 line-height-24">
-                                                                    {this.state.listbio}
-                                                                </p>
-                                                            </div>
-                                                            <ul className="list-items mt-3">
-                                                                <li>
-                                                                    <span className="la d-inline-block"><GiPositionMarker /></span> {this.state.address}
-                                                                </li>
-                                                                <li className="text-lowercase">
-                                                                    <span className="la d-inline-block"><FiPhone /></span> {this.state.country}
-                                                                </li>
-                                                                <li className="text-lowercase">
-                                                                    <span className="la d-inline-block"><FaGlobeAmericas /></span> {this.state.website}
-                                                                </li>
-                                                            </ul>
+                                                                    </div> : ''}
 
+
+                                                            </div>
+                                                            <div className="user-details">
+                                                                <h2 className="user__name widget-title pb-2">
+                                                                    {this.state.listName}
+                                                                </h2>
+                                                                <h5 className="user__name widget-title pb-2">
+
+                                                                </h5>
+                                                                <div className="section-heading">
+                                                                    <p className="sec__desc font-size-15 line-height-24">
+                                                                        {this.state.listbio}
+                                                                    </p>
+                                                                </div>
+                                                                <ul className="list-items mt-3">
+                                                                    <li>
+                                                                        <span className="la d-inline-block"><GiPositionMarker /></span> {this.state.address}
+                                                                    </li>
+                                                                    <li className="text-lowercase">
+                                                                        <span className="la d-inline-block"><FiPhone /></span> {this.state.country}
+                                                                    </li>
+                                                                    <li className="text-lowercase">
+                                                                        <span className="la d-inline-block"><FaGlobeAmericas /></span> {this.state.website}
+                                                                    </li>
+                                                                </ul>
+
+                                                            </div>
                                                         </div>
                                                     </div>
-                                                </div>
-                                                <div className="col-lg-8">
-                                                    <GeneralInfo listurl={this.props.match.params.listurl} />
-                                                    <div className="delete-account-info">
-                                                    {/*    <div className="billing-form-item">
+                                                    <div className="col-lg-8">
+                                                        <GeneralInfo listurl={this.props.match.params.listurl} />
+                                                        <div className="delete-account-info">
+                                                            {/*    <div className="billing-form-item">
                                                             <div className="billing-title-wrap">
                                                                 <h3 className="widget-title pb-0 color-text">Delete Listing</h3>
                                                                 <div className="title-shape margin-top-10px"></div>
@@ -263,110 +290,110 @@ class EditListing extends Component {
                                                                 <Button text="delete my account" url="#" className="delete-account border-0" />
                                                             </div>
                                                         </div>*/}
+                                                        </div>
                                                     </div>
                                                 </div>
-                                            </div>
-                                        </TabPanel>
-                                        <TabPanel>
-                                            <AddFullDetails listid={this.props.listdetail && this.props.listdetail.listing_id} />
-                                        </TabPanel>
-                                        <TabPanel>
-                                            <Amenities categoryid={this.props.listdetail && this.props.listdetail.categoryid} listid={this.props.listdetail && this.props.listdetail.listing_id} />
-                                        </TabPanel>
+                                            </TabPanel>
+                                            <TabPanel>
+                                                <AddFullDetails listid={this.props.listdetail && this.props.listdetail.listing_id} />
+                                            </TabPanel>
+                                            <TabPanel>
+                                                <Amenities subcategoryid={this.props.listdetail && this.props.listdetail.subcat_id} listid={this.props.listdetail && this.props.listdetail.listing_id} />
+                                            </TabPanel>
 
-                                        <TabPanel>
-                                        <b>please add 750 x 480 size image for better view </b>
-                                            <div className="row">
-                                          
-                                                          
-                                                {
-                                                    this.state.listimage.length === 0 ? (
+                                            <TabPanel>
+                                                <b>please add 750 x 480 size image for better view </b>
+                                                <div className="row">
 
-                                                        <div className="user-profile-action">
-                                                            <div className="user-pro-img mb-2">
-                                                                <b>there is no image added please add</b>
-                                                            </div>
-                                                        </div>
-                                                    ) : this.state.listimage.map((img, id) => (
-                                                        <div className="col-2" key={id}>
+
+                                                    {
+                                                        this.state.listimage.length === 0 ? (
+
                                                             <div className="user-profile-action">
                                                                 <div className="user-pro-img mb-2">
-                                                                    <img src={`${process.env.REACT_APP_API_KEY}utilities/${img.imageurl}`} alt="list" />
-                                                                    <div className="dropdown">
-                                                                        <button
-                                                                            className="theme-btn edit-btn dropdown-toggle border-0 after-none"
-                                                                            type="button" id="editImageMenu"
-                                                                            aria-haspopup="true"
-                                                                            aria-expanded="false" onClick={() => this.removeImage(img.id,img.imageurl)}>
-                                                                            <AiFillDelete />
-                                                                        </button></div>
+                                                                    <b>there is no image added please add</b>
                                                                 </div>
                                                             </div>
-                                                        </div>
+                                                        ) : this.state.listimage.map((img, id) => (
+                                                            <div className="col-2" key={id}>
+                                                                <div className="user-profile-action">
+                                                                    <div className="user-pro-img mb-2">
+                                                                        <img src={`${process.env.REACT_APP_API_KEY}utilities/${img.imageurl}`} alt="list" />
+                                                                        <div className="dropdown">
+                                                                            <button
+                                                                                className="theme-btn edit-btn dropdown-toggle border-0 after-none"
+                                                                                type="button" id="editImageMenu"
+                                                                                aria-haspopup="true"
+                                                                                aria-expanded="false" onClick={() => this.removeImage(img.id, img.imageurl)}>
+                                                                                <AiFillDelete />
+                                                                            </button></div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
 
-                                                    ))
+                                                        ))
 
-                                                }
+                                                    }
 
-                                            </div>
+                                                </div>
 
-                                            <PhotoUploader listid={this.props.listdetail && this.props.listdetail.listing_id} addimage={this.addimageinlist} />
-
-
-
-                                        </TabPanel>
-
-                                        <TabPanel>
-                                            <OpeningHours listid={this.props.listdetail && this.props.listdetail.listing_id} />
-                                        </TabPanel>
+                                                <PhotoUploader listid={this.props.listdetail && this.props.listdetail.listing_id} addimage={this.addimageinlist} />
 
 
+
+                                            </TabPanel>
+
+                                            <TabPanel>
+                                                <OpeningHours listid={this.props.listdetail && this.props.listdetail.listing_id} />
+                                            </TabPanel>
+
+
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                        </Tabs>
-                    </div>
-                </section>
+                            </Tabs>
+                        </div>
+                    </section>
 
-                {/* Newsletter */}
-                <NewsLetter />
+                    {/* Newsletter */}
+                    <NewsLetter />
 
-                {/* Footer */}
-                <Footer />
+                    {/* Footer */}
+                    <Footer />
 
-                <ScrollTopBtn />
+                    <ScrollTopBtn />
 
 
-                {/* Modal */}
-                <div className="modal-form text-center">
-                    <div className="modal fade account-delete-modal" tabIndex="-1" role="dialog" aria-labelledby="mySmallModalLabel">
-                        <div className="modal-bg"></div>
-                        <div className="modal-dialog modal-sm" role="document">
-                            <div className="modal-content p-4">
-                                <div className="modal-top border-0 mb-4 p-0">
-                                    <div className="alert-content">
-                                        <span className="la warning-icon"><AiOutlineExclamationCircle /></span>
-                                        <h4 className="modal-title mt-2 mb-1">Your account will be deleted permanently!</h4>
-                                        <p className="modal-sub">Are you sure to proceed.</p>
+                    {/* Modal */}
+                    <div className="modal-form text-center">
+                        <div className="modal fade account-delete-modal" tabIndex="-1" role="dialog" aria-labelledby="mySmallModalLabel">
+                            <div className="modal-bg"></div>
+                            <div className="modal-dialog modal-sm" role="document">
+                                <div className="modal-content p-4">
+                                    <div className="modal-top border-0 mb-4 p-0">
+                                        <div className="alert-content">
+                                            <span className="la warning-icon"><AiOutlineExclamationCircle /></span>
+                                            <h4 className="modal-title mt-2 mb-1">Your listing will be deleted permanently!</h4>
+                                            <p className="modal-sub">Are you sure to proceed.  currently not added remove function</p>
+                                        </div>
                                     </div>
-                                </div>
-                                <div className="btn-box">
-                                    <button type="button" className="theme-btn border-0 button-success mr-1" data-dismiss="modal">
-                                        Cancel
+                                    <div className="btn-box">
+                                        <button type="button" className="theme-btn border-0 button-success mr-1" data-dismiss="modal">
+                                            Cancel
                                     </button>
-                                    <button type="button" className="theme-btn border-0 button-danger">
-                                        delete!
+                                        <button type="button" className="theme-btn border-0 button-danger">
+                                            delete!
                                     </button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
 
 
-            </main>
+                </main>
 
-
+            </LoadingOverlay>
         );
     }
 }
@@ -379,4 +406,4 @@ function mapStateToProps(state) {
 
     };
 }
-export default connect(mapStateToProps)(EditListing);
+export default withRouter(connect(mapStateToProps)(EditListing));

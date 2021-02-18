@@ -10,6 +10,13 @@ class CommonService {
         });
     }
 
+
+    getToptwoCategory(obj) {
+        return axios.post(API_URL + "common/get_toptwocategory", obj).then((response) => {
+            return response.data;
+        });
+    }
+
     getSubCategory(obj) {
         return axios.post(API_URL + "common/get_subcategory",obj).then((response) => {
             return response.data;
@@ -31,7 +38,7 @@ class CommonService {
     }
 
     getRules(obj) {
-        return axios.get(API_URL + "common/rule/" + obj).then((response) => {
+        return axios.post(API_URL + "common/rule",obj).then((response) => {
             return response.data;
         });
     }
@@ -46,7 +53,6 @@ class CommonService {
     
     getNotification(obj) {
         return axios.post(API_URL + "common/get_notification", obj ).then((response) => {
-           
             return response.data;
         });
     }
@@ -65,6 +71,18 @@ class CommonService {
 
     subscribe(obj) {
         return axios.post(API_URL + "common/subscribe", obj ).then((response) => {
+            return response.data;
+        });
+    }
+
+    getPageseo(obj) {
+        return axios.post(API_URL + "common/get_pageinfo", obj).then((response) => {
+            return response.data;
+        });
+    }
+
+    contact(obj) {
+        return axios.post(API_URL + "common/add_contact", obj ).then((response) => {
             return response.data;
         });
     }

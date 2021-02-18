@@ -6,11 +6,11 @@ import { FiPhone, FiExternalLink } from 'react-icons/fi'
 class ContactInfo extends Component {
     states = {
         title: 'Contact Information',
-        address: '101 East Parkview Road, New York',
-        email: 'example@gmail.com',
-        number: '+7(111)123456789',
-        website: 'www.techydevs.com',
-        websiteUrl: 'https://techydevs.com',
+        address: '5605 N MacArthur Blvd Suite 740 Irving, TX 75038 ',
+        email: 'ears@casualdesi.com',
+        number: ': 703-829-5141',
+        website: 'www.casualdesi.com',
+        websiteUrl: 'https://casualdesi.com',
         socials: [
             {
                 icon: <FaFacebookF />,

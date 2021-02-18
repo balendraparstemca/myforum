@@ -6,14 +6,14 @@ import $ from 'jquery';
 
 export default class GeneralHeader extends Component {
     componentDidMount() {
-        $(window).on('scroll', function () {
-            //header fixed animation and control
-            if ($(window).scrollTop() > 10) {
-                $('.header-menu-wrapper').addClass('header-fixed');
-            } else {
-                $('.header-menu-wrapper').removeClass('header-fixed');
-            }
-        });
+        // $(window).on('scroll', function () {
+        //     //header fixed animation and control
+        //     if ($(window).scrollTop() > 200) {
+        //         $('.header-menu-wrapper').addClass('header-fixed');
+        //     } else {
+        //         $('.header-menu-wrapper').removeClass('header-fixed');
+        //     }
+        // });
     }
 
     state = {

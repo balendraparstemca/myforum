@@ -12,6 +12,8 @@ import { connect } from "react-redux";
 import { registerUser } from '../services/action/auth';
 import SweetAlert from 'react-bootstrap-sweetalert';
 import { Helmet } from 'react-helmet';
+import { getDefaultMeta, getPageinfo } from '../services/action/common';
+import MetaTag from './metainfo';
 class SignUp extends Component {
 
     constructor(props) {
@@ -31,8 +33,14 @@ class SignUp extends Component {
             message: "",
             loading: false,
             breadcrumbimg: require('../assets/images/bread-bg.jpg'),
-            submit: false
+            submit: false,
+            metainfo: null,
+            defaultMetaTag: null
         };
+    }
+
+    componentDidMount() {
+        this.getpageseo({ page_type: 'register' })
     }
 
     onReset = () => {
@@ -149,14 +157,41 @@ class SignUp extends Component {
 
     }
 
+    getpageseo = (obj) => {
+        this.props.dispatch(getPageinfo(obj)).then(() => {
+            if (this.props.pageinfo.length > 0) {
+                this.setState({
+                    metainfo: {
+                        title: this.props.pageinfo[0].meta_title,
+                        canonicalURL: `https://www.casualdesi.com/sign-up}`,
+                        meta: [{
+                            attribute: 'name',
+                            value: 'description',
+                            content: this.props.pageinfo[0].meta_description
+                        },
+                        {
+                            attribute: 'name',
+                            value: 'keywords',
+                            content: this.props.pageinfo[0].meta_keywords
+                        }]
+                    }
+                })
+
+            } else {
+
+                this.setState({
+                    defaultMetaTag: getDefaultMeta()
+                })
+            }
+        })
+    }
+
     render() {
-        return (
+        return (<>
+         { this.state.metainfo ? <MetaTag metaTag={ this.state.metainfo || getDefaultMeta() }></MetaTag> : ''}
+
             <main className="signup-page">
-                <Helmet>
-                    <title>Sign-up</title>
-                    <meta name="description" content="signup page for casual desi" />
-                    <meta name="keywords" content="casual desi,desi yaaro,sitarafoods,discussion forum ,information" />
-                </Helmet>
+              
                 {/* Header */}
                 <GeneralHeader />
 
@@ -291,7 +326,7 @@ class SignUp extends Component {
 
                 <ScrollTopBtn />
 
-            </main>
+            </main></>
         );
     }
 }
@@ -300,8 +335,9 @@ class SignUp extends Component {
 function mapStateToProps(state) {
     const { isLoggedIn, isSignup } = state.auth;
     const { message } = state.message;
+    const { pageinfo } = state.common;
     return {
-        isLoggedIn, isSignup,
+        isLoggedIn, isSignup,pageinfo,
         message
     };
 }

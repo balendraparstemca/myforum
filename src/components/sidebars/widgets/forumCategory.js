@@ -15,12 +15,21 @@ class ForumCategory extends Component {
 
     componentDidMount() {
 
-        this.props.dispatch(fetchCategory()).then(() => {
+        this.categoryfetch();
+    }
+   
+
+    categoryfetch()
+    {
+        this.props.dispatch(fetchCategory({for:"FORUM",status:true})).then(() => {
             this.setState({
                 category: this.props.category
             })
         });
+
     }
+
+  
     render() {
 
         return (
@@ -48,7 +57,7 @@ class ForumCategory extends Component {
                                 ) : this.state.category.map((item, i) => {
                                     return (
                                         <li className="mb-2 pb-2" key={i}>
-                                            <Link to={`/forum/community/${item.name}`} className="d-flex justify-content-between align-items-center before-none">
+                                            <Link to={`/forum/community/${item.canonical_url}`} className="d-flex justify-content-between align-items-center before-none">
                                                 {item.name}
                                             </Link>
                                         </li>

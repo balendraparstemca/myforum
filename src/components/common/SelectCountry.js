@@ -973,7 +973,7 @@ class SelectCountry extends Component {
                 <Select
                     value={this.selectedOption}
                     onChange={this.handleChange}
-                    placeholder="Select a Location"
+                    placeholder="Where to look"
                     options={countries}
                 />
             </>

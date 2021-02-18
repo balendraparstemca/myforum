@@ -11,6 +11,11 @@ import Select from "react-select";
 import { postModel } from '../../model/postModel';
 import SweetAlert from 'react-bootstrap-sweetalert';
 import { connect } from "react-redux";
+import { EditorState, ContentState, convertToRaw } from 'draft-js';
+import { Editor } from 'react-draft-wysiwyg';
+import draftToHtml from 'draftjs-to-html';
+import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
+import htmlToDraft from 'html-to-draftjs';
 import { fetchCommunityList, fetchFlair } from '../../services/action/common';
 import { fetcPostDetail, postUpdate } from '../../services/action/post';
 
@@ -28,6 +33,7 @@ class EditPost extends Component {
         this.onChangeDescription = this.onChangeDescription.bind(this);
         this.onDrop = this.onDrop.bind(this);
         this.state = {
+            editorsecondState: EditorState.createEmpty(),
             description: "",
             title: "",
             url: "",
@@ -38,7 +44,8 @@ class EditPost extends Component {
             comid: { label: 'select community', value: 0 },
             titleurl: '',
             postdetail: {},
-            post_id: null
+            post_id: null,
+            canonicalurl: ''
 
         };
 
@@ -53,6 +60,23 @@ class EditPost extends Component {
 
     }
 
+    onEditorsecondStateChange = (editorsecondState) => {
+        this.setState({
+            editorsecondState, description: draftToHtml(convertToRaw(editorsecondState.getCurrentContent()))
+        });
+    }
+
+    convertoTodraft(content) {
+        const contentBlock = htmlToDraft(content)
+        if (contentBlock) {
+            const contentState = ContentState.createFromBlockArray(contentBlock.contentBlocks);
+            const outputEditorState = EditorState.createWithContent(contentState);
+            this.setState({
+                editorsecondState: outputEditorState,
+            });
+        };
+    }
+
     postdetail = () => {
         const userid = this.props.userdetails && this.props.userdetails.id;
 
@@ -60,7 +84,9 @@ class EditPost extends Component {
         this.props.dispatch(fetcPostDetail(obj)).then(() => {
             if (this.props.postsdetail.length > 0) {
                 if (this.props.postsdetail[0].user === userid) {
+                    this.convertoTodraft(this.props.postsdetail[0].description)
                     this.setState({
+                        canonicalurl: this.props.postsdetail[0].canonicalurl,
                         post_id: this.props.postsdetail[0].post_id,
                         comid: { label: this.props.postsdetail[0].com_name, value: this.props.postsdetail[0].com_id },
                         description: this.props.postsdetail[0].description,
@@ -156,8 +182,7 @@ class EditPost extends Component {
             postModel.groupId = this.state.comid.value;
             postModel.imgUrl = this.state.pictures;
             postModel.url = this.state.url;
-            postModel.canonicalurl = this.state.title.split(' ', 6).join(' ').toLowerCase().replace(/ /g, '_').replace(/[^\w-]+/g, '');
-            console.log(postModel);
+
             this.props.dispatch(postUpdate(postModel)).then(() => {
 
 
@@ -182,13 +207,14 @@ class EditPost extends Component {
         this.setState({
             loading: false, alert: null
         });
-        this.props.history.push(`/forum/post/${postModel.canonicalurl}`);
+        this.props.history.push(`/forum/post/${this.state.canonicalurl}`);
         window.location.reload();
 
     }
 
 
     render() {
+        const { editorsecondState } = this.state;
 
         const { flare, comid } = this.state;
         const { communitylist, flair } = this.props;
@@ -244,9 +270,25 @@ class EditPost extends Component {
                                                         <label className="label-text">Description</label>
                                                         <div className="form-group">
                                                             <span className="form-icon"><BsPencil /></span>
-                                                            <textarea className="message-control form-control" name="description" value={this.state.description} onChange={this.onChangeDescription} placeholder="Write description for post"></textarea>
+                                                            <textarea className="message-control form-control" name="description" value={this.state.description} onChange={this.onChangeDescription} placeholder="Write description for post" readOnly></textarea>
                                                         </div>
                                                     </div>
+
+                                                    <div className="input-box">
+                                                        <label className="label-text">Description</label>
+                                                        <div className="form-group">
+                                                            <span className="form-icon"><BsPencil /></span>
+                                                            <Editor
+                                                                editorState={editorsecondState}
+                                                                row='5'
+                                                                wrapperClassName="demo-wrapper"
+                                                                editorClassName="demo-editor form-control "
+                                                                onEditorStateChange={this.onEditorsecondStateChange}
+                                                            />
+                                                        </div>
+                                                    </div>
+
+
                                                     <div className="input-box">
                                                         <label className="label-text">Flare Tags</label>
                                                         <div className="form-group">

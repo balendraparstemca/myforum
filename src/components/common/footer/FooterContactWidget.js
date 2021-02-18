@@ -9,15 +9,15 @@ class FooterContactWidget extends Component {
         lists: [
             {
                 icon: <AiOutlineHome />,
-                text: '500034'
+                text: '5605 N MacArthur Blvd  suite 740  Irving, TX 75038'
             },
             {
                 icon: <FiHeadphones />,
-                text: '+ 9424703403'
+                text: '703-829-5141'
             },
             {
                 icon: <FaRegEnvelope />,
-                text: 'casualdesi@gmail.com'
+                text: 'ears@casualdesi.com'
             }
         ]
     }

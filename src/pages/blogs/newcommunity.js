@@ -12,7 +12,7 @@ import SweetAlert from 'react-bootstrap-sweetalert'
 import { connect } from "react-redux";
 import { communityModel } from '../../model/communityModel';
 import { CountryDropdown } from 'react-country-region-selector';
-import { fetchCategory, fetchRules } from '../../services/action/common';
+import { fetchCategory, fetchRules, getDefaultMeta, getPageinfo } from '../../services/action/common';
 import { createcommunity } from '../../services/action/community';
 
 import {
@@ -23,6 +23,7 @@ import {
     AccordionItemPanel,
 } from 'react-accessible-accordion';
 import { FaPlus, FaMinus } from 'react-icons/fa'
+import MetaTag from '../metainfo';
 class NewCommunity extends Component {
 
     constructor(props) {
@@ -36,7 +37,7 @@ class NewCommunity extends Component {
             name: "",
             title: "",
             about: "",
-            catid: { label: '', value: null },
+            catid: { label: '', value:'' },
             category: [],
             rule: [],
             country: '',
@@ -46,21 +47,51 @@ class NewCommunity extends Component {
             loading: false,
             plus: <FaPlus />,
             minus: <FaMinus />,
-            cardClass: 'mb-3'
+            cardClass: 'mb-3',
+            metainfo: null,
+            defaultMetaTag: null,
+            countryPriorities : ['IN', "US", "CA", "GB","AU","NO","NL","FR","CH", "AE", "SG","KW","SA","QA", "MY",  "LK"],
+          
         };
 
     }
     componentDidMount() {
-        this.props.dispatch(fetchCategory()).then(() => {
+        this.getpageseo({ page_type: 'community' })
+        
+        this.props.dispatch(fetchCategory({ for: 'FORUM', status:true })).then(() => {
             this.setState({
                 category: this.props.category
             })
         });
 
-        this.props.dispatch(fetchRules(0)).then(() => {
+        this.props.dispatch(fetchRules({com_id:4})).then(() => {
             this.setState({
                 rule: this.props.rule
             })
+        })
+    }
+
+    getpageseo = (obj) => {
+        this.props.dispatch(getPageinfo(obj)).then(() => {
+            if (this.props.pageinfo.length > 0) {
+                this.setState({
+                    metainfo: {
+                        title: this.props.pageinfo[0].meta_title,
+                        canonicalURL: `https://www.casualdesi.com/forum/community`,
+                        meta: [{
+                            attribute: 'name',
+                            value: 'description',
+                            content: this.props.pageinfo[0].meta_description
+                        },
+                        {
+                            attribute: 'name',
+                            value: 'keywords',
+                            content: this.props.pageinfo[0].meta_keywords
+                        }]
+                    }
+                })
+
+            } 
         })
     }
 
@@ -82,6 +113,7 @@ class NewCommunity extends Component {
             name: e.target.value.toLocaleLowerCase().replace(/\s/g, ''),
         });
     }
+
     onChangeAbout(e) {
         this.setState({
             about: e.target.value.toLowerCase().replace(/\b(\w)/g, s => s.toUpperCase()),
@@ -92,6 +124,7 @@ class NewCommunity extends Component {
 
 
     onChangeCat = async (catid) => {
+        console.log()
         this.setState({ catid });
 
     }
@@ -99,7 +132,7 @@ class NewCommunity extends Component {
 
     onChangePlace(e) {
         this.setState({
-            place: e.target.value,
+            place: e.target.value.toLocaleLowerCase(),
         });
     }
 
@@ -137,10 +170,11 @@ class NewCommunity extends Component {
             communityModel.community_title = this.state.title;
             communityModel.community_about = this.state.about;
             communityModel.community_category = this.state.catid.label;
+            communityModel.community_categoryid = this.state.catid.value;
             communityModel.community_country = this.state.country;
             communityModel.community_place = this.state.place;
             communityModel.community_admin = this.props.userdetails ? this.props.userdetails.id : alert('user not find');
-
+            
             this.props.dispatch(createcommunity(communityModel)).then(() => {
 
                 if (this.props.isCreated) {
@@ -185,15 +219,18 @@ class NewCommunity extends Component {
         this.setState({ category: e.target.value });
     }
     render() {
-        console.log(this.props.rule)
+    
+      
         const { country, category } = this.state;
         const categories = category && category.length ? category.map(cat => {
-            return { value: `${cat.id}`, label: `${cat.name}` };
+            return { value:`${cat.cat_id}`, label: `${cat.name}`};
         }) : [{
             value: 0,
             label: 'no category feched'
         }];
-        return (
+        return (<>
+          { this.state.metainfo ? <MetaTag metaTag={this.state.metainfo || getDefaultMeta() }></MetaTag> : ''}
+
             <main className="List-map-view2">
                 {/* Header */}
                 <GeneralHeader />
@@ -213,6 +250,18 @@ class NewCommunity extends Component {
                                         <div className="billing-content">
                                             <div className="contact-form-action">
                                                 <form method="post" onSubmit={this.handleCommunity}>
+
+                                                <div className="input-box">
+                                                        <label className="label-text">Categories</label>
+                                                        <div className="form-group">
+                                                            <span className="form-icon"><FaRegEnvelope /></span>
+                                                            <Select
+                                                                value={this.state.catid}
+                                                                onChange={this.onChangeCat}
+                                                                placeholder="Short by"
+                                                                options={categories}
+                                                            />  </div>
+                                                    </div>
 
 
                                                     <div className="input-box">
@@ -239,17 +288,7 @@ class NewCommunity extends Component {
                                                             <textarea className="message-control form-control" name="about" value={this.state.about} onChange={this.onChangeAbout} required="required" placeholder="About Community(max150) "></textarea>
                                                         </div>
                                                     </div>
-                                                    <div className="input-box">
-                                                        <label className="label-text">Categories</label>
-                                                        <div className="form-group">
-                                                            <span className="form-icon"><FaRegEnvelope /></span>
-                                                            <Select
-                                                                value={this.state.catid}
-                                                                onChange={this.onChangeCat}
-                                                                placeholder="Short by"
-                                                                options={categories}
-                                                            />  </div>
-                                                    </div>
+                                                  
                                                     <div className="billing-form-item">
                                                         <div className="billing-title-wrap">
                                                             <h3 className="widget-title pb-0">
@@ -266,6 +305,7 @@ class NewCommunity extends Component {
                                                                         <label className="label-text">Country</label>
                                                                         <div className="form-group">
                                                                             <CountryDropdown
+                                                                                priorityOptions={this.state.countryPriorities}
                                                                                 value={country}
                                                                                 onChange={(val) => this.selectCountry(val)} />
                                                                         </div>
@@ -355,6 +395,7 @@ class NewCommunity extends Component {
                 <ScrollTopBtn />
 
             </main>
+            </>
         );
     }
 }
@@ -363,10 +404,10 @@ function mapStateToProps(state) {
     const { userdetails } = state.auth;
     const { message } = state.message;
     const { isCreated } = state.community;
-    const { category, rule } = state.common;
+    const { category, rule, pageinfo } = state.common;
 
     return {
-        message, category, userdetails, isCreated, rule
+        message, category, userdetails, isCreated, rule, pageinfo
     };
 }
 export default connect(mapStateToProps)(NewCommunity);

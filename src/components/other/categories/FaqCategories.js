@@ -1,13 +1,34 @@
 import React, {Component} from 'react';
 import {Link} from "react-router-dom";
+import { Overlay } from 'react-bootstrap';
+import { Popover } from 'react-bootstrap';
+import { Button } from 'react-bootstrap';
+import { OverlayTrigger } from 'react-bootstrap';
 
 class FaqCategories extends Component {
     render() {
         return (
             <>
                 <div className="row">
+
+                    <div className="col-12">
+                 
+                    </div>
                     <div className="col-lg-3 column-td-6">
                         <div className="category-item faq-cat-item p-0">
+                        <OverlayTrigger
+                                trigger="click"
+                                key='gettingstarted'
+                                placement='top'
+                                overlay={
+                                    <Popover id={`popover-positioned-to`}>
+                                        <Popover.Title as="b">{`getting started`}</Popover.Title>
+                                        <Popover.Content>
+                                            <strong>It is as simple as having a coffee.. Seriously it is, just create an account then look and find for what you need or add a listing you wanted to fellow Indians to see. Super simple. </strong> 
+                                        </Popover.Content>
+                                    </Popover>
+                                }
+                            >
                             <Link to="#" className="d-block padding-top-30px padding-bottom-30px">
                                 <svg className="cat-svg" version="1.1" id="Capa_1" x="0px" y="0px" viewBox="0 0 512 512" >
                                     <g>
@@ -49,10 +70,24 @@ class FaqCategories extends Component {
                                 </svg>
                                 <span className="d-block font-size-18 font-weight-semi-bold mt-3">getting started</span>
                             </Link>
+                            </OverlayTrigger>
                         </div>
                     </div>
                     <div className="col-lg-3 column-td-6">
                         <div className="category-item faq-cat-item p-0">
+                        <OverlayTrigger
+                                trigger="click"
+                                key='pricingplan'
+                                placement='top'
+                                overlay={
+                                    <Popover id={`popover-positioned-to`}>
+                                        <Popover.Title as="b">{`pricing plans`}</Popover.Title>
+                                        <Popover.Content>
+                                            <strong>There is no such thing as a free meal in this world, is a famous saying, but its wrong in few cases, yup our services are absolutely free. Unless otherwise my boss die and things change.</strong> 
+                                        </Popover.Content>
+                                    </Popover>
+                                }
+                            >
                             <Link to="#" className="d-block padding-top-30px padding-bottom-30px">
                                 <svg className="cat-svg" version="1.1" id="Capa_2" x="0px" y="0px" viewBox="0 0 512 512" >
                             <g>
@@ -121,10 +156,24 @@ class FaqCategories extends Component {
                         </svg>
                                 <span className="d-block font-size-18 font-weight-semi-bold mt-3">pricing plans</span>
                             </Link>
+                            </OverlayTrigger>
                         </div>
                     </div>
                     <div className="col-lg-3 column-td-6">
                         <div className="category-item faq-cat-item p-0">
+                        <OverlayTrigger
+                                trigger="click"
+                                key='salesquestion'
+                                placement='top'
+                                overlay={
+                                    <Popover id={`popover-positioned-to`}>
+                                        <Popover.Title as="b">{`sales question`}</Popover.Title>
+                                        <Popover.Content>
+                                            <strong>There is no question of sale here so.. NO sale questions ..</strong> 
+                                        </Popover.Content>
+                                    </Popover>
+                                }
+                            >
                             <Link to="#" className="d-block padding-top-30px padding-bottom-30px">
                                 <svg className="cat-svg" version="1.1" id="Capa_3" x="0px" y="0px" viewBox="0 0 512.001 512.001">
                             <g>
@@ -214,10 +263,24 @@ class FaqCategories extends Component {
                         </svg>
                                 <span className="d-block font-size-18 font-weight-semi-bold mt-3">sales question</span>
                             </Link>
+                            </OverlayTrigger>
                         </div>
                     </div>
                     <div className="col-lg-3 column-td-6">
                         <div className="category-item faq-cat-item p-0">
+                        <OverlayTrigger
+                                trigger="click"
+                                key='usage guides'
+                                placement='top'
+                                overlay={
+                                    <Popover id={`popover-positioned-to`}>
+                                        <Popover.Title as="b">{`usage guides`}</Popover.Title>
+                                        <Popover.Content>
+                                            <strong>We have given enough information on everything on Casual Desi . If you feel you really need a usage guide, you are free to write one and send us. We promise we will post it if we like it. </strong> 
+                                        </Popover.Content>
+                                    </Popover>
+                                }
+                            >
                             <Link to="#" className="d-block padding-top-30px padding-bottom-30px">
                                 <svg className="cat-svg" version="1.1" id="Capa_4" x="0px" y="0px" viewBox="0 0 412.72 412.72">
                             <g>
@@ -240,10 +303,24 @@ class FaqCategories extends Component {
                           </svg>
                                 <span className="d-block font-size-18 font-weight-semi-bold mt-3">usage guides</span>
                             </Link>
+                            </OverlayTrigger>
                         </div>
                     </div>
                     <div className="col-lg-3 column-td-6">
                         <div className="category-item faq-cat-item p-0">
+                        <OverlayTrigger
+                                trigger="click"
+                                key='usage guides'
+                                placement='top'
+                                overlay={
+                                    <Popover id={`popover-positioned-to`}>
+                                        <Popover.Title as="b">{`usage guides`}</Popover.Title>
+                                        <Popover.Content>
+                                            <strong>It’s already there everywhere on Casual Desi . </strong> 
+                                        </Popover.Content>
+                                    </Popover>
+                                }
+                            >
                             <Link to="#" className="d-block padding-top-30px padding-bottom-30px">
                                 <svg className="cat-svg" id="Capa_5" viewBox="0 0 511.996 511.996">
                                     <g id="XMLID_1609_">
@@ -257,10 +334,24 @@ class FaqCategories extends Component {
                                 </svg>
                                 <span className="d-block font-size-18 font-weight-semi-bold mt-3">information</span>
                             </Link>
+                            </OverlayTrigger>
                         </div>
                     </div>
                     <div className="col-lg-3 column-td-6">
                         <div className="category-item faq-cat-item p-0">
+                        <OverlayTrigger
+                                trigger="click"
+                                key='Transactions'
+                                placement='top'
+                                overlay={
+                                    <Popover id={`popover-positioned-to`}>
+                                        <Popover.Title as="b">{`Transactions`}</Popover.Title>
+                                        <Popover.Content>
+                                            <strong>As we said in About Casual Desi page. The service is free to use for consumers and business as well. If any further help is needed by any Indian from any service provider we encourage to contact the service provider / business directly and strike a deal. </strong> 
+                                        </Popover.Content>
+                                    </Popover>
+                                }
+                            >
                             <Link to="#" className="d-block padding-top-30px padding-bottom-30px">
                                 <svg className="cat-svg" version="1.1" id="Capa_6" x="0px" y="0px" viewBox="0 0 480.1 480.1">
                                 <g>
@@ -301,10 +392,24 @@ class FaqCategories extends Component {
                                 </svg>
                                 <span className="d-block font-size-18 font-weight-semi-bold mt-3">Transactions</span>
                             </Link>
+                            </OverlayTrigger>
                         </div>
                     </div>
                     <div className="col-lg-3 column-td-6">
                         <div className="category-item faq-cat-item p-0">
+                        <OverlayTrigger
+                                trigger="click"
+                                key='card'
+                                placement='top'
+                                overlay={
+                                    <Popover id={`popover-positioned-to`}>
+                                        <Popover.Title as="b">{`card`}</Popover.Title>
+                                        <Popover.Content>
+                                            <strong>You don’t need one here on Casual Desi </strong> 
+                                        </Popover.Content>
+                                    </Popover>
+                                }
+                            >
                             <Link to="#" className="d-block padding-top-30px padding-bottom-30px">
                                 <svg className="cat-svg" version="1.1" id="Capa_7" x="0px" y="0px" viewBox="0 0 507.996 507.996">
                             <g>
@@ -360,10 +465,24 @@ class FaqCategories extends Component {
                         </svg>
                                 <span className="d-block font-size-18 font-weight-semi-bold mt-3">card</span>
                             </Link>
+                            </OverlayTrigger>
                         </div>
                     </div>
                     <div className="col-lg-3 column-td-6">
                         <div className="category-item faq-cat-item p-0">
+                        <OverlayTrigger
+                                trigger="click"
+                                key='account'
+                                placement='top'
+                                overlay={
+                                    <Popover id={`popover-positioned-to`}>
+                                        <Popover.Title as="b">{`account`}</Popover.Title>
+                                        <Popover.Content>
+                                            <strong> You have to cerate an account for sure to fully utilize our services.  </strong> 
+                                        </Popover.Content>
+                                    </Popover>
+                                }
+                            >
                             <Link to="#" className="d-block padding-top-30px padding-bottom-30px">
                                 <svg className="cat-svg" version="1.1" id="Capa_8" x="0px" y="0px" viewBox="0 0 511.997 511.997" >
                             <g>
@@ -448,6 +567,7 @@ class FaqCategories extends Component {
                          </svg>
                                 <span className="d-block font-size-18 font-weight-semi-bold mt-3">account</span>
                             </Link>
+                            </OverlayTrigger>
                         </div>
                     </div>
                 </div>

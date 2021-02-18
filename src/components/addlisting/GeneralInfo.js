@@ -5,7 +5,7 @@ import Select from "react-select";
 import { FiMap } from 'react-icons/fi';
 import { CountryDropdown, RegionDropdown } from 'react-country-region-selector';
 import { connect } from "react-redux";
-import { fetchAmenties, fetchCategory } from '../../services/action/common';
+import { fetchAmenties, fetchCategory, getAllSubCategory } from '../../services/action/common';
 import { getListDetail, UpdateListing } from '../../services/action/list';
 class GeneralInfo extends Component {
     constructor(props) {
@@ -18,7 +18,7 @@ class GeneralInfo extends Component {
         this.onChangeCity = this.onChangeCity.bind(this);
         this.onChangeDescription = this.onChangeDescription.bind(this);
         this.onChangeZipcode = this.onChangeZipcode.bind(this);
-
+        this.onChangeSubcat = this.onChangeSubcat.bind(this);
         this.state = {
             listid: null,
             title: '',
@@ -28,9 +28,11 @@ class GeneralInfo extends Component {
             address: '',
             selectedCatOp: null,
             breadcrumbimg: require('../../assets/images/bread-bg.jpg'),
-            catid: { label: '', value: 2 },
+            catid: { label: 'select a service', value: null, id:'' },
+            subcat: { label: 'select a subcategory', value: '',id:null },
             category: [],
             amenties: [],
+            subcategory: [],
             showModal: false,
             country: '',
             region: '',
@@ -38,7 +40,8 @@ class GeneralInfo extends Component {
             zipcode: '',
             ModelContent: '',
             canonicalurl: '',
-            loading: false
+            loading: false,
+            uniqid:''
         }
     }
 
@@ -64,21 +67,49 @@ class GeneralInfo extends Component {
             })
 
         });
-       this.fetchlistDetail();
+        this.fetchlistDetail();
 
 
     }
 
+    onChangeSubcat = async (subcat) => {
+        this.setState({ subcat })
+        await this.props.dispatch(fetchAmenties(subcat.id));
+      }
+      
+
+    getsubcategory = (catid) => {
+        const obj = { cat_id: catid }
+     
+        this.props.dispatch(getAllSubCategory(obj)).then(() => {
+            if (this.props.subcategory && this.props.subcategory.length > 0) {
+                this.setState({
+                    subcategory: this.props.subcategory
+                })
+
+            } else {
+                this.setState({
+                    subcategory: []
+                })
+            }
+
+        })
+
+    }
+
     fetchlistDetail = () => {
-        let obj = { "canonicalurl": this.props.listurl}
+        let obj = { "canonicalurl": this.props.listurl }
         this.props.dispatch(getListDetail(obj)).then(() => {
-            this.setState({
+            const obj =this.state.category.find((obj)=> obj.id === Number(this.props.listdetail.categoryid));
+             this.setState({
+                uniqid:this.props.listdetail && this.props.listdetail.listid,
+                subcat:{value:this.props.listdetail && this.props.listdetail.subcat_id, label:this.props.listdetail && this.props.listdetail.categoryname},
                 businessname: this.props.listdetail && this.props.listdetail.list_title,
                 description: this.props.listdetail && this.props.listdetail.description,
                 address: this.props.listdetail && this.props.listdetail.address,
                 place: this.props.listdetail && this.props.listdetail.city,
                 listid: this.props.listdetail && this.props.listdetail.listing_id,
-                catid: {label: this.props.listdetail && this.props.listdetail.categoryname, value : this.props.listdetail && this.props.listdetail.categoryid},
+                catid: { value: this.props.listdetail && this.props.listdetail.categoryid,label:obj && obj.name },
                 keywords: this.props.listdetail && this.props.listdetail.keywords,
                 zipcode: this.props.listdetail && this.props.listdetail.zipcode,
                 country: this.props.listdetail && this.props.listdetail.country,
@@ -147,11 +178,10 @@ class GeneralInfo extends Component {
     }
 
 
-    handleChangeCat = async (catid) => {
+    handleChangeCat = (catid) => {
         this.setState({ catid });
-        await this.props.dispatch(fetchAmenties(catid.value));
-
-    }
+        this.getsubcategory(catid.id);
+     }
 
     handleListing(e) {
         e.preventDefault();
@@ -160,12 +190,14 @@ class GeneralInfo extends Component {
         });
 
         const obj = {
+            listid:this.state.uniqid,
             listing_id: this.state.listid,
             list_title: this.state.businessname,
             description: this.state.description,
             keywords: this.state.keywords,
             categoryid: this.state.catid.value,
-            categoryname:this.state.catid.label,
+            subcat_id: this.state.subcat.value,
+            categoryname: this.state.subcat.label,
             address: this.state.address,
             country: this.state.country,
             state: this.state.region,
@@ -175,6 +207,7 @@ class GeneralInfo extends Component {
             created_by: this.props.userdetails.id && this.props.userdetails.id
 
         }
+       
 
         this.props.dispatch(UpdateListing(obj)).then(() => {
             if (this.props.isCreated) {
@@ -188,12 +221,21 @@ class GeneralInfo extends Component {
 
     render() {
 
-        const { country, region, category } = this.state;
+        const { country, region, category, subcategory } = this.state;
         const categories = category && category.length ? category.map(cat => {
-            return { value: `${cat.id}`, label: `${cat.name}` };
+            return { value: `${cat.id}`, label: `${cat.name}`, id:`${cat.cat_id}` };
         }) : [{
             value: 0,
             label: 'no category feched'
+        }];
+
+      
+
+        const subcategories = subcategory && subcategory.length > 0 ? subcategory.map(cat => {
+            return { value: `${cat.subcat_id}`, label: `${cat.name}`, id:`${cat.id}`};
+        }) : [{
+            value: '',
+            label: 'no subcategory feched'
         }];
 
         return (
@@ -220,13 +262,26 @@ class GeneralInfo extends Component {
                                     </div>
                                     <div className="col-lg-6">
                                         <div className="input-box">
-                                            <label className="label-text">Service you Offer</label>
+                                            <label className="label-text">Select Category</label>
                                             <div className="form-group mb-0">
                                                 <Select
                                                     value={this.state.catid}
                                                     onChange={this.handleChangeCat}
                                                     placeholder="Select a Category"
                                                     options={categories}
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="col-lg-8">
+                                        <div className="input-box">
+                                            <label className="label-text">Service you Offer</label>
+                                            <div className="form-group mb-0">
+                                                <Select
+                                                    value={this.state.subcat}
+                                                    onChange={this.onChangeSubcat}
+                                                    placeholder="Select a Category"
+                                                    options={subcategories}
                                                 />
                                             </div>
                                         </div>
@@ -357,9 +412,9 @@ class GeneralInfo extends Component {
 function mapStateToProps(state) {
     const { isLoggedIn, userdetails } = state.auth;
     const { isCreated, listdetail } = state.list;
-    const { amenties, category } = state.common;
+    const { amenties, category,subcategory } = state.common;
     return {
-        isLoggedIn, category, amenties, userdetails, isCreated, listdetail
+        isLoggedIn, category, amenties, userdetails,subcategory, isCreated, listdetail
 
     };
 }

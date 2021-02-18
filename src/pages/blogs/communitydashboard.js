@@ -12,14 +12,13 @@ import Footer from "../../components/common/footer/Footer";
 import ScrollTopBtn from "../../components/common/ScrollTopBtn";
 import GenericHeader from '../../components/common/GenericHeader';
 import { connect } from "react-redux";
-import { fetchRules } from '../../services/action/common';
 import { fetchCommunityPost } from '../../services/action/post';
 import { communitydetails, joinCommunity, leaveCommunity, approveCommunity, fetchcommunitymember } from "../../services/action/community";
 import CommunitySidebar from '../../components/sidebars/communitysidebar';
 import { Badge } from 'react-bootstrap';
 import EditCommunity from './editCommunity';
 import { Helmet } from 'react-helmet';
-
+import LoadingOverlay from 'react-loading-overlay';
 
 class CommunityDashboard extends Component {
     constructor(props) {
@@ -127,7 +126,7 @@ class CommunityDashboard extends Component {
                 this.setState({
                     communitydetail: this.props.communitydetails[0],loading:false
                 })
-                this.fetchcommunitypost();
+                this.props.dispatch(fetchCommunityPost(this.props.communitydetails[0].com_id))
                 this.fetchcommunitymember();
 
             }
@@ -161,9 +160,14 @@ class CommunityDashboard extends Component {
         })
     }
 
-    fetchcommunitypost = async () => {
-       return await this.props.dispatch(fetchCommunityPost(this.props.communitydetails[0].com_id))
+      fetchcommunitypost = async () => {
+        if(this.props.communitydetails && this.props.communitydetails.length > 0)
+        {
+            return await this.props.dispatch(fetchCommunityPost(this.props.communitydetails[0].com_id))
 
+
+        }
+       
     }
 
     render() {
@@ -171,6 +175,11 @@ class CommunityDashboard extends Component {
       
 
         return (
+            <LoadingOverlay
+            active={this.state.loading}
+            spinner
+            text='Loading your content...'
+        >
             <main className="List-map-view2">
                 <Helmet>
                     <title>{this.state.communitydetail && ('r/' + this.state.communitydetail.communityName)}</title>
@@ -179,13 +188,8 @@ class CommunityDashboard extends Component {
                 </Helmet>
                 {/* Header */}
                 <GeneralHeader />
-                { this.state.loading ? (
-                    <div className="d-flex justify-content-center margin-top-200px margin-bottom-200px text-primary">
-
-                        <span className="spinner-border spinner-border-lg"></span>
-                    </div>
-                ) : (
-                <section className="dashboard-area padding-top-140px padding-bottom-90px">
+               
+                <section className="dashboard-area padding-top-180px padding-bottom-90px">
                     <div className="container">
                         <Tabs>
                             <div className="row">
@@ -247,9 +251,9 @@ class CommunityDashboard extends Component {
                                                 }
                                             </Tab>
 
-                                            <div className="btn-box">
+                                            <Tab>
                                                 <Link to={`/forum/submit/${this.state.communitydetail && this.state.communitydetail.communityName}`} className="theme-btn"><span className="la"><AiOutlinePlusCircle /></span> create post</Link>
-                                            </div>
+                                            </Tab>
                                             {
                                                 this.props.isLoggedIn ? (
                                                     this.state.communitydetail && this.state.communitydetail.admin === user.id ?
@@ -337,7 +341,7 @@ class CommunityDashboard extends Component {
                             </div>
                         </Tabs>
                     </div>
-                </section>)}
+                </section>
 
                 {/* Newsletter */}
                 <NewsLetter />
@@ -376,6 +380,7 @@ class CommunityDashboard extends Component {
 
 
             </main >
+            </LoadingOverlay>
 
 
         );

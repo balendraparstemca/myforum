@@ -13,7 +13,7 @@ function Banner6({title}) {
                                     <h2 className="breadcrumb__title">
                                         {title}
                                     </h2>
-                                    <div className="contact-form-action">
+                                    {/* <div className="contact-form-action">
                                         <form method="post">
                                             <div className="row">
                                                 <div className="col-lg-7 mx-auto">
@@ -28,7 +28,7 @@ function Banner6({title}) {
                                                 </div>
                                             </div>
                                         </form>
-                                    </div>
+                                    </div> */}
                                 </div>
                             </div>
                         </div>

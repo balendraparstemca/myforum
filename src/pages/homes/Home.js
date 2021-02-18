@@ -5,64 +5,90 @@ import SectionsHeading from "../../components/common/SectionsHeading";
 import PopularCategories from "../../components/other/categories/PopularCategories";
 import Toplisting from "../../components/places/toplist";
 import InfoBox2 from "../../components/other/infoboxes/InfoBox2";
-import Button from "../../components/common/Button";
 import SectionDivider from "../../components/common/SectionDivider";
-import ClientLogo from "../../components/sliders/ClientLogo";
 import NewsLetter from "../../components/other/cta/NewsLetter";
 import Footer from "../../components/common/footer/Footer";
 import ScrollTopBtn from "../../components/common/ScrollTopBtn";
 import { connect } from "react-redux";
-import { fetchCategory, getAddress } from '../../services/action/common';
-import PopularPosts from '../../components/places/popularposts';
-import { getpeopleviewList } from '../../services/action/list';
-import { fetchHomePost } from '../../services/action/post';
-import { Link } from 'react-router-dom';
+import { fetchCategory, getDefaultMeta, getGeoInfo, getPageinfo } from '../../services/action/common';
+import MetaTag from '../metainfo';
+
+
 class Home extends Component {
+
+    constructor(props) {
+        super(props)
+        this.state = {
+            metainfo: null,
+            defaultMetaTag: null
+        }
+
+    }
 
 
     componentDidMount() {
-        this.fetchcurrentlocation()
-        this.props.dispatch(fetchCategory())
-        this.fetchtoplistnear();
-        this.fetchtoppostsnearyou();
+        this.fetchlocationbyipaddress()
+        this.getpageseo({ page_type: 'home' })
+        this.props.dispatch(fetchCategory({  for: 'LISTING',status:true}))
 
     }
 
 
+    getpageseo = (obj) => {
+        this.props.dispatch(getPageinfo(obj)).then(() => {
+            if (this.props.pageinfo.length > 0) {
+                this.setState({
+                    metainfo: {
+                        title: this.props.pageinfo[0].meta_title,
+                        canonicalURL: `https://www.casualdesi.com${this.props.location.pathname || ''}`,
+                        meta: [{
+                            attribute: 'name',
+                            value: 'description',
+                            content: this.props.pageinfo[0].meta_description
+                        },
+                        {
+                            attribute: 'name',
+                            value: 'keywords',
+                            content: this.props.pageinfo[0].meta_keywords
+                        }]
+                    }
+                })
 
-    fetchcurrentlocation = async () => {
-        navigator.geolocation.getCurrentPosition(
-            async function (position) {
-                const result = await getAddress(position.coords.latitude, position.coords.longitude)
-                if (result) {
+            } else {
 
-                    const addressArray = result.results[0].address_components;
-
-
-                }
-
-            }, function (error) {
+                this.setState({
+                    defaultMetaTag: getDefaultMeta()
+                })
             }
-        );
+        })
     }
 
-    fetchtoplistnear = async () => {
-        const obj = {
-            "city": '',
-            "country": '',
-            "state": ''
-        }
-        return await this.props.dispatch(getpeopleviewList(obj));
-    }
 
-    fetchtoppostsnearyou = () => {
-        this.props.dispatch(fetchHomePost({ place: 'India' }))
+
+    // fetchcurrentlocation = async () => {
+    //     navigator.geolocation.getCurrentPosition(
+    //         async function (position) {
+    //             const result = await getAddress(position.coords.latitude, position.coords.longitude)
+    //             if (result) {
+    //                 console.log(result)
+    //             }
+
+    //         }, function (error) {
+    //         }
+    //     );
+    // }
+
+    fetchlocationbyipaddress = () => {
+        getGeoInfo()
+
     }
 
     render() {
 
-        return (
-            <main className="home-1">
+        return (<>
+            { this.state.metainfo ? <MetaTag metaTag={this.state.metainfo || this.state.defaultMetaTag}></MetaTag> : ''}
+
+            <main className="blog-left-sidebar-page">
                 {/* Header */}
                 <GeneralHeader />
 
@@ -70,26 +96,20 @@ class Home extends Component {
                 <BannerOne />
 
                 {/* Popular Categories */}
-                <section className="cat-area padding-top-10px padding-bottom-10px">
+                <section className="cat-area padding-top-50px padding-bottom-0px">
+
                     <div className="container">
                         <div className="row section-title-width text-center">
-                            <div className="section-heading">
-                                 <Link to="/categories"><b className="sec__title">Browse By Category</b></Link>
-                                
-                              </div>
-
+                            <SectionsHeading title="Top Categories" desc="Let it be an Immigration question you have or a Indian roommate or Indian event or a movie near by you, we got you covered" />
                         </div>
-                        <div className="row mt-5">
-
-                            <PopularCategories />
-                        </div>
+                        <PopularCategories />
                     </div>
                 </section>
                 {/* How It Word */}
-                <section className="hiw-area padding-top-10px padding-bottom-10px after-none text-center">
+                <section className="hiw-area  text-center">
                     <div className="container">
                         <div className="row section-title-width text-center">
-                            <SectionsHeading title="What We Offer" desc="Morbi convallis bibendum urna ut viverra. Maecenas quis consequat libero, a feugiat eros. Nunc ut lacinia tortors." />
+                            <SectionsHeading title="What We Offer" desc="We help you find any thing Desi Around you, let it be in any part of the world you live. From Indian Restaurant to a Desi Nanny or a near by local Desi event " />
                         </div>
 
                         <InfoBox2 />
@@ -100,39 +120,17 @@ class Home extends Component {
 
                 <SectionDivider />
 
-                {/* Blog */}
-                <section className="blog-area padding-top-100px padding-bottom-80px">
-                    <div className="container">
-                        <div className="row section-title-width section-title-ml-mr-0">
-                            <div className="col-lg-8">
-                                <SectionsHeading title="Popular Places near you" desc="Morbi convallis bibendum urna ut viverra. Maecenas quis consequat libero, a feugiat eros. Nunc ut lacinia tortors." />
-                            </div>
-                            <div className="col-lg-4">
-                                <div className="btn-box h-100 d-flex align-items-center justify-content-end">
-                                    <Button text="view all Lists" url="/listing-list/search/?q=nearme" className=" margin-top-100px" />
-                                </div>
-                            </div>
-                        </div>
-                        <Toplisting city="" country="" state="" />
-                        <div className="row section-title-width section-title-ml-mr-0">
-                            <div className="col-lg-8">
-                                <SectionsHeading title="Popular Posts near you" desc="Morbi convallis bibendum urna ut viverra. Maecenas quis consequat libero, a feugiat eros. Nunc ut lacinia tortors." />
-                            </div>
-                            <div className="col-lg-4">
-                                <div className="btn-box h-100 d-flex align-items-center justify-content-end">
-                                    <Button text="view all post" url="/forum/home" className=" margin-top-100px" />
-                                </div>
-                            </div>
-                        </div>
 
-                        <PopularPosts />
-                    </div>
-                </section>
+                {/* neares lists and post */}
+
+
+                <Toplisting myloc={this.props.mylocation && this.props.mylocation} />
+
 
 
 
                 {/* Client Logo */}
-                <ClientLogo />
+                {/* <ClientLogo /> */}
 
                 {/* NewsLetter */}
                 <NewsLetter />
@@ -142,6 +140,7 @@ class Home extends Component {
 
                 <ScrollTopBtn />
             </main>
+        </>
         )
     }
 }
@@ -149,9 +148,9 @@ class Home extends Component {
 function mapStateToProps(state) {
     const { posts } = state.post;
     const { isLoggedIn, userdetails } = state.auth;
-    const { category } = state.common;
+    const { category, topcategory, mylocation, pageinfo } = state.common;
     return {
-        isLoggedIn, category, userdetails, posts
+        isLoggedIn, category, userdetails, posts, pageinfo, topcategory, mylocation
 
     };
 }

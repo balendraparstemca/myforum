@@ -4,17 +4,14 @@ class CopyrightMenu extends Component {
     state = {
         links: [
             {
-                path: '#',
+                path: '/terms-condition',
                 title: 'Terms & Conditions'
             },
             {
-                path: '#',
+                path: '/privacy-policy',
                 title: 'Privacy Policy'
             },
-            {
-                path: '#',
-                title: 'Help Center'
-            }
+           
         ]
     }
     render() {

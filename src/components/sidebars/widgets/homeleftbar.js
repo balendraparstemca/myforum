@@ -18,14 +18,32 @@ class HomeSidebar extends Component {
     }
 
     componentDidMount() {
-        this.props.dispatch(fetchCommunityList()).then(() => {
+        
+        this.props.dispatch(fetchCommunityList({ approved: true })).then(() => {
             this.setState({
                 communitylist: this.props.communitylist
             })
         });
     }
 
+    filterList = (originalcommunity) => {
+
+        let updateList = originalcommunity;
+        updateList = updateList.filter(item => {
+            return item.country.toLowerCase().search(
+                this.props.mylocation.country.toLowerCase()
+            ) !== -1 || item.place.toLowerCase().search(
+                this.props.mylocation.city.toLowerCase()
+            ) !== -1 || item.place.toLowerCase().search(
+                this.props.mylocation.state.toLowerCase()
+            ) !== -1
+        });
+
+        return updateList
+    }
+
     render() {
+
         const { communitylist } = this.props
         const map = new Map();
         let result = []
@@ -38,6 +56,7 @@ class HomeSidebar extends Component {
                 map.set(item.category, true);    // set any value to Map
                 result.push({
                     cat: item.category,
+                    canonical_url:item.canonical_url,
                     catNum: 1
                 });
             }
@@ -102,7 +121,7 @@ class HomeSidebar extends Component {
                                 {result.length ? result.map((item, i) => {
                                     return (
                                         <li className="mb-2 pb-2" key={i}>
-                                            <Link to={`/forum/community/${item.cat}`} className="d-flex justify-content-between align-items-center before-none">
+                                            <Link  className="d-flex justify-content-between align-items-center before-none">
                                                 {item.cat} <span>{item.catNum}</span>
                                             </Link>
                                         </li>
@@ -111,49 +130,50 @@ class HomeSidebar extends Component {
 
                             </ul>
                         </div>
+                               <div className="btn-box text-center  padding-top-30px">
+                                <Link to="/forum/community">  <Button className="d-block" variant="danger">
+                                <BsEye />  All Category
+                                </Button></Link>
+                            </div>
                     </div>
 
-                   { /* <div className="sidebar-widget">
-                        <h3 className="widget-title">
-                           community Near you
-                    </h3>
-                        <div className="title-shape"></div>
-                        <div className="cat-list padding-top-30px">
-                            <ul className="list-items">
+                    {
+                        this.props.mylocation ? (<>
 
-                                {this.state.communitylist && this.state.communitylist.length === 0 ?
-                                    (
-                                        <li className="mb-2 pb-2" >
-                                            <Link to="#" className="d-flex justify-content-between align-items-center before-none">
-                                                there is no community near you
-                                         </Link>
+                            <div className="sidebar-widget">
+                                <h3 className="widget-title">
+                                    community Near you
+                                 </h3>
+                                <div className="title-shape"></div>
+                                <div className="cat-list padding-top-30px">
+                                    <ul className="list-items">
 
-                                        </li>
-                                    ) : this.state.communitylist.slice(0, 5).map((com, i) => {
-                                        return (
-                                            <li className="mb-2 pb-2" key={i}>
-                                                <div className="author-bio margin-bottom-0px">
-                                                    <div className="d-flex align-items-center">
-                                                        {i + 1}- <img src={this.state.img} alt="author" />
-                                                        <div className="author-inner-bio margin-right-2px">
-                                                            <p>
-                                                                <Link to={`/forum/r/${com.communityName}`}>{'r/' + com.communityName}</Link>
-                                                            </p>
+                                        {
+                                        this.filterList(this.state.communitylist).map((com, i) => {
+                                            return (
+                                                <li className="mb-2 pb-2" key={i}>
+                                                    <div className="author-bio margin-bottom-0px">
+                                                        <div className="d-flex align-items-center">
+                                                            {i + 1}- <img src={this.state.img} alt="author" />
+                                                            <div className="author-inner-bio margin-right-2px">
+                                                                <p>
+                                                                    <Link to={`/forum/r/${com.communityName}`}>{'r/' + com.communityName}</Link>
+                                                                </p>
 
+                                                            </div>
                                                         </div>
                                                     </div>
-                                                </div>
-                                            </li>
+                                                </li>
 
-                                        )
-                                    })
-                                }
+                                            )
+                                        })
+                                        }
 
-                            </ul>
-                         
-                        </div>
-                    </div>*/}
-                   
+                                    </ul>
+
+                                </div>
+                            </div></>) : ''}
+
 
                 </div>
             </>
@@ -165,11 +185,11 @@ class HomeSidebar extends Component {
 function mapStateToProps(state) {
     const { communitydetails, communitylist } = state.community;
     const { message } = state.message;
-    const { category } = state.common;
+    const { category, mylocation } = state.common;
     const { posts } = state.post;
 
     return {
-        communitydetails, category, communitylist, posts,
+        communitydetails, category, communitylist, posts, mylocation,
         message
     };
 }

@@ -45,16 +45,10 @@ class HeaderAuthorAccess extends React.Component {
 
     render() {
         return (
-            <>
+            <> <div className="logo-right-content">
 
-
-                <div className="logo-right-content">
-
-                    {this.props.isLoggedIn ? <>   <ul> <li>
-                        <Button text="add listing" url="/add-listing" >
-                            <FiPlusCircle />
-                        </Button>
-                    </li></ul> <div className="side-user-menu-open" onClick={() => this.setAuthorAccessOpen()}>
+                    {this.props.isLoggedIn ? <>  
+                     <div className="side-user-menu-open" onClick={() => this.setAuthorAccessOpen()}>
                             <AiOutlineUser />
                         </div></> : (<ul className="author-access-list"> <li>
                             <Link to="/login">login</Link>

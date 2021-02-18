@@ -56,24 +56,30 @@ class ReviewFields extends Component {
 
     handleReview(e) {
         e.preventDefault();
+        if (this.props.isLoggedIn) {
+            const obj = {
+                listing_id: this.props.listingid,
+                name: this.state.name,
+                email: this.state.email,
+                stars: this.state.star,
+                review_text: this.state.message,
+                userid:this.props.userdetails.id
+            }
+            this.props.dispatch(addListReview(obj)).then(() => {
+                this.setState({
+                    name: '',
+                    email: '',
+                    message: '',
+                    star: ''
 
-        const obj = {
-            listing_id: this.props.listingid,
-            name: this.state.name,
-            email: this.state.email,
-            stars: this.state.star,
-            review_text: this.state.message,
+                })
+                this.props.fetchlistcomment(this.props.listingid)
+            });
+
+        }else{
+            alert('please login first')
         }
-        this.props.dispatch(addListReview(obj)).then(() => {
-            this.setState({
-                name: '',
-                email: '',
-                message: '',
-                star: ''
 
-            })
-            this.props.fetchlistcomment(this.props.listingid)
-        });
     }
 
 

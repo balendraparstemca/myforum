@@ -16,6 +16,12 @@ class CommunityService {
     });
   }
 
+  removeCommunity(obj) {
+    return axios.post(API_URL + "remove_community", obj).then((response) => {
+      return response.data;
+    });
+  }
+
   joinCommunity(obj) {
     return axios.post(API_URL + "join_community", obj).then((response) => {
       return response.data;

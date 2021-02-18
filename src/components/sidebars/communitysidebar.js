@@ -29,7 +29,7 @@ class CommunitySidebar extends Component {
 
     }
 
-    componentDidUpdate(prevProps) {
+    componentDidUpdate() {
 
         if (this.state.catid !== this.props.categoryid) {
             this.setState({ catid: this.props.categoryid });

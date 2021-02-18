@@ -4,8 +4,8 @@ import SocialProfile from "../../other/account/SocialProfile";
 
 class FooterLeftWidget extends Component {
     state = {
-        logo: require('../../../assets/images/logo2.png'),
-        desc: 'Morbi convallis bibendum urna ut viverra. Maecenas quis consequat libero, a feugiat eros',
+        logo: require('../../../assets/images/logo2.jpg'),
+        desc: 'Casual Desi is owned and operated by 3 Guys Global Inc., headquartered in Irving, Texas, United States started its digital service operations in the year 2020',
     }
     render() {
         return (

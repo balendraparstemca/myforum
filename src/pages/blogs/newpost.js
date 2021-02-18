@@ -11,11 +11,23 @@ import Select from "react-select";
 import { postModel } from '../../model/postModel';
 import SweetAlert from 'react-bootstrap-sweetalert';
 import { connect } from "react-redux";
-import { addFlaretags, fetchCommunityList, fetchFlair } from '../../services/action/common';
+import { addFlaretags, fetchCommunityList, fetchFlair, fetchRules } from '../../services/action/common';
 import { createpost, createpostwith } from '../../services/action/post';
 import { Link } from 'react-router-dom';
 import { Badge } from 'react-bootstrap';
 import { Modal } from 'react-bootstrap';
+import { EditorState, ContentState, convertToRaw } from 'draft-js';
+import { Editor } from 'react-draft-wysiwyg';
+import draftToHtml from 'draftjs-to-html';
+import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
+import {
+    Accordion,
+    AccordionItem,
+    AccordionItemHeading,
+    AccordionItemButton,
+    AccordionItemPanel,
+} from 'react-accessible-accordion';
+import { FaPlus, FaMinus } from 'react-icons/fa'
 
 class NewPost extends Component {
 
@@ -33,6 +45,7 @@ class NewPost extends Component {
         this.onChangeAmentiesname = this.onChangeAmentiesname.bind(this);
         this.onDrop = this.onDrop.bind(this);
         this.state = {
+            editorsecondState: EditorState.createEmpty(),
             description: "",
             title: "",
             url: "",
@@ -46,7 +59,13 @@ class NewPost extends Component {
             imagecollection: '',
             createdsuccess: false,
             showModal: false,
-            amentiesname: ''
+            amentiesname: '',
+            rule: [],
+            plus: <FaPlus />,
+            minus: <FaMinus />,
+            cardClass: 'mb-3',
+            countryPriorities: ['IN', "US", "CA", "GB", "AU", "NO", "NL", "FR", "CH", "AE", "SG", "KW", "SA", "QA", "MY", "LK"],
+
 
         };
 
@@ -57,10 +76,16 @@ class NewPost extends Component {
         this.props.dispatch(fetchCommunityList());
         this.props.dispatch(fetchFlair(0));
         if (this.props.match.params.communityname) {
-          this.setState({
-                comid:{label:`r/${this.props.match.params.communityname}`}
+            this.setState({
+                comid: { label: `r/${this.props.match.params.communityname}` }
             })
         }
+
+        this.props.dispatch(fetchRules({ com_id: 3 })).then(() => {
+            this.setState({
+                rule: this.props.rule
+            })
+        })
 
     }
 
@@ -236,8 +261,16 @@ class NewPost extends Component {
         this.setState({ showModal: true });
     }
 
+    onEditorsecondStateChange = (editorsecondState) => {
+        this.setState({
+            editorsecondState, description: draftToHtml(convertToRaw(editorsecondState.getCurrentContent()))
+        });
+    }
+
 
     render() {
+
+        const { editorsecondState } = this.state;
         let imgPreview;
         if (this.state.file) {
             imgPreview = <img src={this.state.file} alt='' width="580px" height="500px" />;
@@ -322,12 +355,25 @@ class NewPost extends Component {
                                                             <input className="form-control" type="url" placeholder="Any urls for refences" name="url" value={this.state.url} onChange={this.onChangeUrl} />
                                                         </div>
                                                     </div>
-                                                    <div className="input-box">
+                                                    {/* <div className="input-box">
                                                         <label className="label-text">Description</label>
                                                         <div className="form-group">
                                                             <span className="form-icon"><BsPencil /></span>
                                                             <textarea className="message-control form-control" name="description" value={this.state.description} onChange={this.onChangeDescription} required="required" placeholder="Write description for post"></textarea>
                                                         </div>
+                                                    </div> */}
+
+                                                    <div className="input-box">
+                                                        <label className="label-text">Description</label>
+                                                        <div className="form-group">
+                                                            <span className="form-icon"><BsPencil /></span>
+                                                            <Editor
+                                                                editorState={editorsecondState}
+                                                                row='5'
+                                                                wrapperClassName="demo-wrapper"
+                                                                editorClassName="demo-editor form-control "
+                                                                onEditorStateChange={this.onEditorsecondStateChange}
+                                                            />  </div>
                                                     </div>
                                                     <div className="input-box">
                                                         <label className="label-text"> Select Flare Tags if not then add popular trending Flare tags <Badge variant="danger" onClick={this.open}><BsFillPlusCircleFill /> Add New tags</Badge></label>
@@ -367,7 +413,40 @@ class NewPost extends Component {
 
                             </div>
                             <div className="col-lg-4">
+                                <div className="billing-form-item">
+                                    <div className="billing-title-wrap">
+                                        <h3 className="widget-title pb-0">
+                                            Some Important rule
+                                            </h3>
+                                        <div className="title-shape margin-top-10px"></div>
+                                    </div>
 
+                                    <Accordion className="accordion accordion-item pr-4" id="accordionExample">
+
+                                        {this.state.rule && this.state.rule.map((item, i) => {
+                                            return (
+                                                <div className={'card ' + this.state.cardClass} key={i}>
+                                                    <AccordionItem>
+                                                        <AccordionItemHeading className="card-header">
+                                                            <AccordionItemButton className="btn btn-link d-flex align-items-center justify-content-between">
+                                                                {item.title}
+                                                                <i className="minus">{this.state.minus}</i>
+                                                                <i className="plus">{this.state.plus}</i>
+                                                            </AccordionItemButton>
+                                                        </AccordionItemHeading>
+                                                        <AccordionItemPanel>
+                                                            <div className="card-body">
+                                                                {item.description}
+                                                            </div>
+                                                        </AccordionItemPanel>
+                                                    </AccordionItem>
+                                                </div>
+                                            )
+                                        })}
+
+                                    </Accordion>
+
+                                </div>
                             </div>
                         </div>
 
@@ -375,7 +454,7 @@ class NewPost extends Component {
                 </section>
                 <Modal show={this.state.showModal} onHide={this.close}>
                     <Modal.Header closeButton>
-                        <Modal.Title>{this.state.title}</Modal.Title>
+                        <Modal.Title>Add Hashtags & Flare</Modal.Title>
                     </Modal.Header>
                     <Modal.Body>
                         {addAmenties}
@@ -402,11 +481,11 @@ class NewPost extends Component {
 function mapStateToProps(state) {
 
     const { communitylist } = state.community;
-    const { flair } = state.common;
+    const { flair, rule } = state.common;
     const { userdetails, isLoggedIn } = state.auth;
     const { isCreated } = state.post;
     return {
-        communitylist, flair, userdetails, isCreated, isLoggedIn
+        communitylist, flair, userdetails, isCreated, isLoggedIn, rule
     };
 }
 export default connect(mapStateToProps)(NewPost);

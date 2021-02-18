@@ -23,7 +23,7 @@ class WidgetSimilarListing extends Component {
                 "city": this.props.city,
                 "country": this.props.country,
                 "state": this.props.state,
-                "categoryid": this.props.categoryid
+                "subcategoryid": this.props.subcatid
             }
             this.props.dispatch(getsimilarviewList(obj));
         }

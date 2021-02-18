@@ -3,19 +3,20 @@ import GeneralHeader from "../../components/common/GeneralHeader";
 import Breadcrumb from "../../components/common/Breadcrumb";
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import { Link } from "react-router-dom";
-import { BsListCheck, BsBookmark,  BsCheckCircle, BsExclamationCircle, BsFillChatSquareQuoteFill, BsFillBellFill, } from 'react-icons/bs'
-import { FaRegEdit, FaRegEnvelope, FaRegTrashAlt } from 'react-icons/fa'
-import { AiOutlineUser, AiOutlinePlusCircle, AiOutlinePoweroff, AiOutlineExclamationCircle } from 'react-icons/ai'
+import { BsListCheck, BsBookmark, BsCheckCircle, BsExclamationCircle, BsFillChatSquareQuoteFill, BsFillBellFill, } from 'react-icons/bs'
+import { FaRegCalendarCheck, FaRegEdit, FaRegEnvelope, FaRegTrashAlt } from 'react-icons/fa'
+import { AiOutlineUser, AiOutlinePlusCircle, AiOutlinePoweroff, AiOutlineExclamationCircle, AiFillQuestionCircle } from 'react-icons/ai'
 import NewsLetter from "../../components/other/cta/NewsLetter";
 import Footer from "../../components/common/footer/Footer";
 import ScrollTopBtn from "../../components/common/ScrollTopBtn";
 import { connect } from "react-redux";
 import { addImageprofile, userUpdate, userVerify } from '../../services/action/auth';
-import { getuserlist, getusersavedlist, userUnsaveList } from '../../services/action/list';
+import { getmylist, getusersavedlist, userUnsaveList } from '../../services/action/list';
 import { userdetails } from '../../services/action/user';
 import { Badge } from 'react-bootstrap';
 import { getNotification, removeNotification } from '../../services/action/common';
-
+import { IoIosCheckmarkCircle } from 'react-icons/io';
+import moment from 'moment';
 class Dashboard extends Component {
 
     constructor(props) {
@@ -28,6 +29,7 @@ class Dashboard extends Component {
         this.upload = this.upload.bind(this)
         this.state = {
             file: require('../../assets/images/team2.jpg'),
+            listimg: require('../../assets/images/img24.jpg'),
             imgCollection: '',
             breadcrumbimg: require('../../assets/images/bread-bg.jpg'),
             savedlist: [],
@@ -95,7 +97,7 @@ class Dashboard extends Component {
 
 
     getuserlist = (userid) => {
-        this.props.dispatch((getuserlist(userid))).then(() => {
+        this.props.dispatch((getmylist(userid))).then(() => {
             this.setState({
                 userlist: this.props.alluserlist
             })
@@ -415,18 +417,26 @@ class Dashboard extends Component {
                                                         return (
                                                             <div key={i} className="col-lg-4 column-td-6">
                                                                 <div className="card-item">
-                                                                    <Link to={`/listing-details/${item.listing.canonicalurl}`} className="card-image-wrap">
+                                                                    <Link to={`/listing-details/${item.listing.approved ? item.listing.canonicalurl : item.listing.canonicalurl + '/edit'}`} className="card-image-wrap">
                                                                         <div className="card-image">
-                                                                            <img src={`${process.env.REACT_APP_API_KEY}utilities/${item.listing.bannerimg}`} className="card__img" alt="Card" />
+                                                                            <img src={item.listing.bannerimg ? `${process.env.REACT_APP_API_KEY}utilities/${item.listing.bannerimg}` : this.state.listimg} className="card__img" alt="Card" width="200px" height="200px" />
                                                                         </div>
                                                                     </Link>
                                                                     <div className="card-content-wrap">
                                                                         <div className="card-content">
-                                                                            <Link to={`/listing-details/${item.listing.canonicalurl}`}>
-                                                                                <h4 className="card-title mt-0">{item.listing.list_title}</h4>
+                                                                            <Link to={`/listing-details/${item.listing.approved ? item.listing.canonicalurl : item.listing.canonicalurl + '/edit'}`}>
+                                                                                <h4 className="card-title">{item.listing.list_title}
+                                                                                    {item.listing.approved === 1 ? <i><IoIosCheckmarkCircle /></i> : <i><AiFillQuestionCircle /><Link to={`/listing-details/${item.listing.canonicalurl}/edit`}>not verified</Link></i>}
+                                                                                </h4>
                                                                                 <p className="card-sub">{item.listing.address}</p>
                                                                             </Link>
                                                                         </div>
+                                                                        <ul className="info-list padding-top-5px">
+                                                                            
+                                                                            <li>
+                                                                                <span className="la d-inline-block"><FaRegCalendarCheck /></span>Created {moment(Number(item.listing.creating_time)).fromNow()}
+                                                                            </li>
+                                                                        </ul>
                                                                         <div className="rating-row">
                                                                             <div className="edit-info-box">
                                                                                 <button type="button" className="theme-btn button-success border-0 mr-1">
@@ -465,6 +475,12 @@ class Dashboard extends Component {
                                                                                 <p className="card-sub">{item.address}</p>
                                                                             </Link>
                                                                         </div>
+                                                                        <ul className="info-list padding-top-5px">
+                                                                            
+                                                                            <li>
+                                                                                <span className="la d-inline-block"><FaRegCalendarCheck /></span>Saved {moment(Number(item.save_time)).fromNow()}
+                                                                            </li>
+                                                                        </ul>
                                                                         <div className="rating-row">
                                                                             <div className="edit-info-box">
 

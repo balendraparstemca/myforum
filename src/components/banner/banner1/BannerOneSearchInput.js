@@ -1,5 +1,5 @@
-import React, {Component} from 'react'
-import  { FiSearch } from 'react-icons/fi'
+import React, { Component } from 'react'
+import { FiSearch } from 'react-icons/fi'
 import SelectCountry from "../../common/SelectCountry";
 import Select from "react-select";
 
@@ -67,32 +67,35 @@ export default class BannerOneSearchInput extends Component {
             <>
                 <div className="main-search-input">
 
+                    <div className="main-search-input-item category">
+                        <Select
+                            value={this.selectedCatOp}
+                            onChange={this.handleChangeCat}
+                            placeholder={`Select ${this.props.placeholder} category`}
+                            options={categories}
+                        />
+                    </div>
+                    <div className="main-search-input-item location">
+                        <SelectCountry />
+                    </div>
+
                     <div className="main-search-input-item">
                         <div className="contact-form-action">
                             <form action="#">
                                 <div className="form-group mb-0">
-                                <span className="form-icon">
-                                    <FiSearch/>
-                                </span>
+                                    <span className="form-icon">
+                                        <FiSearch />
+                                    </span>
                                     <input className="form-control" type="text"
-                                           placeholder="What are you looking for?"/>
+                                        placeholder="What are you looking for?" />
                                 </div>
                             </form>
                         </div>
                     </div>
 
-                    <div className="main-search-input-item location">
-                        <SelectCountry />
-                    </div>
+               
 
-                    <div className="main-search-input-item category">
-                        <Select
-                            value={this.selectedCatOp}
-                            onChange={this.handleChangeCat}
-                            placeholder="Select a Category"
-                            options={categories}
-                        />
-                    </div>
+
 
                     <div className="main-search-input-btn">
                         <button className="button theme-btn" type="submit">Search</button>

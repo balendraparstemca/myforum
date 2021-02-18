@@ -7,27 +7,27 @@ class FooterCategoryWidget extends Component {
         links: [
             {
                 path: '#',
-                text: 'Shops'
+                text: 'Local Desi Shops'
             },
             {
                 path: '#',
-                text: 'Hotels'
+                text: 'Local Desi Businesses'
             },
             {
                 path: '#',
-                text: 'Restaurants'
+                text: 'Immigration Help'
             },
             {
                 path: '#',
-                text: 'Bars'
+                text: 'Desi Events'
             },
             {
                 path: '#',
-                text: 'Events'
+                text: 'Desi Roommates'
             },
             {
                 path: '#',
-                text: 'Fitness'
+                text: 'Desi Movies'
             }
         ]
     }

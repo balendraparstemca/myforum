@@ -5,7 +5,6 @@ import './assets/css/style.css';
 import './App.css';
 import Home from './pages/homes/Home';
 import AllCategories from './pages/categories/AllCategories';
-import AllLocations from './pages/categories/AllLocations';
 import ListingDetails from "./pages/listings/ListingDetails";
 import AddListing from "./pages/listings/AddListing";
 import UserProfile from "./components/other/account/UserProfile";
@@ -35,31 +34,34 @@ import { connect } from "react-redux";
 import PopularForums from './pages/blogs/popularForums';
 import listheadertwo from './components/common/listheadertwo';
 import BlogGrid from './pages/blogs/BlogGrid';
-
+import PrivacyPolicy from './pages/dashboard/privacypolicy';
+import TermsCondition from './pages/dashboard/termcondition';
+import { HelmetProvider } from 'react-helmet-async';
 
 
 function App(props) {
 
   return (
-
     <>
+      <HelmetProvider>
       <Route>
         <Switch>
           <Route exact path="/" component={Home} />
           <Route exact path="/home" component={Home} />
           <Route exact path="/categories" component={AllCategories} />
           <Route exact path="/categories/:catname" component={BlogGrid} />
-          <Route exact path="/all-location" component={AllLocations} />
           <Route exact path="/listing-list" component={ListHeader} />
           <Route exact path="/listing-list/search" component={listheadertwo} />
           <Route exact path="/listing-list/:category" component={ListHeader} />
           <Route exact path="/listing-details/:listurl" component={ListingDetails} />
-          <Route exact path="/listing-details/:listurl/edit" component={EditListing} />
-          <Route exact path="/add-listing"  exact render={() => props.isLoggedIn ? <AddListing/> : <Redirect to="/login" />}/>
+          <Route exact path="/listing-details/:listurl/edit" exact render={() => props.isLoggedIn ? <EditListing /> : <Redirect to="/login" />} />
+          <Route exact path="/add-listing" exact render={() => props.isLoggedIn ? <AddListing /> : <Redirect to="/login" />} />
           <Route exact path="/user-profile/:username" component={UserProfile} />
           <Route exact path="/dashboard" render={() => props.isLoggedIn ? <Dashboard /> : <Redirect to="/" />} />
           <Route exact path="/about" component={About} />
           <Route exact path="/faq" component={Faq} />
+          <Route exact path="/privacy-policy" component={PrivacyPolicy} />
+          <Route exact path="/terms-condition" component={TermsCondition} />
           <Route exact path="/contact" component={Contact} />
           <Route exact path="/recover" component={RecoverPassword} />
           <Route path="/forum" exact render={() => props.isLoggedIn ? <Redirect to="/forum/home" /> : <Redirect to="/forum/popular" />} />
@@ -74,7 +76,7 @@ function App(props) {
           <Route path="/forum/community/:categoryid" exact component={BlogLeftSidebar} />
           <Route path="/forum/post/:url" exact component={BlogDetail} />
           <Route path="/forum/post/edit/:url" exact component={editPost} />
-         <Route path="/sign-up" component={SignUp} />
+          <Route path="/sign-up" component={SignUp} />
           <Route path="/login" render={() => props.isLoggedIn ? <Redirect to="/" /> : < LoginBox />} />
           <Route path="/verify/:emailid" component={Verify} />
           <Route path="/reset/:emailid" component={ChangePassword} />
@@ -94,6 +96,7 @@ function App(props) {
         draggable
         pauseOnHover
       />
+      </HelmetProvider>
     </>
   );
 }
