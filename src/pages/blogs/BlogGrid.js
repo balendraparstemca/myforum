@@ -25,6 +25,7 @@ import { gethomeList, getMainCategorylist, likeList } from '../../services/actio
 import { MdStar } from 'react-icons/md';
 import { AiOutlineEye } from 'react-icons/ai';
 import { Badge } from 'react-bootstrap';
+import MetaTag from '../metainfo';
 const shortby = [
     {
         value: 1,
@@ -91,7 +92,8 @@ class BlogGrid extends Component {
             selectedCountryby: null,
             selectedRegion: null,
             showregion: false,
-            countryname: ''
+            countryname: '',
+            metainfo: null
         }
     }
 
@@ -416,7 +418,7 @@ class BlogGrid extends Component {
     }
 
     fetchHomelists = (catid) => {
-      
+
         if (catid) {
             this.setState({ loading: true })
             this.props.dispatch(getMainCategorylist(catid)).then(() => {
@@ -583,6 +585,32 @@ class BlogGrid extends Component {
         let obj = { canonical_url: this.props.match.params.catname }
         this.props.dispatch(fetchCategory(obj)).then(() => {
             if (this.props.category && this.props.category.length > 0) {
+
+
+                if (this.props.category[0].meta) {
+                    this.setState({
+                        metainfo: {
+                            title: this.props.category[0].seo_title ? this.props.category[0].seo_title : this.props.category[0].name,
+                            canonicalURL: `https://www.casualdesi.com${this.props.location.pathname || ''}`,
+                            meta: JSON.parse(this.props.category[0].meta)
+                        }
+                    })
+
+                }
+                else {
+                    this.setState({
+                        metainfo: {
+                            title: this.props.category[0].name,
+                            canonicalURL: `https://www.casualdesi.com${this.props.location.pathname || ''}`,
+                            meta: [{
+                                attribute: 'name',
+                                value: 'description',
+                                content: this.createMarkup(this.props.category[0].description)
+                            }]
+                        }
+                    })
+                }
+
                 const obj = { cat_id: this.props.category[0].cat_id }
                 this.setState({ loading: false, catid: this.props.category[0].id, icon: this.props.category[0].icon, categoryname: this.props.category[0].name, description: this.props.category[0].description, breadcrumbimg: this.props.category[0].imgsrc ? `${process.env.REACT_APP_API_KEY}utilities/${this.props.category[0].imgsrc}` : this.state.breadimg })
                 this.fetchHomelists(this.props.category[0].id)
@@ -623,10 +651,9 @@ class BlogGrid extends Component {
                 spinner
                 text='Loading your content...'
             >
-                <Helmet>
-                    <title>{this.state.categoryname && this.state.categoryname}</title>
-                    <meta name="keywords" content="casual desi,desi yaaro,sitarafoods,discussion forum ,information" />
-                </Helmet>
+                {this.state.metainfo ? <MetaTag metaTag={this.state.metainfo || this.state.defaultMetaTag}></MetaTag> : ''}
+
+
                 <main className="blog-grid-page">
                     {/* Header */}
                     <GeneralHeader />
@@ -676,7 +703,7 @@ class BlogGrid extends Component {
                                                                     <figcaption className="fig-caption">
                                                                         <Link to={`/listing-list/${item.canonical_url}`} className="cat-fig-box">
                                                                             <div className="icon-element mb-3">
-                                                                                <i class={`${item.icon}`}></i>
+                                                                                <i className={`${item.icon}`}></i>
                                                                             </div>
                                                                             <div className="cat-content">
                                                                                 <h4 className="cat__title mb-3">{item.name}</h4>
@@ -695,7 +722,7 @@ class BlogGrid extends Component {
                                                                 <figcaption className="fig-caption">
                                                                     <Link to={``} className="cat-fig-box">
                                                                         <div className="icon-element mb-3">
-                                                                            <i class=''></i>
+                                                                           
                                                                         </div>
                                                                         <div className="cat-content">
                                                                             <h4 className="cat__title mb-3">there is no category</h4>
@@ -812,7 +839,7 @@ class BlogGrid extends Component {
                                                                                                                         <Link to={`/listing-details/${item.listing.canonicalurl}`} className="card-image-wrap">
                                                                                                                             <div className="card-image">
                                                                                                                                 <img src={item.listing.bannerimg ? `${process.env.REACT_APP_API_KEY}utilities/${item.listing.bannerimg}` : item.listing.listimage} className="card__img" width="200px" height="200px" alt={item.listing.list_title} />
-                                                                                                                                <span className='badge'>{item.listing.badge_status ? item.listing.badge_status : '' }</span>
+                                                                                                                                <span className='badge'>{item.listing.badge_status ? item.listing.badge_status : ''}</span>
                                                                                                                                 <span className="badge-toggle" data-toggle="tooltip" data-placement="bottom" title="22 Likes">
                                                                                                                                     <FiHeart />
                                                                                                                                 </span>
@@ -850,16 +877,17 @@ class BlogGrid extends Component {
                                                                                                                                 </ul>
                                                                                                                             </div>
                                                                                                                             <div className="rating-row">
-                                                                                                                                <div className="rating-rating">
 
-                                                                                                                                    <span> <ReactStars
-                                                                                                                                        count={5}
-                                                                                                                                        size={24}
-                                                                                                                                        value={item.rating[0].rating ? parseFloat(item.rating[0].rating).toFixed(1) : 0}
-                                                                                                                                        isHalf={true} /> </span><span> - </span>
-                                                                                                                                    <span className="rating-count"> {parseFloat(item.rating[0].rating).toFixed(1)}</span>
+                                                                                                                                <div className="listing-info">
+                                                                                                                                    <ul>
 
-
+                                                                                                                                        <li><span> <ReactStars
+                                                                                                                                            count={5}
+                                                                                                                                            size={24}
+                                                                                                                                            value={item.rating[0].rating ? parseFloat(item.rating[0].rating).toFixed(1) : 0}
+                                                                                                                                            isHalf={true} /> </span> </li>
+                                                                                                                                        <li> <span className="info__count"> {parseFloat(item.rating[0].rating).toFixed(1)}</span></li>
+                                                                                                                                    </ul>
                                                                                                                                 </div>
                                                                                                                                 <div className="listing-info">
                                                                                                                                     <ul>
@@ -1097,14 +1125,16 @@ class BlogGrid extends Component {
                                                                                                             </ul>
                                                                                                         </div>
                                                                                                         <div className="rating-row">
-                                                                                                            <div className="rating-rating">
+                                                                                                            <div className="listing-info">
+                                                                                                                <ul>
 
-                                                                                                                <span> <ReactStars
-                                                                                                                    count={5}
-                                                                                                                    size={24}
-                                                                                                                    value={item.rating[0].rating ? parseFloat(item.rating[0].rating).toFixed(1) : 0}
-                                                                                                                    isHalf={true} /> </span><span> - </span>
-                                                                                                                <span className="rating-count"> {parseFloat(item.rating[0].rating).toFixed(1)}</span>
+                                                                                                                    <li><span> <ReactStars
+                                                                                                                        count={5}
+                                                                                                                        size={24}
+                                                                                                                        value={item.rating[0].rating ? parseFloat(item.rating[0].rating).toFixed(1) : 0}
+                                                                                                                        isHalf={true} /> </span> </li>
+                                                                                                                    <li> <span className="info__count"> {parseFloat(item.rating[0].rating).toFixed(1)}</span></li>
+                                                                                                                </ul>
 
 
                                                                                                             </div>

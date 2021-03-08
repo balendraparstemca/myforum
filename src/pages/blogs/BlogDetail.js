@@ -17,7 +17,6 @@ import SectionDivider from '../../components/common/SectionDivider';
 import { Dropdown } from 'react-bootstrap';
 import { AiFillDelete } from 'react-icons/ai';
 import { DeletePosts } from '../../services/action/user';
-import { Helmet } from 'react-helmet';
 import LoadingOverlay from 'react-loading-overlay';
 import { EditorState, convertToRaw } from 'draft-js';
 import { Editor } from 'react-draft-wysiwyg';
@@ -25,6 +24,8 @@ import draftToHtml from 'draftjs-to-html';
 import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
 import { EmailShareButton, WhatsappShareButton, WhatsappIcon, FacebookShareButton, FacebookIcon, TwitterShareButton, TwitterIcon, TelegramShareButton, TelegramIcon, EmailIcon } from "react-share";
 import { MdDateRange } from 'react-icons/md';
+
+import MetaTag from '../metainfo';
 
 class BlogDetail extends Component {
 
@@ -49,7 +50,9 @@ class BlogDetail extends Component {
             authorImg: require('../../assets/images/default.png'),
             userimg: require('../../assets/images/testi-img1.jpg'),
             img: require('../../assets/images/post.png'),
-            visible: 2
+            visible: 2,
+            metainfo: null,
+            defaultMetaTag: null
 
         }
     }
@@ -59,8 +62,12 @@ class BlogDetail extends Component {
     componentDidMount() {
 
         this.postdetail();
+      
 
     }
+
+
+    
 
     onEditorStateChange = (editorState) => {
         this.setState({
@@ -100,6 +107,33 @@ class BlogDetail extends Component {
                 this.setState({
                     postdetail: this.props.postsdetail[0], loading: false
                 })
+
+                if (this.props.postsdetail[0].meta) 
+                {
+                    this.setState({
+                        metainfo: {
+                            title: this.props.postsdetail[0].seo_title ? this.props.postsdetail[0].seo_title:this.props.postsdetail[0].title,
+                            canonicalURL: `https://www.casualdesi.com${this.props.location.pathname || ''}`,
+                            meta: JSON.parse(this.props.postsdetail[0].meta) 
+                        }
+                    })
+
+                }
+                else{
+                    this.setState({
+                        metainfo: {
+                            title: this.props.postsdetail[0].seo_title ? this.props.postsdetail[0].seo_title:this.props.postsdetail[0].title,
+                            canonicalURL: `https://www.casualdesi.com${this.props.location.pathname || ''}`,
+                            meta: [{
+                                attribute: 'name',
+                                value: 'description',
+                                content: this.createMarkup(this.props.postsdetail[0].description)
+                            }]
+                        }
+                    })
+                }
+
+  
                 this.fetchcomment(this.props.postsdetail[0].post_id);
             }
             else {
@@ -373,19 +407,17 @@ class BlogDetail extends Component {
 
 
     render() {
+    
         const { editorState } = this.state;
         const userid = this.state.postdetail && this.state.postdetail.user
-        return (
+        return (<>
+          { this.state.metainfo ? <MetaTag metaTag={this.state.metainfo || this.state.defaultMetaTag}></MetaTag> : ''}
+
 
             <main className="List-map-view2">
 
                 {/* Header */}
-                <Helmet>
-                    <title>Casual desi</title>
-                    <meta name="title" content={this.state.postdetail && this.state.postdetail.title} />
-                    <meta name="description" content={this.state.postdetail && this.state.postdetail.description} />
-                    <meta name="keywords" content={this.state.postdetail && this.state.postdetail.com_name + ',' + this.state.postdetail && this.state.postdetail.flare_tag} />
-                </Helmet>
+               
 
                 <GeneralHeader />
                 <LoadingOverlay
@@ -711,7 +743,7 @@ class BlogDetail extends Component {
                 <ScrollTopBtn />
 
 
-            </main >
+            </main ></>
 
         );
     }
@@ -721,9 +753,10 @@ class BlogDetail extends Component {
 function mapStateToProps(state) {
     const { postsdetail, postcomment } = state.post;
     const { userdetails, isLoggedIn } = state.auth;
+    const { pageinfo } = state.common;
 
     return {
-        postsdetail, userdetails, postcomment, isLoggedIn
+        postsdetail, userdetails, postcomment, isLoggedIn,pageinfo
 
     };
 }

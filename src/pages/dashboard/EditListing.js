@@ -16,6 +16,7 @@ import ScrollTopBtn from "../../components/common/ScrollTopBtn";
 import AddFullDetails from '../../components/addlisting/AddFullDetails';
 import PhotoUploader from '../../components/addlisting/PhotoUploader';
 import OpeningHours from '../../components/addlisting/OpeningHours';
+import ListOtherscontent from '../../components/addlisting/ListOtherts';
 import Amenities from '../../components/addlisting/Amenities';
 import GeneralInfo from '../../components/addlisting/GeneralInfo';
 import { addImageList, addImageListprofile, getListDetail, getlistimage, removeImageList } from '../../services/action/list';
@@ -159,7 +160,7 @@ class EditListing extends Component {
 
 
     render() {
-console.log(this.props.listdetail)
+
 
         return (
             <LoadingOverlay
@@ -205,6 +206,12 @@ console.log(this.props.listdetail)
                                                 <Tab>
                                                     <Link className="nav-item nav-link theme-btn pt-0 pb-0 mr-1" to="#">
                                                         <span className="la"><BsBookmark /></span> Add shedule
+                                                </Link>
+                                                </Tab>
+
+                                                <Tab>
+                                                    <Link className="nav-item nav-link theme-btn pt-0 pb-0 mr-1" to="#">
+                                                        <span className="la"><BsBookmark /></span> others
                                                 </Link>
                                                 </Tab>
 
@@ -345,6 +352,10 @@ console.log(this.props.listdetail)
 
                                             <TabPanel>
                                                 <OpeningHours listid={this.props.listdetail && this.props.listdetail.listing_id} />
+                                            </TabPanel>
+
+                                            <TabPanel>
+                                                <ListOtherscontent listid={this.props.listdetail && this.props.listdetail.listing_id} />
                                             </TabPanel>
 
 

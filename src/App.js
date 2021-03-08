@@ -37,6 +37,7 @@ import BlogGrid from './pages/blogs/BlogGrid';
 import PrivacyPolicy from './pages/dashboard/privacypolicy';
 import TermsCondition from './pages/dashboard/termcondition';
 import { HelmetProvider } from 'react-helmet-async';
+import FulldetailsListing from './pages/listings/FulldetailsListing';
 
 
 function App(props) {
@@ -56,6 +57,7 @@ function App(props) {
           <Route exact path="/listing-details/:listurl" component={ListingDetails} />
           <Route exact path="/listing-details/:listurl/edit" exact render={() => props.isLoggedIn ? <EditListing /> : <Redirect to="/login" />} />
           <Route exact path="/add-listing" exact render={() => props.isLoggedIn ? <AddListing /> : <Redirect to="/login" />} />
+          <Route exact path="/allinfo" exact render={() => props.isLoggedIn ? <FulldetailsListing/> : <Redirect to="/login" />} />
           <Route exact path="/user-profile/:username" component={UserProfile} />
           <Route exact path="/dashboard" render={() => props.isLoggedIn ? <Dashboard /> : <Redirect to="/" />} />
           <Route exact path="/about" component={About} />

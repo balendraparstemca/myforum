@@ -19,6 +19,9 @@ class MetaTag extends React.Component {
             metainfo: this.props.metaTag ? this.props.metaTag : null
         })
     }
+
+
+ 
     render() {
         
         return (<>
@@ -48,6 +51,15 @@ class MetaTag extends React.Component {
                     {this.state.metainfo.canonicalURL ? <meta property="og:url" content={this.state.metainfo.canonicalURL} /> : ''}
                     {this.state.metainfo.canonicalURL ? <meta property="twitter:url" content={this.state.metainfo.canonicalURL} /> : ''}
                     {this.state.metainfo.ldSchema ? <script type="application/ld+json">{this.ldSchema}</script> : ''}
+                    { this.state.metainfo.schemaObj ? 
+                    ( <> <meta itemProp="brand" content="Casual Desi"/>
+                    <meta itemProp="name" content={`${this.state.metainfo.schemaObj.name}`}/>
+                    <meta itemProp="description" content={`${this.state.metainfo.schemaObj.description}`}/>
+                    <meta itemProp={`${this.state.metainfo.schemaObj.typeCon}`} content={`${this.state.metainfo.schemaObj.typoId}`}/>
+                    <meta itemProp="url" content={`${this.state.metainfo.schemaObj.url}`}/>
+                    { this.state.metainfo.schemaObj.image ? <meta itemProp="image" content={`${this.state.metainfo.schemaObj.image}`}/> : ''}
+                    </> ) : ''}
+                
                 </Helmet>) : ''
             } </div>
         </>)

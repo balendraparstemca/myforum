@@ -3,7 +3,7 @@ import GeneralHeader from "../../components/common/GeneralHeader";
 import Breadcrumb from "../../components/common/Breadcrumb";
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import { Link } from "react-router-dom";
-import { BsListCheck, BsBookmark, BsCheckCircle, BsExclamationCircle, BsFillChatSquareQuoteFill, BsFillBellFill, } from 'react-icons/bs'
+import { BsListCheck, BsBookmark, BsCheckCircle, BsExclamationCircle, BsFillChatSquareQuoteFill, BsFillBellFill,BsFileCode } from 'react-icons/bs'
 import { FaRegCalendarCheck, FaRegEdit, FaRegEnvelope, FaRegTrashAlt } from 'react-icons/fa'
 import { AiOutlineUser, AiOutlinePlusCircle, AiOutlinePoweroff, AiOutlineExclamationCircle, AiFillQuestionCircle } from 'react-icons/ai'
 import NewsLetter from "../../components/other/cta/NewsLetter";
@@ -17,6 +17,9 @@ import { Badge } from 'react-bootstrap';
 import { getNotification, removeNotification } from '../../services/action/common';
 import { IoIosCheckmarkCircle } from 'react-icons/io';
 import moment from 'moment';
+import { CountryDropdown, RegionDropdown } from 'react-country-region-selector';
+import { FiMap } from 'react-icons/fi';
+
 class Dashboard extends Component {
 
     constructor(props) {
@@ -25,6 +28,9 @@ class Dashboard extends Component {
         this.onChangeFirstname = this.onChangeFirstname.bind(this);
         this.onChangeLastname = this.onChangeLastname.bind(this);
         this.onChangeEmail = this.onChangeEmail.bind(this);
+        this.onChangeAddress = this.onChangeAddress.bind(this);
+        this.onChangeCity = this.onChangeCity.bind(this);
+        this.onChangeZipcode = this.onChangeZipcode.bind(this);
         this.uploadSingleFile = this.uploadSingleFile.bind(this)
         this.upload = this.upload.bind(this)
         this.state = {
@@ -38,6 +44,7 @@ class Dashboard extends Component {
             userName: '',
             userbio: '',
             address: '',
+            zipcode: '',
             phoneNum: '',
             website: '',
             email: "",
@@ -46,7 +53,11 @@ class Dashboard extends Component {
             active: false,
             show: false,
             userid: null,
-            emailVerified: false
+            emailVerified: false,
+            country: '',
+            region: '',
+            countryPriorities: ['IN', "US", "CA", "GB", "AU", "NO", "NL", "FR", "CH", "AE", "SG", "KW", "SA", "QA", "MY", "LK"],
+
 
         }
     }
@@ -56,6 +67,30 @@ class Dashboard extends Component {
 
 
     }
+
+
+    onChangeAddress(e) {
+        this.setState({
+            address: e.target.value,
+        });
+
+    }
+
+    onChangeCity(e) {
+
+         this.setState({
+                place: e.target.value.toLocaleLowerCase()
+            });
+        
+    }
+
+    onChangeZipcode(e) {
+    
+            this.setState({
+                zipcode: e.target.value
+            });
+        }
+    
 
     toggle = () => {
         this.setState({ show: !this.state.show })
@@ -77,6 +112,11 @@ class Dashboard extends Component {
                 email: this.props.udetails[0].emailId,
                 firstname: this.props.udetails[0].firstName,
                 lastname: this.props.udetails[0].lastName,
+                address:this.props.udetails[0].address,
+                country:this.props.udetails[0].country,
+                region:this.props.udetails[0].state,
+                place:this.props.udetails[0].city,
+                zipcode:this.props.udetails[0].zipcode,
                 active: this.props.udetails[0].active,
                 emailVerified: this.props.udetails[0].emailVerified,
                 file: this.props.udetails[0].profileimg ? `${process.env.REACT_APP_API_KEY}utilities/${this.props.udetails[0].profileimg}` : require('../../assets/images/team2.jpg')
@@ -127,6 +167,14 @@ class Dashboard extends Component {
         });
     }
 
+    selectCountry(val) {
+        this.setState({ country: val });
+    }
+
+    selectRegion(val) {
+        this.setState({ region: val });
+    }
+
     handleRegister(e) {
         e.preventDefault();
         this.setState({
@@ -136,6 +184,11 @@ class Dashboard extends Component {
             id: this.state.userid,
             firstName: this.state.firstname,
             lastName: this.state.lastname,
+            address: this.state.address,
+            country: this.state.country,
+            state: this.state.region,
+            city: this.state.place,
+            zipcode: this.state.zipcode,
             updatedDate: new Date().getTime().toString()
         }
 
@@ -202,7 +255,7 @@ class Dashboard extends Component {
     }
 
     render() {
-
+        const { country, region } = this.state;
 
         return (
             <main className="dashboard-page">
@@ -381,6 +434,79 @@ class Dashboard extends Component {
                                                                                 </div>
                                                                             </div>
                                                                         </div>
+                                                                        <div className="billing-form-item">
+                                                    <div className="billing-title-wrap">
+                                                        <h3 className="widget-title pb-0">
+                                                            Add Location
+                                                       </h3>
+                                                        <div className="title-shape margin-top-10px"></div>
+                                                    </div>
+                                                    <div className="billing-content">
+                                                        <div className="contact-form-action">
+
+                                                            <div className="row">
+                                                                <div className="col-lg-12">
+                                                                    <div className="input-box">
+                                                                        <label className="label-text">Address</label>
+                                                                        <div className="form-group">
+                                                                            <span className="la form-icon">
+                                                                                <FiMap />
+                                                                            </span>
+                                                                            <input className="form-control" value={this.state.address} onChange={this.onChangeAddress} type="text" name="address" required="required" placeholder="full address" />
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div className="col-lg-6">
+                                                                    <label className="label-text">Country</label>
+                                                                    <div className="form-group">
+                                                                        <CountryDropdown
+                                                                            priorityOptions={this.state.countryPriorities}
+                                                                            value={country}
+                                                                            onChange={(val) => this.selectCountry(val)} />
+                                                                    </div>
+                                                                </div>
+                                                                <div className="col-lg-6">
+                                                                    <div className="input-box">
+                                                                        <label className="label-text">State</label>
+                                                                        <div className="form-group">
+                                                                            <RegionDropdown
+                                                                                country={country}
+                                                                                value={region}
+                                                                                onChange={(val) => this.selectRegion(val)} />
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div className="col-lg-6">
+                                                                    <div className="input-box">
+                                                                        <label className="label-text">City or (place name)</label>
+                                                                        <div className="form-group">
+                                                                            <span className="la form-icon">
+                                                                                <BsFileCode />
+                                                                            </span>
+                                                                            <input className="form-control" type="text" value={this.state.place} onChange={this.onChangeCity} name="place" required="required" placeholder="(city or place name)" />
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+
+
+                                                                <div className="col-lg-6">
+                                                                    <div className="input-box">
+                                                                        <label className="label-text">
+                                                                            Zip-Code
+                                                                       </label>
+                                                                        <div className="form-group">
+                                                                            <span className="la form-icon">
+                                                                                <BsFileCode />
+                                                                            </span>
+                                                                            <input className="form-control" value={this.state.zipcode} onChange={this.onChangeZipcode} type="text" name="zipcode" required="required" placeholder="Zip-Code" />
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+
+                                                        </div>
+                                                    </div>
+                                                </div>
 
 
 

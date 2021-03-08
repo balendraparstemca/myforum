@@ -33,10 +33,10 @@ class Toplisting extends Component {
     }
 
     componentDidMount() {
-        
+
     }
     componentDidUpdate() {
-     if (this.state.catid !== this.props.myloc) {
+        if (this.state.catid !== this.props.myloc) {
             this.setState({ catid: this.props.myloc });
             this.fetchtoplistnear(this.props.myloc)
             this.fetchtoppostsnearyou(this.props.myloc)
@@ -50,7 +50,7 @@ class Toplisting extends Component {
             "country": loc.country,
             "state": loc.state
         }
-      
+
         return this.props.dispatch(getpeopleviewList(obj));
     }
 
@@ -103,7 +103,6 @@ class Toplisting extends Component {
     }
 
     render() {
-    
 
         return (<>
 
@@ -145,7 +144,7 @@ class Toplisting extends Component {
                                                 <Link to={`/listing-details/${item.listing.canonicalurl}`} className="card-image-wrap">
                                                     <div className="card-image">
                                                         <img src={item.listing.bannerimg ? `${process.env.REACT_APP_API_KEY}utilities/${item.listing.bannerimg}` : this.state.listimage} className="card__img" alt={item.listing.list_title} width="200px" height="200px" />
-                                                        <span className='badge'>{item.listing.badge_status ? item.listing.badge_status : '' }</span>
+                                                        <span className='badge'>{item.listing.badge_status ? item.listing.badge_status : ''}</span>
                                                         <span className="badge-toggle" data-toggle="tooltip" data-placement="bottom" title={item.listing.likes}>
                                                             <FiHeart />
                                                         </span>
@@ -182,14 +181,16 @@ class Toplisting extends Component {
                                                         </ul>
                                                     </div>
                                                     <div className="rating-row">
-                                                        <div className="rating-rating">
-                                                            <span> <ReactStars
-                                                                count={5}
-                                                                size={24}
-                                                                value={item.rating[0].rating ? parseFloat(item.rating[0].rating).toFixed(1) : 0}
-                                                                isHalf={true} /> </span><span> - </span>
-                                                            <span className="rating-count"> {parseFloat(item.rating[0].rating).toFixed(1)}</span>
+                                                        <div className="listing-info">
+                                                            <ul>
 
+                                                                <li><span> <ReactStars
+                                                                    count={5}
+                                                                    size={24}
+                                                                    value={item.rating[0].rating ? parseFloat(item.rating[0].rating).toFixed(1) : 0}
+                                                                    isHalf={true} /> </span> </li>
+                                                                <li> <span className="info__count"> {parseFloat(item.rating[0].rating).toFixed(1)}</span></li>
+                                                            </ul>
                                                         </div>
                                                         <div className="listing-info">
                                                             <ul>

@@ -20,7 +20,7 @@ import ListingDetailsComments from "../../components/contact/ListingDetailsComme
 import NewsLetter from "../../components/other/cta/NewsLetter";
 import Footer from "../../components/common/footer/Footer";
 import ScrollTopBtn from "../../components/common/ScrollTopBtn";
-import { getListAmenties, getListDetail, getListFullDetail, getlistimage, getlistreview, getListShedule, getpeopleviewList, reportList, saveList, viewList } from '../../services/action/list';
+import { getListAmenties, getListDetail, getListFullDetail, getlistimage, getListingother, getlistreview, getListShedule, getpeopleviewList, reportList, saveList, viewList } from '../../services/action/list';
 import { connect } from "react-redux";
 import $ from 'jquery';
 import moment from 'moment';
@@ -32,6 +32,7 @@ import { IoIosCheckmarkCircle, IoIosLink } from 'react-icons/io';
 import LoadingOverlay from 'react-loading-overlay';
 import { Dropdown } from 'react-bootstrap';
 import { EmailShareButton, WhatsappShareButton, WhatsappIcon, FacebookShareButton, FacebookIcon, TwitterShareButton, TwitterIcon, TelegramShareButton, TelegramIcon, EmailIcon } from "react-share";
+import MetaTag from '../metainfo';
 class ListingDetails extends Component {
     constructor(props) {
         super(props)
@@ -72,7 +73,9 @@ class ListingDetails extends Component {
             categoryid: null,
             viewlisting: [],
             createddate: '',
-            subcatid: ''
+            subcatid: '',
+            metainfo: null,
+            listother: []
 
 
 
@@ -104,6 +107,23 @@ class ListingDetails extends Component {
             })
             this.fetchlistDeatil()
 
+        }
+    }
+
+
+    fetchlistothers = (listid) => {
+        if (listid) {
+            this.props.dispatch(getListingother({ listing_id: listid })).then(() => {
+                if (this.props.listother.length > 0) {
+                    this.setState({ listother: this.props.listother })
+
+                } else {
+                    this.setState({
+                        listother: []
+                    })
+                }
+
+            })
         }
     }
 
@@ -204,7 +224,32 @@ class ListingDetails extends Component {
             this.props.dispatch(getListDetail(obj)).then(() => {
                 this.setState({ loading: false })
                 if (this.props.listdetail) {
-                    
+                    if (this.props.listdetail.meta) {
+                        this.setState({
+                            metainfo: {
+                                title: this.props.listdetail.seo_title ? this.props.listdetail.seo_title : this.props.listdetail.list_title,
+                                canonicalURL: `https://www.casualdesi.com${this.props.location.pathname || ''}`,
+                                meta: JSON.parse(this.props.listdetail.meta)
+                            }
+                        })
+
+                    }
+                    else {
+                        this.setState({
+                            metainfo: {
+                                title: this.props.listdetail.list_title,
+                                canonicalURL: `https://www.casualdesi.com${this.props.location.pathname || ''}`,
+                                meta: [{
+                                    attribute: 'name',
+                                    value: 'description',
+                                    content: this.props.listdetail.description
+                                }]
+                            }
+                        })
+                    }
+
+
+
                     this.UserViewedList(this.props.listdetail.listing_id)
                     this.setState({
                         listName: this.props.listdetail && this.props.listdetail.list_title,
@@ -227,9 +272,11 @@ class ListingDetails extends Component {
 
 
                     })
+
                     this.fetchlistfullDeatil();
                     this.props.dispatch(getListAmenties({ "listing_id": this.props.listdetail && this.props.listdetail.listing_id }));
                     this.fetchImage(this.props.listdetail && this.props.listdetail.listing_id);
+                    this.fetchlistothers(this.props.listdetail && this.props.listdetail.listing_id);
                     this.fetchlistshedule(this.props.listdetail && this.props.listdetail.listing_id);
                     this.props.dispatch(getlistreview({ "listing_id": this.props.listdetail && this.props.listdetail.listing_id }))
                     this.peopleviewedList(this.props.listdetail.country, this.props.listdetail.state, this.props.listdetail.city)
@@ -307,13 +354,14 @@ class ListingDetails extends Component {
     }
 
     contentstate = {
-        featureTitle: 'Features',
+        featureTitle: 'Amenties',
         videoTitle: 'Video',
         buttonText: 'Watch Video',
         mapTitle: 'Location',
         peopleViewtitle: 'People Also Viewed'
     }
     render() {
+
 
         var val = this.props.allreviewlist.length > 0 ? this.props.allreviewlist.reduce(function (previousValue, currentValue) {
             return {
@@ -328,13 +376,15 @@ class ListingDetails extends Component {
                 spinner
                 text='Loading your content...'
             >
+                { this.state.metainfo ? <MetaTag metaTag={this.state.metainfo && this.state.metainfo}></MetaTag> : ''}
+
 
                 <main className="listing-details">
                     {/* Header */}
                     <GeneralHeader />
 
                     {/* Breadcrumb */}
-                    <> <section className="breadcrumb-area listing-detail-breadcrumb" style={{ backgroundImage: `url( ${this.state.file})` }}>
+                    <> <section className="breadcrumb-area listing-detail-breadcrumb" style={{ backgroundImage: `url('${this.state.file}')` }}>
                         <div className="breadcrumb-wrap">
                             <div className="container">
                                 <div className="row">
@@ -509,30 +559,33 @@ class ListingDetails extends Component {
                                 <div className="row">
                                     <div className="col-lg-8">
                                         <div className="single-listing-wrap">
-                                            <h2 className="widget-title">
-                                                {'Gallery'}
-                                            </h2>
-                                            <div className="title-shape"></div>
-                                            <OwlCarousel
-                                                className="gallery-carousel padding-top-35px"
-                                                loop
-                                                margin={10}
-                                                autoplay={true}
-                                                nav={true}
-                                                navText={[this.state.previcon, this.state.nextIcon]}
-                                                dots={true}
-                                                smartSpeed={1000}
-                                                items={1}
-                                                dotsContainer={'#gallery-carousel'}
-                                            >
-                                                {this.state.listimage && this.state.listimage.map((img, i) => {
-                                                    return (
-                                                        <div key={i} className="gallery-item">
-                                                            <img src={`${process.env.REACT_APP_API_KEY}utilities/${img.imageurl}`} alt="list" width="400px" height="400px" />
-                                                        </div>
-                                                    )
-                                                })}
-                                            </OwlCarousel>
+                                            {this.state.listimage && this.state.listimage.length > 0 ?
+                                                <div>
+                                                    <h2 className="widget-title">
+                                                        {'Gallery'}
+                                                    </h2>
+                                                    <div className="title-shape"></div>
+                                                    <OwlCarousel
+                                                        className="gallery-carousel padding-top-35px"
+                                                        loop
+                                                        margin={10}
+                                                        autoplay={true}
+                                                        nav={true}
+                                                        navText={[this.state.previcon, this.state.nextIcon]}
+                                                        dots={true}
+                                                        smartSpeed={1000}
+                                                        items={1}
+                                                        dotsContainer={'#gallery-carousel'}
+                                                    >
+                                                        {this.state.listimage && this.state.listimage.map((img, i) => {
+                                                            return (
+                                                                <div key={i} className="gallery-item">
+                                                                    <img src={`${process.env.REACT_APP_API_KEY}utilities/${img.imageurl}`} alt="list" width="400px" height="400px" />
+                                                                </div>
+                                                            )
+                                                        })}
+                                                    </OwlCarousel>
+                                                </div> : ''}
 
                                             <div className="listing-description padding-top-40px padding-bottom-35px">
                                                 <h2 className="widget-title">
@@ -545,29 +598,29 @@ class ListingDetails extends Component {
                                                     </p>
                                                 </div>
                                             </div>
+                                            {this.props.listamenties && this.props.listamenties.length > 0 ?
+                                                <div className="feature-listing padding-bottom-20px">
+                                                    <h2 className="widget-title">
+                                                        {this.contentstate.featureTitle}
+                                                    </h2>
+                                                    <div className="title-shape"></div>
+                                                    <ul className="list-items mt-4">
+                                                        {this.props.listamenties.length === 0 ?
+                                                            (<li>
+                                                                <i className="color-text font-size-18"><BsCheckCircle /></i> there is no amenties
+                                                            </li>)
+                                                            : this.props.listamenties.map(item => {
+                                                                return (
 
-                                            <div className="feature-listing padding-bottom-20px">
-                                                <h2 className="widget-title">
-                                                    {this.contentstate.featureTitle}
-                                                </h2>
-                                                <div className="title-shape"></div>
-                                                <ul className="list-items mt-4">
-                                                    {this.props.listamenties.length === 0 ?
-                                                        (<li>
-                                                            <i className="color-text font-size-18"><BsCheckCircle /></i> there is no amenties
-                                                        </li>)
-                                                        : this.props.listamenties.map(item => {
-                                                            return (
+                                                                    <li key={item.id}>
+                                                                        <i className="color-text font-size-18"><BsCheckCircle /></i> {item.amenties_name}
+                                                                    </li>
 
-                                                                <li key={item.id}>
-                                                                    <i className="color-text font-size-18"><BsCheckCircle /></i> {item.amenties_name}
-                                                                </li>
+                                                                )
+                                                            })}
+                                                    </ul>
 
-                                                            )
-                                                        })}
-                                                </ul>
-
-                                            </div>
+                                                </div> : ''}
 
                                             {this.state.videolink ? (
                                                 <div className="video-listing padding-bottom-40px">
@@ -618,8 +671,30 @@ class ListingDetails extends Component {
 
                                                 ) : ''
                                             }
+                                            {/* other info */}
+
+                                            {
+                                                this.state.listother.length && this.state.listother.length > 0 ? this.state.listother.map((item, i) => {
+                                                    return (<div className="listing-description padding-top-20px padding-bottom-15px">
+                                                        <h2 className="widget-title">
+                                                            <span>   {item.title}</span>
+                                                        </h2>
+                                                        {
+                                                            item.title ? <div className="title-shape"></div> : ''
+                                                        }
 
 
+                                                        { JSON.parse(item.text).map((x, i) => {
+                                                            return (<div className="section-heading mt-2">
+                                                                <span className="mr-2" style={{ color: 'black' }}><strong>{JSON.parse(item.text).length > 1 ? i + 1 : ''}</strong> </span>
+                                                                <span className="sec__desc font-size-16">
+                                                                    {x.description}    </span>
+                                                            </div>
+                                                            );
+                                                        })}</div>)
+                                                }) : ''
+
+                                            }
 
 
 
@@ -627,7 +702,7 @@ class ListingDetails extends Component {
                                             <div className="contact-listing padding-top-40px padding-bottom-40px">
                                                 <h2 className="widget-title">
                                                     Contact Information
-                                        </h2>
+                                             </h2>
                                                 <div className="title-shape"></div>
                                                 <div className="info-list margin-top-35px padding-bottom-35px">
                                                     <ul>
@@ -872,14 +947,16 @@ class ListingDetails extends Component {
                                                                 </ul>
                                                             </div>
                                                             <div className="rating-row">
-                                                                <div className="rating-rating">
-                                                                    <span> <ReactStars
-                                                                        count={5}
-                                                                        size={24}
-                                                                        value={item.rating[0].rating ? parseFloat(item.rating[0].rating).toFixed(1) : 0}
-                                                                        isHalf={true} /> </span><span> - </span>
-                                                                    <span className="rating-count"> {parseFloat(item.rating[0].rating).toFixed(1)}</span>
+                                                                <div className="listing-info">
+                                                                    <ul>
 
+                                                                        <li><span> <ReactStars
+                                                                            count={5}
+                                                                            size={24}
+                                                                            value={item.rating[0].rating ? parseFloat(item.rating[0].rating).toFixed(1) : 0}
+                                                                            isHalf={true} /> </span> </li>
+                                                                        <li> <span className="info__count"> {parseFloat(item.rating[0].rating).toFixed(1)}</span></li>
+                                                                    </ul>
                                                                 </div>
                                                                 <div className="listing-info">
                                                                     <ul>
@@ -924,9 +1001,9 @@ class ListingDetails extends Component {
 
 function mapStateToProps(state) {
     const { isLoggedIn, userdetails } = state.auth;
-    const { listdetail, listamenties, viewedlists, similarlists, listallimage, allreviewlist, listfulldetail } = state.list;
+    const { listdetail, listamenties, listother, viewedlists, similarlists, listallimage, allreviewlist, listfulldetail } = state.list;
     return {
-        isLoggedIn, userdetails, listdetail, listallimage, viewedlists, allreviewlist, listamenties, listfulldetail, similarlists
+        isLoggedIn, userdetails, listdetail, listother, listallimage, viewedlists, allreviewlist, listamenties, listfulldetail, similarlists
 
     };
 }

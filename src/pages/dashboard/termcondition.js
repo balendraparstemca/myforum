@@ -2,7 +2,8 @@ import React, { Component } from 'react';
 import { AiOutlinePrinter } from 'react-icons/ai'
 import { RiReplyLine } from 'react-icons/ri'
 import { Link } from "react-router-dom";
-
+import ScrollTopBtn from '../../components/common/ScrollTopBtn';
+import $ from 'jquery';
 class TermsCondition extends Component {
     state = {
         logo: require('../../assets/images/logo22.png'),
@@ -825,12 +826,23 @@ class TermsCondition extends Component {
          `
     }
 
+    componentDidMount() {
+        $(window).on('scroll', function () {
+            //header fixed animation and control
+            if ($(window).scrollTop() > 200) {
+                $('.header-menu-wrapper').addClass('header-fixed');
+            } else {
+                $('.header-menu-wrapper').removeClass('header-fixed');
+            }
+        });
+    }
+
     createMarkup = () => {
         return { __html: this.state.content };
     }
 
     render() {
-        return (
+        return (<>
             <main className="invoice-page">
                 <section className="invoice-area padding-top-60px">
                     <div className="container">
@@ -859,7 +871,7 @@ class TermsCondition extends Component {
                         </div>
                     </div>
                 </section>
-            </main>
+            </main> <ScrollTopBtn/></>
         );
     }
 }

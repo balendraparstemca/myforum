@@ -3,12 +3,10 @@ import { CountryDropdown } from 'react-country-region-selector';
 import { FiSearch } from 'react-icons/fi';
 import { connect } from "react-redux";
 import Select from "react-select";
-import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
-import { GiPositionMarker } from 'react-icons/gi'
 import { withRouter } from "react-router-dom";
 import { fetchCategory, getAllSubCategory } from '../../../services/action/common';
 import loadjs from 'loadjs';
-import { Link } from "react-router-dom";
+
 
 
 class BannerOneHeroHeading extends Component {
@@ -54,21 +52,21 @@ class BannerOneHeroHeading extends Component {
             ],
             country: '',
             catname: '',
-            catid: '',
             subcategory: [],
             countryPriorities: ['IN', "US", "CA", "GB", "AU", "NO", "NL", "FR", "CH", "AE", "SG", "KW", "SA", "QA", "MY", "LK"],
-            catid: { label: 'select a category', value: '' },
+            catid: { label: 'Select category', value: '' },
+            subcatid: { label: 'Select Sub category', value: '' },
             searchitem: '',
             desc: 'Discover the best places to stay, eat, shop & visit the city nearest to you.'
         }
     }
 
     componentDidMount() {
-         loadjs('/js/jquery-3.5.1.js', function () {
-             loadjs('/js/animated-headline.js', function () {
+        loadjs('/js/jquery-3.5.1.js', function () {
+            loadjs('/js/animated-headline.js', function () {
 
             });
-         });
+        });
 
         this.props.dispatch(fetchCategory({ for: 'LISTING', status: true }))
         this.getsubcategory();
@@ -79,9 +77,9 @@ class BannerOneHeroHeading extends Component {
         e.preventDefault();
         const obj = {
             searchitem: this.state.searchitem ? `searchitem=${this.state.searchitem}` : '',
-            country: this.state.country  ? `${this.state.searchitem ? '&' : ''}country=${this.state.country}` : '',
+            country: this.state.country ? `${this.state.searchitem ? '&' : ''}country=${this.state.country}` : '',
             category: this.state.catname ? `${this.state.country || this.state.searchitem ? '&' : ''}category=${this.state.catname}` : '',
-            subcategory: this.state.catid.value ? `${this.state.catname || this.state.searchitem || this.state.country  ? '&' : ''}subcat=${this.state.catid.value}` : ''
+            subcategory: this.state.subcatid.value ? `${this.state.catname || this.state.searchitem || this.state.country ? '&' : ''}subcat=${this.state.subcatid.value}` : ''
 
         }
         this.props.history.push(`/listing-list/search/?${obj.searchitem}${obj.country}${obj.category}${obj.subcategory}`);
@@ -98,7 +96,15 @@ class BannerOneHeroHeading extends Component {
     }
 
     handleChangeCat = async (catid) => {
-        this.setState({ catid });
+        this.setState({ catid: catid });
+      
+        this.setState({ catname: catid.label,  subcatid: { label: 'Select Sub category', value: '' } })
+        this.getsubcategory(catid.value)
+    }
+
+    handleChangeSubCat = async (subcatid) => {
+        this.setState({ subcatid: subcatid });
+
     }
 
     getsubcategory = (catid) => {
@@ -121,17 +127,21 @@ class BannerOneHeroHeading extends Component {
 
     }
 
-    opentab = (name, id) => {
-     
-        this.setState({ catname: name, catid: id })
-        this.getsubcategory(id)
-    }
+   
 
 
 
     render() {
 
         let categorytwo = [{ value: "All", label: "All" }];
+        let category = [{ value: "All", label: "All" }]
+
+        category = this.props.category && this.props.category.length > 0 ? this.props.category.map(cat => {
+            return { value: `${cat.cat_id}`, label: `${cat.name}`, text: `Enter ${cat.name} name` };
+        }) : [{
+            value: '',
+            label: 'no category feched'
+        }];
 
 
         categorytwo = this.state.subcategory && this.state.subcategory.length > 0 ? this.state.subcategory.map(cat => {
@@ -169,133 +179,55 @@ class BannerOneHeroHeading extends Component {
 
                 <div className="hero-heading mt-5 ">
 
-                    {this.props.category && this.props.category.length > 0 ?
-                        <Tabs>
-                            <div className="tab-shared">
-                                <TabList className="nav nav-tabs" id="myTab">
-
-                                    <Tab  onClick={() => this.opentab('All')}>
-                                        <Link className="nav-link theme-btn radius-rounded" to="#">
-                                            <span>
-                                                <GiPositionMarker />
-                                            </span>All
-                                        </Link>
-                                    </Tab>
-                                    {
-
-                                        this.props.category.slice(0, 10).map((item, i) => {
-                                            return (
-                                                <Tab onClick={() => this.opentab(item.name, item.cat_id)}>
-                                                    <Link className="nav-link theme-btn radius-rounded" to="#">
-                                                        <span>
-                                                            <i className={item.icon}></i>
-                                                        </span> {item.name}
-                                                    </Link>
-                                                </Tab>
-                                            )
-                                        })
-                                    }
+                    <div className="main-search-input">
+                        <div className="main-search-input-item category">
+                            <Select
+                                value={this.state.catid}
+                                onChange={this.handleChangeCat}
+                                placeholder={`Select Category`}
+                                options={category}
+                            />
+                        </div>
+                        <div className="main-search-input-item category">
+                            <Select
+                                value={this.state.subcatid}
+                                onChange={this.handleChangeSubCat}
+                                placeholder={`Select Sub Category for ${this.state.catname}`}
+                                options={categorytwo}
+                            />
+                        </div>
 
 
+                        <div className="main-search-input-item location">
+                            <CountryDropdown
+                                priorityOptions={this.state.countryPriorities}
+                                value={this.state.country}
+                                onChange={(val) => this.selectCountry(val)} />
+                        </div>
 
-                                </TabList>
+                        <div className="main-search-input-item">
+                            <div className="contact-form-action">
+                                <form action="#">
+                                    <div className="form-group mb-0">
+                                        <span className="form-icon">
+                                            <FiSearch />
+                                        </span>
+                                        <input className="form-control" type="text" value={this.state.searchitem} onChange={this.onChangeSearch} placeholder={`What are you looking for `} />
+                                    </div>
+                                </form>
                             </div>
-
-                            <TabPanel>
-                                <div className="main-search-input">
-                                   <div className="main-search-input-item category">
-                                        <Select
-                                            value={this.state.catid}
-                                            onChange={this.handleChangeCat}
-                                            placeholder={`Select Category for ${this.state.catname}`}
-                                            options={categorytwo}
-                                        />
-                                    </div>
-                                 
-
-                                    <div className="main-search-input-item location">
-                                        <CountryDropdown
-                                            priorityOptions={this.state.countryPriorities}
-                                            value={this.state.country}
-                                            onChange={(val) => this.selectCountry(val)} />
-                                    </div>
-
-                                    <div className="main-search-input-item">
-                                        <div className="contact-form-action">
-                                            <form action="#">
-                                                <div className="form-group mb-0">
-                                                    <span className="form-icon">
-                                                        <FiSearch />
-                                                    </span>
-                                                    <input className="form-control" type="text" value={this.state.searchitem} onChange={this.onChangeSearch} placeholder={`What are you looking for `} />
-                                                </div>
-                                            </form>
-                                        </div>
-                                    </div>
-
-                                    
-
-                                    <div className="main-search-input-btn">
-                                        <button className="button theme-btn" onClick={this.handleSearch} type="submit">Search</button>
-                                    </div>
-
-                                </div>
-                            </TabPanel>
-
-                            {this.props.category.slice(0, 10).map((item, i) => {
-                                return (<TabPanel>
-                                    <div className="main-search-input">
-
-                                    <div className="main-search-input-item category">
-                                            <Select
-                                                value={this.state.catid}
-                                                onChange={this.handleChangeCat}
-                                                placeholder={`Select Category for ${this.state.catname}`}
-                                                options={categorytwo}
-                                            />
-                                        </div>
-                                      
-
-                                        <div className="main-search-input-item location">
-                                            <CountryDropdown
-                                                priorityOptions={this.state.countryPriorities}
-                                                value={this.state.country}
-                                                onChange={(val) => this.selectCountry(val)} />
-                                        </div>
-
-                                        <div className="main-search-input-item">
-                                            <div className="contact-form-action">
-                                                <form action="#">
-                                                    <div className="form-group mb-0">
-                                                        <span className="form-icon">
-                                                            <FiSearch />
-                                                        </span>
-                                                        <input className="form-control" type="text" value={this.state.searchitem} onChange={this.onChangeSearch} placeholder={`What are you looking  for `} />
-                                                    </div>
-                                                </form>
-                                            </div>
-                                        </div>
-
-                                       
-
-                                        <div className="main-search-input-btn">
-                                            <button className="button theme-btn" onClick={this.handleSearch} type="submit">Search</button>
-                                        </div>
-
-                                    </div>
-                                </TabPanel>)
-                            })
+                        </div>
 
 
 
-                            }
+                        <div className="main-search-input-btn">
+                            <button className="button theme-btn" onClick={this.handleSearch} type="submit">Search</button>
+                        </div>
 
-
-
-                        </Tabs> : ''}
+                    </div>
                 </div>
 
-               
+
             </>
         )
     }

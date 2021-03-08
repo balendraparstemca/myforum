@@ -4,7 +4,7 @@ import { FaRegEnvelope } from 'react-icons/fa'
 import { FiPhone } from 'react-icons/fi'
 import { BsLink45Deg } from 'react-icons/bs'
 import { TiSocialGooglePlus } from 'react-icons/ti'
-import { getListFullDetail, UpdateListingdetail } from '../../services/action/list';
+import { getListFullDetail, nextupdate, UpdateListingdetail } from '../../services/action/list';
 import { connect } from "react-redux";
 import LoadingOverlay from 'react-loading-overlay';
 class AddFullDetails extends Component {
@@ -63,6 +63,7 @@ class AddFullDetails extends Component {
                         linkedin: this.props.listfulldetail && this.props.listfulldetail.linkedin,
                         videolink: this.props.listfulldetail && this.props.listfulldetail.video_link,
                     })
+                   this.props.dispatch(nextupdate(true))
                 } else {
                     this.setState({
                         loading: false
@@ -215,7 +216,7 @@ class AddFullDetails extends Component {
                                                     <span className="la form-icon">
                                                         <BsLink45Deg />
                                                     </span>
-                                                    <input className="form-control" type="url" name="website" value={this.state.website} onChange={this.onChangeWebsite} required="required" placeholder="website url" />
+                                                    <input className="form-control" type="url" name="website" value={this.state.website} onChange={this.onChangeWebsite}  placeholder="website url" />
                                                 </div>
                                             </div>
                                         </div>

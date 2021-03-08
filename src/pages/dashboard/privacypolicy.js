@@ -2,6 +2,8 @@ import React, { Component } from 'react';
 import { AiOutlinePrinter } from 'react-icons/ai'
 import { RiReplyLine } from 'react-icons/ri'
 import { Link } from "react-router-dom";
+import $ from 'jquery';
+import ScrollTopBtn from '../../components/common/ScrollTopBtn';
 
 class PrivacyPolicy extends Component {
     state = {
@@ -186,13 +188,23 @@ class PrivacyPolicy extends Component {
             <p ><span style="color: rgb(0,0,0);font-family: Garamond;"><strong>- legal@CasualDesi.com</strong></span>&nbsp;</p>
              `
     }
+    componentDidMount() {
+        $(window).on('scroll', function () {
+            //header fixed animation and control
+            if ($(window).scrollTop() > 200) {
+                $('.header-menu-wrapper').addClass('header-fixed');
+            } else {
+                $('.header-menu-wrapper').removeClass('header-fixed');
+            }
+        });
+    }
 
     createMarkup = () => {
         return { __html: this.state.content };
     }
 
     render() {
-        return (
+        return (<>
             <main className="invoice-page">
                 <section className="invoice-area padding-top-60px">
                     <div className="container">
@@ -222,6 +234,7 @@ class PrivacyPolicy extends Component {
                     </div>
                 </section>
             </main>
+              <ScrollTopBtn/></>
         );
     }
 }

@@ -224,6 +224,24 @@ class ListService {
         });
     }
 
+    getlistothers(obj) {
+        return axios.post(API_URL + "list/getlist_others", obj).then((response) => {
+            return response.data;
+        });
+    }
+
+    addlistothers(obj) {
+        return axios.post(API_URL + "list/addlist_others", obj).then((response) => {
+            return response.data;
+        });
+    }
+
+    removelistothers(obj) {
+        return axios.post(API_URL + "list/deletelist_others", obj).then((response) => {
+            return response.data;
+        });
+    }
+
 
 }
 

@@ -53,6 +53,10 @@ class ListHeaderTwo extends Component {
     constructor(props) {
         super(props);
         this.loadMore = this.loadMore.bind(this);
+        this.filterList = this.filterList.bind(this);
+        this.searchList = this.searchList.bind(this);
+        this.fetchSearchlists = this.fetchSearchlists.bind(this);
+     
         this.state = {
             isloading: false,
             loading: true,
@@ -416,6 +420,10 @@ class ListHeaderTwo extends Component {
         })
     }
 
+    searchList=(e)=>{
+        this.setState({searchitem:e.target.value})
+    }
+
     filterList = (e) => {
 
         let updateList = this.state.mainlists;
@@ -596,15 +604,26 @@ class ListHeaderTwo extends Component {
 
 
 
-    fetchSearchlists = (obj) => {
-        let updateList = this.props.lists;
+    fetchSearchlists = (e) => {
+        e.preventDefault();
+        this.setState({
+           loading:true
+        })
 
+        let updateList = this.props.lists;
+       const  obj={searchitem:this.state.searchitem}
         updateList = updateList.filter(item => {
-            return item.listing.list_title.toLowerCase().search(
+            return item.listing.badge_status.toLowerCase().search(
+                obj.searchitem.toLowerCase()
+            ) !== -1 ||item.listing.phone.toLowerCase().search(
+                obj.searchitem.toLowerCase()
+            ) !== -1 ||item.listing.list_title.toLowerCase().search(
                 obj.searchitem.toLowerCase()
             ) !== -1 || item.listing.categoryname.toLowerCase().search(
                 obj.searchitem.toLowerCase()
-            ) !== -1 || item.listing.username.toLowerCase().search(
+            ) !== -1 || item.listing.name.toLowerCase().search(
+                obj.searchitem.toLowerCase()
+            ) !== -1 ||item.listing.username.toLowerCase().search(
                 obj.searchitem.toLowerCase()
             ) !== -1 || item.listing.city.toLowerCase().search(
                 obj.searchitem.toLowerCase()
@@ -612,11 +631,19 @@ class ListHeaderTwo extends Component {
                 obj.searchitem.toLowerCase()
             ) !== -1 || item.listing.state.toLowerCase().search(
                 obj.searchitem.toLowerCase()
-            ) !== -1
+            ) !== -1 || item.listing.address.toLowerCase().search(
+                obj.searchitem.toLowerCase()
+            ) !== -1 || item.listing.zipcode.toLowerCase().search(
+                obj.searchitem.toLowerCase()
+            ) !== -1 || item.listing.keywords.toLowerCase().search(
+                obj.searchitem.toLowerCase()
+            ) !== -1 || item.listing.description.toLowerCase().search(
+                obj.searchitem.toLowerCase()
+            ) !== -1 
         });
 
         this.setState({
-            alllists: updateList
+            alllists: updateList,loading:false
         });
 
     }
@@ -836,7 +863,7 @@ class ListHeaderTwo extends Component {
 
 
     render() {
-    console.log(this.props.lists)
+
         return (
             <><LoadingOverlay
                 active={this.state.loading}
@@ -858,15 +885,15 @@ class ListHeaderTwo extends Component {
                                                 Search anything
                                           </h2>
                                             <div className="contact-form-action">
-                                                <form method="post">
+                                                <form method="post" onSubmit={this.fetchSearchlists}>
                                                     <div className="row">
                                                         <div className="col-lg-7 mx-auto">
                                                             <div className="input-box">
                                                                 <div className="form-group mb-0">
-                                                                    <button type="button" className="theme-btn submit-btn border-0">
+                                                                    <button type="submit" className="theme-btn submit-btn border-0">
                                                                         <span className="d-inline-block"><FiSearch /></span>
                                                                     </button>
-                                                                    <input className="form-control" type="text" name="name" value={this.state.searchitem} placeholder="What are you looking for?" onChange={(e) => this.filterList(e)} />
+                                                                    <input className="form-control" type="text" name="name" value={this.state.searchitem} placeholder="What are you looking for?" onChange={(e) => this.searchList(e)} />
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -1016,15 +1043,18 @@ class ListHeaderTwo extends Component {
                                                                             </ul>
                                                                         </div>
                                                                         <div className="rating-row">
-                                                                            <div className="rating-rating">
-                                                                                <span> <ReactStars
-                                                                                    count={5}
-                                                                                    size={24}
-                                                                                    value={item.rating[0].rating ? parseFloat(item.rating[0].rating).toFixed(1) : 0}
-                                                                                    isHalf={true} /> </span><span> - </span>
-                                                                                <span className="rating-count"> {parseFloat(item.rating[0].rating).toFixed(1)}</span>
+                                                                        <div className="listing-info">
+                                                                                <ul>
 
+                                                                                    <li><span> <ReactStars
+                                                                                        count={5}
+                                                                                        size={24}
+                                                                                        value={item.rating[0].rating ? parseFloat(item.rating[0].rating).toFixed(1) : 0}
+                                                                                        isHalf={true} /> </span> </li>
+                                                                                    <li> <span className="info__count"> {parseFloat(item.rating[0].rating).toFixed(1)}</span></li>
+                                                                                </ul>
 
+                                                                               
                                                                             </div>
                                                                             <div className="listing-info">
                                                                                 <ul>
@@ -1292,16 +1322,19 @@ class ListHeaderTwo extends Component {
                                                                             </ul>
                                                                         </div>
                                                                         <div className="rating-row">
-                                                                            <div className="rating-rating">
+                                               
+                                                                            <div className="listing-info">
+                                                                                <ul>
 
-                                                                                <span> <ReactStars
-                                                                                    count={5}
-                                                                                    size={24}
-                                                                                    value={item.rating[0].rating ? parseFloat(item.rating[0].rating).toFixed(1) : 0}
-                                                                                    isHalf={true} /> </span><span> - </span>
-                                                                                <span className="rating-count"> {parseFloat(item.rating[0].rating).toFixed(1)}</span>
+                                                                                    <li><span> <ReactStars
+                                                                                        count={5}
+                                                                                        size={24}
+                                                                                        value={item.rating[0].rating ? parseFloat(item.rating[0].rating).toFixed(1) : 0}
+                                                                                        isHalf={true} /> </span> </li>
+                                                                                    <li> <span className="info__count"> {parseFloat(item.rating[0].rating).toFixed(1)}</span></li>
+                                                                                </ul>
 
-
+                                                                               
                                                                             </div>
                                                                             <div className="listing-info">
                                                                                 <ul>

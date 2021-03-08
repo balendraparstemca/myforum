@@ -100,7 +100,7 @@ class UserDashboard extends Component {
     fetchuserpost = async () => {
         let obj = { "userName": this.props.match.params.username }
            return await this.props.dispatch(userdetails(obj)).then(() => {
-            this.props.dispatch(fetchUserPost(this.props.udetails && this.props.udetails[0].id))
+            return this.props.dispatch(fetchUserPost(this.props.udetails && this.props.udetails[0].id))
 
         })
 

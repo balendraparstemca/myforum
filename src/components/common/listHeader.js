@@ -99,24 +99,27 @@ class ListHeader extends Component {
             metainfo: null,
             defaultMetaTag: null,
             showsubcat: false,
-            searchitem:''
-         
+            searchitem: ''
+
         }
 
 
     }
 
     componentDidMount() {
-        this.props.dispatch(fetchCategory({ status: true }))
-        if (this.props.match.params.category) {
-            this.setState({ paramid: this.props.match.params.category });
-            this.fetchsubcategorydetail()
+        this.props.dispatch(fetchCategory({ status: true })).then(() => {
+            if (this.props.match.params.category) {
+                this.setState({ paramid: this.props.match.params.category });
+                this.fetchsubcategorydetail()
 
-        } else {
-            this.fetchHomelists();
-            this.getpageseo({ page_type: 'listing' })
+            } else {
+                this.fetchHomelists();
+                this.getpageseo({ page_type: 'listing' })
 
-        }
+            }
+
+        })
+
 
 
         $(document).ready(function () {
@@ -168,16 +171,19 @@ class ListHeader extends Component {
     componentDidUpdate() {
 
         if (this.state.paramid !== this.props.match.params.category) {
-            this.props.dispatch(fetchCategory({ status: true }))
-            this.setState({ paramid: this.props.match.params.category });
-            if (this.props.match.params.category) {
-                this.fetchsubcategorydetail()
+            this.props.dispatch(fetchCategory({ status: true })).then(() => {
+                this.setState({ paramid: this.props.match.params.category });
+                if (this.props.match.params.category) {
+                    this.fetchsubcategorydetail()
 
-            } else {
-                this.fetchHomelists();
-                this.getpageseo({ page_type: 'listing' })
+                } else {
+                    this.fetchHomelists();
+                    this.getpageseo({ page_type: 'listing' })
 
-            }
+                }
+
+            })
+
         }
 
         //let catbox = document.querySelector('.sidebar-widget .filter-by-category');
@@ -277,26 +283,30 @@ class ListHeader extends Component {
     }
 
     maincategory = () => {
-        const array = this.state.alllists;
-        this.setState({ maincategory: [] })
-        const result = [{
-            value: 'All',
-            label: 'All',
+        if (this.props.category && this.props.category.length) {
+            const array = this.state.alllists;
+            this.setState({ maincategory: [] })
+            const result = [{
+                value: 'All',
+                label: 'All',
 
-        }];
-        const map = new Map();
-        for (const item of array) {
+            }];
+            const map = new Map();
+            for (const item of array) {
 
-            if (!map.has(item.listing.categoryid)) {
-                map.set(item.listing.categoryid, true);
-                result.push({
-                    value: item.listing.categoryid,
-                    label: this.props.category.find(o => o.id === item.listing.categoryid).name,
-                });
+                if (!map.has(item.listing.categoryid)) {
+                    map.set(item.listing.categoryid, true);
+                    result.push({
+                        value: item.listing.categoryid,
+                        label: this.props.category.find(o => o.id === item.listing.categoryid).name,
+                    });
+                }
             }
-        }
 
-        this.setState({ maincategory: result })
+            this.setState({ maincategory: result })
+
+
+        }
 
     }
 
@@ -353,7 +363,7 @@ class ListHeader extends Component {
     filterList = (e) => {
 
         let updateList = this.state.mainlists;
-        this.setState({searchitem:e.target.value})
+        this.setState({ searchitem: e.target.value })
         updateList = updateList.filter(item => {
             return item.listing.list_title.toLowerCase().search(
                 e.target.value.toLowerCase()
@@ -630,7 +640,7 @@ class ListHeader extends Component {
 
     sortBydefault = () => {
 
-        this.setState({ alllists: this.state.mainlists,selectedMaincategory:null,selectedCountryby:null })
+        this.setState({ alllists: this.state.mainlists, selectedMaincategory: null, selectedCountryby: null })
 
     }
 
@@ -672,9 +682,9 @@ class ListHeader extends Component {
     }
 
     handleChangeCountryby = async (selectedCountryby) => {
-        this.setState({ selectedCountryby:selectedCountryby, searchitem:'',selectedShortby:null });
-        this.handleChangeMaincategory({value:'All',label:'All'})
-        this.handleChangeRegion({value:'All',label:'All'})
+        this.setState({ selectedCountryby: selectedCountryby, searchitem: '', selectedShortby: null });
+        this.handleChangeMaincategory({ value: 'All', label: 'All' })
+        this.handleChangeRegion({ value: 'All', label: 'All' })
         if (selectedCountryby.value === 'All') {
 
             this.setState({ alllists: this.state.mainlists, mediaterlist: this.state.mainlists, showregion: false, countryname: '' }, () => { this.Region(); this.category(); this.maincategory() })
@@ -695,11 +705,11 @@ class ListHeader extends Component {
 
     handleChangeRegion = async (selectedRegion) => {
         this.setState({ selectedRegion });
-        this.handleChangeMaincategory({value:'All',label:'All'})
+        this.handleChangeMaincategory({ value: 'All', label: 'All' })
 
         if (selectedRegion.value === 'All') {
 
-            this.setState({ alllists: this.state.mediaterlist },()=>{ this.maincategory()})
+            this.setState({ alllists: this.state.mediaterlist }, () => { this.maincategory() })
 
         }
         else {
@@ -708,7 +718,7 @@ class ListHeader extends Component {
                 return item.listing.state === selectedRegion.value;
             });
 
-            this.setState({ alllists: arr,mediatersecondlist:arr },()=>{ this.maincategory()})
+            this.setState({ alllists: arr, mediatersecondlist: arr }, () => { this.maincategory() })
         }
 
     }
@@ -718,7 +728,7 @@ class ListHeader extends Component {
 
         if (selectedMaincategory.value === 'All') {
 
-            this.setState({ alllists: this.state.mediaterlist, showsubcat: false },()=> {this.category()})
+            this.setState({ alllists: this.state.mediaterlist, showsubcat: false }, () => { this.category() })
 
         }
         else {
@@ -727,7 +737,7 @@ class ListHeader extends Component {
                 return item.listing.categoryid === selectedMaincategory.value;
             });
 
-            this.setState({ alllists: arr,mediatersecondlist:arr, showsubcat: true },()=> { this.category()})
+            this.setState({ alllists: arr, mediatersecondlist: arr, showsubcat: true }, () => { this.category() })
         }
 
     }
@@ -757,13 +767,13 @@ class ListHeader extends Component {
                     <div className="container">
                         <div className="shadow mb-2">
                             <HighlightedCategory />
-                             {this.props.match.params.category ? (
+                            {this.props.match.params.category ? (
                                 <div className="col-lg-12 mb-10">
 
                                     { this.state.subcatdescription && this.state.subcatdescription ? (
                                         <div className="container card shadow  margin-top-10px  margin-bottom-10px ">
-                                       
-                                            <Button  className="margin-top-10px">
+
+                                            <Button className="margin-top-10px">
                                                 <b className="breadcrumb__title highlight-btn mt-4">
                                                     <span className="la d-inline-block"><i className={this.state.icon}></i></span>   {this.state.subcatname && this.state.subcatname}
                                                 </b>
@@ -779,7 +789,7 @@ class ListHeader extends Component {
 
                                 </div>
 
-                            ) : ''} 
+                            ) : ''}
 
                         </div>
                         <Tabs>
@@ -863,7 +873,7 @@ class ListHeader extends Component {
                                                                     <Link to={`/listing-details/${item.listing.canonicalurl}`} className="card-image-wrap">
                                                                         <div className="card-image">
                                                                             <img src={item.listing.bannerimg ? `${process.env.REACT_APP_API_KEY}utilities/${item.listing.bannerimg}` : this.state.listimage} className="card__img" width="200px" height="200px" alt={item.listing.list_title} />
-                                                                            <span className='badge'>{item.listing.badge_status ? item.listing.badge_status : '' }</span>
+                                                                            <span className='badge'>{item.listing.badge_status ? item.listing.badge_status : ''}</span>
                                                                             <span className="badge-toggle" data-toggle="tooltip" data-placement="bottom" title="22 Likes">
                                                                                 <FiHeart />
                                                                             </span>
@@ -900,13 +910,16 @@ class ListHeader extends Component {
                                                                             </ul>
                                                                         </div>
                                                                         <div className="rating-row">
-                                                                            <div className="rating-rating">
-                                                                                <span> <ReactStars
-                                                                                    count={5}
-                                                                                    size={24}
-                                                                                    value={item.rating[0].rating ? parseFloat(item.rating[0].rating).toFixed(1) : 0}
-                                                                                    isHalf={true} /> </span><span> - </span>
-                                                                                <span className="rating-count"> {parseFloat(item.rating[0].rating).toFixed(1)}</span>
+                                                                            <div className="listing-info">
+                                                                                <ul>
+
+                                                                                    <li><span> <ReactStars
+                                                                                        count={5}
+                                                                                        size={24}
+                                                                                        value={item.rating[0].rating ? parseFloat(item.rating[0].rating).toFixed(1) : 0}
+                                                                                        isHalf={true} /> </span> </li>
+                                                                                    <li> <span className="info__count"> {parseFloat(item.rating[0].rating).toFixed(1)}</span></li>
+                                                                                </ul>
 
 
                                                                             </div>
@@ -978,7 +991,7 @@ class ListHeader extends Component {
                                                             />
                                                         </div> : ''}
 
-                                                        { this.state.maincategory && this.state.maincategory.length > 0 ? (<div className="sidebar-widget">
+                                                        {this.state.maincategory && this.state.maincategory.length > 0 ? (<div className="sidebar-widget">
                                                             <h3 className="widget-title">
                                                                 Filter By  Category
                                                             </h3>
@@ -998,30 +1011,30 @@ class ListHeader extends Component {
                                                         {/* { filter by subcategory} */}
 
                                                         {
-                                                         this.state.showsubcat ?  this.state.category && this.state.category.length > 0 ? (<div className="sidebar-widget">
-                                                            <h3 className="widget-title">
-                                                                Filter By  Sub Category
+                                                            this.state.showsubcat ? this.state.category && this.state.category.length > 0 ? (<div className="sidebar-widget">
+                                                                <h3 className="widget-title">
+                                                                    Filter By  Sub Category
                                                             </h3>
-                                                            <div className="title-shape"></div>
-                                                            <div className="check-box-list show-more-item filter-by-category mt-4 mb-4">
+                                                                <div className="title-shape"></div>
+                                                                <div className="check-box-list show-more-item filter-by-category mt-4 mb-4">
 
-                                                                {this.state.category.map(item => {
-                                                                    return (
-                                                                        <div className="custom-checkbox" key={item.id}>
-                                                                            <input type="checkbox" id={'chb' + item.id} value={item.cat} onChange={(e) => this.handleChange(e)} />
-                                                                            <label htmlFor={'chb' + item.id}>
-                                                                                {item.cat} <span>{item.catNum}</span>
-                                                                            </label>
-                                                                        </div>
-                                                                    )
-                                                                })}
-                                                            </div>
-                                                            {this.state.category && this.state.category.length > 3 ? (<Link to="#" id="showfilterbycategory" className="showmore-btn font-weight-semi-bold text-capitalize d-block ml-auto mr-auto text-center radius-rounded p-0 lessfilterbyfeature categorylessfilterbyfeature ">
-                                                                <span className="showmore-txt ">Show More</span>
-                                                                <span className="lessmore-txt d-none">Show Less</span>
-                                                            </Link>) : ''}
+                                                                    {this.state.category.map(item => {
+                                                                        return (
+                                                                            <div className="custom-checkbox" key={item.id}>
+                                                                                <input type="checkbox" id={'chb' + item.id} value={item.cat} onChange={(e) => this.handleChange(e)} />
+                                                                                <label htmlFor={'chb' + item.id}>
+                                                                                    {item.cat} <span>{item.catNum}</span>
+                                                                                </label>
+                                                                            </div>
+                                                                        )
+                                                                    })}
+                                                                </div>
+                                                                {this.state.category && this.state.category.length > 3 ? (<Link to="#" id="showfilterbycategory" className="showmore-btn font-weight-semi-bold text-capitalize d-block ml-auto mr-auto text-center radius-rounded p-0 lessfilterbyfeature categorylessfilterbyfeature ">
+                                                                    <span className="showmore-txt ">Show More</span>
+                                                                    <span className="lessmore-txt d-none">Show Less</span>
+                                                                </Link>) : ''}
 
-                                                        </div>) : '' : ''}
+                                                            </div>) : '' : ''}
                                                         {/* <WidgetFilterPrice />*/}
 
                                                         {this.props.match.params.category ? (<div className="sidebar-widget">
@@ -1163,16 +1176,18 @@ class ListHeader extends Component {
                                                                             </ul>
                                                                         </div>
                                                                         <div className="rating-row">
-                                                                            <div className="rating-rating">
+                                                                            <div className="listing-info">
+                                                                                <ul>
 
-                                                                                <span> <ReactStars
-                                                                                    count={5}
-                                                                                    size={24}
-                                                                                    value={item.rating[0].rating ? parseFloat(item.rating[0].rating).toFixed(1) : 0}
-                                                                                    isHalf={true} /> </span><span> - </span>
-                                                                                <span className="rating-count"> {parseFloat(item.rating[0].rating).toFixed(1)}</span>
+                                                                                    <li><span> <ReactStars
+                                                                                        count={5}
+                                                                                        size={24}
+                                                                                        value={item.rating[0].rating ? parseFloat(item.rating[0].rating).toFixed(1) : 0}
+                                                                                        isHalf={true} /> </span> </li>
+                                                                                    <li> <span className="info__count"> {parseFloat(item.rating[0].rating).toFixed(1)}</span></li>
+                                                                                </ul>
 
-
+                                                                               
                                                                             </div>
                                                                             <div className="listing-info">
                                                                                 <ul>

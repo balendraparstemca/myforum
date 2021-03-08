@@ -1,5 +1,5 @@
 import { toast } from 'react-toastify';
-import { ADD_LIST_AMENTIES, CREATE_LISTING, GET_LIST_IMAGE, GET_LIST_AMENTIES, GET_LIST_DETAIL, GET_LIST_FULLDETAIL, SET_MESSAGE, UPDATE_LISTINGDETAIL, ADD_LIST_SHEDULE, GET_LIST_SHEDULE, POST_LIST_REVIEW, GET_LIST_REVIEW, GET_USER_LIST, GET_USER_SAVE_LIST, GET_HOME_LIST, GET_CATEGORY_LIST, GET_PEOPLE_VIEWED_LIST, GET_SIMILAR_LIST, GET_SEARCH_LIST, GET_MAINCATEGORY_LIST } from '../actionType';
+import { ADD_LIST_AMENTIES, CREATE_LISTING, GET_LIST_IMAGE, GET_LIST_AMENTIES, GET_LIST_DETAIL, GET_LIST_FULLDETAIL, SET_MESSAGE, UPDATE_LISTINGDETAIL, ADD_LIST_SHEDULE, GET_LIST_SHEDULE, POST_LIST_REVIEW, GET_LIST_REVIEW, GET_USER_LIST, GET_USER_SAVE_LIST, GET_HOME_LIST, GET_CATEGORY_LIST, GET_PEOPLE_VIEWED_LIST, GET_SIMILAR_LIST, GET_SEARCH_LIST, GET_MAINCATEGORY_LIST, GET_LIST_OTHERS } from '../actionType';
 import ListService from "../restapi/listService";
 
 
@@ -9,23 +9,140 @@ export const CreateListing = (obj) => (dispatch) => {
     return ListService.createList(obj).then(
         (response) => {
             if (response.status === 'SUCCESS') {
-             
-               
                 dispatch({
                     type: CREATE_LISTING,
                     payload: { list: response.data }
                 });
+                localStorage.setItem("createdlist", JSON.stringify({ listingid: response.data ? response.data.listing_id : null, subcat_id: response.data.subcat_id, step: 0 }));
+                toast.success(response.message)
+
+            }
+            else {
+                toast.error(response.message)
 
                 dispatch({
-                    type: 'NEXT',
-                    payload: { listingid: response.data ? response.data.listing_id:null, subcat_id:response.data.subcat_id }
+                    type: SET_MESSAGE,
+                    payload: response.message,
+                });
+            }
+
+            return Promise.resolve();
+        },
+        (error) => {
+            const message =
+                (error.response &&
+                    error.response.data &&
+                    error.response.data.message) ||
+                error.message ||
+                error.toString();
+            toast.error(message)
+
+            return Promise.reject();
+        }
+    );
+
+}
+
+export const nextupdate = (obj) => (dispatch) => {
+
+    dispatch({
+        type: 'NEXT',
+        payload: { next: obj ? obj : false }
+    })
+
+    return
+}
+
+export const getListingother = (obj) => (dispatch) => {
+
+    return ListService.getlistothers(obj).then(
+        (response) => {
+            if (response.status === 'SUCCESS') {
+                dispatch({
+                    type: GET_LIST_OTHERS,
+                    payload: { listother: response.data }
                 });
 
                 toast.success(response.message)
 
             }
             else {
-                toast.error(response.message)
+                toast.warning(response.message)
+
+                dispatch({
+                    type: SET_MESSAGE,
+                    payload: response.message,
+                });
+            }
+
+            return Promise.resolve();
+        },
+        (error) => {
+            const message =
+                (error.response &&
+                    error.response.data &&
+                    error.response.data.message) ||
+                error.message ||
+                error.toString();
+            toast.error(message)
+
+            return Promise.reject();
+        }
+    );
+
+}
+
+export const addListingother = (obj) => (dispatch) => {
+
+    return ListService.addlistothers(obj).then(
+        (response) => {
+            if (response.status === 'SUCCESS') {
+
+
+                toast.success(response.message)
+
+            }
+            else {
+                toast.warning(response.message)
+
+                dispatch({
+                    type: SET_MESSAGE,
+                    payload: response.message,
+                });
+            }
+
+            return Promise.resolve();
+        },
+        (error) => {
+            const message =
+                (error.response &&
+                    error.response.data &&
+                    error.response.data.message) ||
+                error.message ||
+                error.toString();
+            toast.error(message)
+
+            return Promise.reject();
+        }
+    );
+
+}
+
+export const deleteListingother = (obj) => (dispatch) => {
+
+    return ListService.removelistothers(obj).then(
+        (response) => {
+            if (response.status === 'SUCCESS') {
+                dispatch({
+                    type: GET_LIST_OTHERS,
+                    payload: { listother: response.data }
+                });
+
+                toast.success(response.message)
+
+            }
+            else {
+                toast.warning(response.message)
 
                 dispatch({
                     type: SET_MESSAGE,
@@ -96,6 +213,12 @@ export const UpdateListingdetail = (obj) => (dispatch) => {
             if (response.status === 'SUCCESS') {
                 dispatch({
                     type: UPDATE_LISTINGDETAIL,
+
+                });
+
+                dispatch({
+                    type: 'NEXT',
+                    payload: { next: true }
 
                 });
 
@@ -176,7 +299,7 @@ export const getListAmenties = (obj) => (dispatch) => {
 
                 });
 
-             
+
 
             }
             else {
@@ -205,7 +328,7 @@ export const getListAmenties = (obj) => (dispatch) => {
 
 
 export const getListDetail = (obj) => (dispatch) => {
- 
+
 
     return ListService.getlistdetail(obj).then(
         (response) => {
@@ -216,7 +339,7 @@ export const getListDetail = (obj) => (dispatch) => {
 
                 });
 
-              
+
 
             }
             else {
@@ -249,7 +372,7 @@ export const getListFullDetail = (obj) => (dispatch) => {
 
     return ListService.getlistfulldetail(obj).then(
         (response) => {
-            
+
             if (response.status === 'SUCCESS') {
                 dispatch({
                     type: GET_LIST_FULLDETAIL,
@@ -257,7 +380,7 @@ export const getListFullDetail = (obj) => (dispatch) => {
 
                 });
 
-             
+
 
             }
             else {
@@ -405,6 +528,11 @@ export const addImageList = (formdata, listingid) => (dispatch) => {
 
     return ListService.addImage(formdata, listingid).then(
         (response) => {
+
+            dispatch({
+                type: 'NEXT',
+                payload: { next: true }
+            });
             toast.success('successfully added image')
 
             return Promise.resolve();
@@ -481,7 +609,7 @@ export const viewList = (obj) => (dispatch) => {
 
     return ListService.viewListing(obj).then(
         (response) => {
-           
+
 
             return Promise.resolve();
         },
@@ -563,7 +691,34 @@ export const addListShedule = (obj) => (dispatch) => {
                 type: ADD_LIST_SHEDULE,
 
             });
+
+           
             toast.success('successfully added shedule')
+
+            return Promise.resolve();
+        },
+        (error) => {
+
+            const message =
+                (error.response &&
+                    error.response.data &&
+                    error.response.data.message) ||
+                error.message ||
+                error.toString();
+            toast.error(message)
+
+            return Promise.reject();
+        }
+    );
+
+}
+
+export const deleteListShedule = (obj) => (dispatch) => {
+
+    return ListService.removelistshedule(obj).then(
+        (response) => {
+
+            toast.success(response.message)
 
             return Promise.resolve();
         },
@@ -588,14 +743,14 @@ export const getListShedule = (obj) => (dispatch) => {
 
     return ListService.getlistshedule(obj).then(
         (response) => {
-           
+
 
             dispatch({
                 type: GET_LIST_SHEDULE,
                 payload: { listshedule: response.data }
 
             });
-          
+
 
             return Promise.resolve();
         },
@@ -676,7 +831,7 @@ export const gethomeList = () => (dispatch) => {
 
     return ListService.getHomeList().then(
         (response) => {
-           
+
 
             dispatch({
                 type: GET_HOME_LIST,
@@ -706,7 +861,7 @@ export const getsearchList = (obj) => (dispatch) => {
 
     return ListService.getsearchList(obj).then(
         (response) => {
-           
+
 
             dispatch({
                 type: GET_SEARCH_LIST,
@@ -740,7 +895,7 @@ export const getpeopleviewList = (obj) => (dispatch) => {
 
     return ListService.getpeopleviewList(obj).then(
         (response) => {
-       
+
 
             dispatch({
                 type: GET_PEOPLE_VIEWED_LIST,
@@ -748,7 +903,7 @@ export const getpeopleviewList = (obj) => (dispatch) => {
 
             });
 
-            
+
 
             return Promise.resolve();
         },
@@ -772,7 +927,7 @@ export const getsimilarviewList = (obj) => (dispatch) => {
 
     return ListService.getsimilarList(obj).then(
         (response) => {
-          
+
 
             dispatch({
                 type: GET_SIMILAR_LIST,
@@ -780,7 +935,7 @@ export const getsimilarviewList = (obj) => (dispatch) => {
 
             });
 
-          
+
 
             return Promise.resolve();
         },
@@ -811,7 +966,7 @@ export const getlistreview = (obj) => (dispatch) => {
                     type: GET_LIST_REVIEW,
                     payload: { reviewlist: response.data }
                 });
-               
+
 
             }
             else {
@@ -853,7 +1008,7 @@ export const getlistimage = (obj) => (dispatch) => {
                     type: GET_LIST_IMAGE,
                     payload: { listimage: response.data }
                 });
-               
+
 
             }
             else {
@@ -892,7 +1047,7 @@ export const getuserlist = (id) => (dispatch) => {
                     type: GET_USER_LIST,
                     payload: { userlist: response.data }
                 });
-              
+
 
             }
             else {
@@ -929,7 +1084,7 @@ export const getmylist = (id) => (dispatch) => {
                     type: GET_USER_LIST,
                     payload: { userlist: response.data }
                 });
-              
+
 
             }
             else {
@@ -968,7 +1123,7 @@ export const getusersavedlist = (id) => (dispatch) => {
                     type: GET_USER_SAVE_LIST,
                     payload: { savedlist: response.data }
                 });
-               
+
 
             }
             else {
@@ -1008,7 +1163,7 @@ export const getCategorylist = (id) => (dispatch) => {
                     type: GET_CATEGORY_LIST,
                     payload: { catlist: response.data }
                 });
-               
+
 
             }
             else {
@@ -1038,14 +1193,14 @@ export const getMainCategorylist = (id) => (dispatch) => {
 
     return ListService.getmainCategoryList(id).then(
         (response) => {
-            console.log(response.data)  
+
             if (response.status === 'SUCCESS') {
 
                 dispatch({
                     type: GET_MAINCATEGORY_LIST,
                     payload: { maincatlist: response.data }
                 });
-               
+
 
             }
             else {

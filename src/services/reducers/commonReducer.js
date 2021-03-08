@@ -1,6 +1,6 @@
 import { FETCH_AMENTIES, FETCH_CATEGORY, FETCH_FLAIR_SUCCESS, FETCH_RULE_SUCCESS, FETCH_TOP_CATEGORY, GET_PAGESEO, GET_SUBCATEGORY } from "../actionType";
 
-const initialState = { mylocation: undefined, pageinfo: [], steplist: { ishide: false, listiid: null, subcat_id: '' }, amenties: [], isFetched: false, category: [], topcategory: [], subcategory: [], flair: [], rule: [] };
+const initialState = { mylocation: undefined, pageinfo: [],  next:false , amenties: [], isFetched: false, category: [], topcategory: [], subcategory: [], flair: [], rule: [] };
 
 export default function (state = initialState, action) {
     const { type, payload } = action;
@@ -16,7 +16,7 @@ export default function (state = initialState, action) {
         case 'NEXT':
             return {
                 ...state,
-                steplist: { ishide: true, listid: payload.listingid, subcat_id: payload.subcat_id },
+                next:payload.next,
             }
 
 

@@ -1,6 +1,6 @@
-import { ADD_LIST_AMENTIES, ADD_LIST_SHEDULE, CREATE_LISTING, GET_CATEGORY_LIST, GET_HOME_LIST, GET_LIST_AMENTIES, GET_LIST_DETAIL, GET_LIST_FULLDETAIL, GET_LIST_IMAGE, GET_LIST_REVIEW, GET_LIST_SHEDULE, GET_MAINCATEGORY_LIST, GET_PEOPLE_VIEWED_LIST, GET_SEARCH_LIST, GET_SIMILAR_LIST, GET_TOP_LIST, GET_USER_LIST, GET_USER_SAVE_LIST, POST_LIST_REVIEW, REMOVE_LIST_SHEDULE, UPDATE_LISTINGDETAIL } from "../actionType";
+import { ADD_LIST_AMENTIES,GET_LIST_OTHERS, ADD_LIST_SHEDULE, CREATE_LISTING, GET_CATEGORY_LIST, GET_HOME_LIST, GET_LIST_AMENTIES, GET_LIST_DETAIL, GET_LIST_FULLDETAIL, GET_LIST_IMAGE, GET_LIST_REVIEW, GET_LIST_SHEDULE, GET_MAINCATEGORY_LIST, GET_PEOPLE_VIEWED_LIST, GET_SEARCH_LIST, GET_SIMILAR_LIST, GET_TOP_LIST, GET_USER_LIST, GET_USER_SAVE_LIST, POST_LIST_REVIEW, REMOVE_LIST_SHEDULE, UPDATE_LISTINGDETAIL } from "../actionType";
 
-const initialState = { isCreated: false, listing: null, listdetail: null, listfulldetail: null, toplists: [], searchlists: [], listamenties: [], listallimage: [], shedulelist: [], allreviewlist: [], alluserlist: [], usersavedlist: [], lists: [], categorylists: [],maincategorylists:[], viewedlists: [], similarlists: [] };
+const initialState = { isCreated: false,listother:[], listing: null, listdetail: null, listfulldetail: null, toplists: [], searchlists: [], listamenties: [], listallimage: [], shedulelist: [], allreviewlist: [], alluserlist: [], usersavedlist: [], lists: [], categorylists: [], maincategorylists: [], viewedlists: [], similarlists: [] };
 
 export default function (state = initialState, action) {
     const { type, payload } = action;
@@ -100,7 +100,7 @@ export default function (state = initialState, action) {
                 ...state,
                 maincategorylists: payload.maincatlist,
             }
-           
+
 
         case GET_TOP_LIST:
             return {
@@ -112,6 +112,12 @@ export default function (state = initialState, action) {
             return {
                 ...state,
                 searchlists: payload.searchlist,
+            }
+
+        case GET_LIST_OTHERS:
+            return {
+                ...state,
+                listother: payload.listother,
             }
 
         case GET_PEOPLE_VIEWED_LIST:

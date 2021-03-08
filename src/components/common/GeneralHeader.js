@@ -3,17 +3,18 @@ import Navbar from './Navbar'
 import HeaderAuthorAccess from '../other/account/HeaderAuthorAccess'
 import Logo from './Logo'
 import $ from 'jquery';
+import { connect } from "react-redux";
 
-export default class GeneralHeader extends Component {
+class GeneralHeader extends Component {
     componentDidMount() {
-        // $(window).on('scroll', function () {
-        //     //header fixed animation and control
-        //     if ($(window).scrollTop() > 200) {
-        //         $('.header-menu-wrapper').addClass('header-fixed');
-        //     } else {
-        //         $('.header-menu-wrapper').removeClass('header-fixed');
-        //     }
-        // });
+        $(window).on('scroll', function () {
+            //header fixed animation and control
+            if ($(window).scrollTop() > 200) {
+                $('.header-menu-wrapper').addClass('header-fixed');
+            } else {
+                $('.header-menu-wrapper').removeClass('header-fixed');
+            }
+        });
     }
 
     state = {
@@ -34,7 +35,7 @@ export default class GeneralHeader extends Component {
                                         </div>
 
                                         {/* Navbar */}
-                                        <Navbar />
+                                        <Navbar loggedin={this.props.isLoggedIn}/>
 
                                         {/* Author Access */}
                                         <HeaderAuthorAccess />
@@ -48,3 +49,14 @@ export default class GeneralHeader extends Component {
         )
     }
 }
+
+function mapStateToProps(state) {
+    const { isLoggedIn, userdetails } = state.auth;
+    const { notifications } = state.notification;
+    const { message } = state.message;
+    return {
+        isLoggedIn, userdetails, notifications,
+        message
+    };
+}
+export default connect(mapStateToProps)(GeneralHeader);

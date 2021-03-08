@@ -11,7 +11,6 @@ import ScrollTopBtn from "../components/common/ScrollTopBtn";
 import { connect } from "react-redux";
 import { registerUser } from '../services/action/auth';
 import SweetAlert from 'react-bootstrap-sweetalert';
-import { Helmet } from 'react-helmet';
 import { getDefaultMeta, getPageinfo } from '../services/action/common';
 import MetaTag from './metainfo';
 class SignUp extends Component {

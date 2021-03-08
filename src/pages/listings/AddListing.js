@@ -280,7 +280,8 @@ class AddListing extends Component {
 
             this.props.dispatch(CreateListing(obj)).then(() => {
                 if (this.props.isCreated) {
-                    this.setState({ loading: false, showFulldetail: true })
+                    this.props.history.push("/allinfo");
+                    this.setState({ loading: false })
                     this.onReset();
 
                 }
@@ -602,10 +603,10 @@ class AddListing extends Component {
 function mapStateToProps(state) {
     const { isLoggedIn, userdetails } = state.auth;
     const { isCreated } = state.list;
-    const { amenties, steplist, category, subcategory, rule,pageinfo } = state.common;
+    const { amenties,  category, subcategory, rule,pageinfo } = state.common;
 
     return {
-        isLoggedIn,pageinfo, category, steplist, subcategory, amenties, userdetails, isCreated, rule
+        isLoggedIn,pageinfo, category, subcategory, amenties, userdetails, isCreated, rule
 
     };
 }

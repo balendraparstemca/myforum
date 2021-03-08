@@ -306,9 +306,10 @@ body {
   line-height: 24px;
   font-family: "Work Sans", sans-serif;
   color: #808996;
-   margin-right: calc(100vw - 100%);
+    /* margin-right: calc(100vw - 100%);
   -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale; }
+  -moz-osx-font-smoothing: grayscale; */
+ } 
   .my-wrapper{
 	   overflow-y: scroll;
 	    width: auto;
@@ -320,7 +321,8 @@ body {
   /* width */
 
 ::-webkit-scrollbar {
-  width: 5px;
+  width: 7px;
+  height: 8px;
 }
 
 /* Track */
@@ -337,6 +339,7 @@ body {
 ::-webkit-scrollbar-thumb:hover {
   background: #555; 
 }
+
 
 /*---------------- fonts ----------------*/
 .font-size-30 {
@@ -2210,7 +2213,7 @@ body {
   position: relative;
   z-index: 1;
   color: #fff;
-  background-image: url("../images/bread-bg.jpg");
+   background-image: url("../images/bread-bg.jpg"); 
   background-size: cover;
   background-position: center;
   overflow: hidden; }
@@ -2433,7 +2436,7 @@ body {
     listing-detail-breadcrumb
  ====================================================*/
 .listing-detail-breadcrumb {
-  background-image: url("../images/bread-bg.jpg");
+  /* background-image: url("../images/bread-bg.jpg"); */
   overflow: inherit;
   z-index: 2; }
   .listing-detail-breadcrumb .breadcrumb-content {

@@ -2,8 +2,9 @@ import React, { useState } from 'react'
 import { FiChevronDown } from 'react-icons/fi'
 import { Link } from "react-router-dom";
 import $ from 'jquery';
+import { connect } from "react-redux";
 
-export default function Navbar() {
+function Navbar(props) {
     const [navOpen, setNavOpen] = useState(false)
 
     $(document).on('click', '.side-menu-ul li', function () {
@@ -15,6 +16,7 @@ export default function Navbar() {
     })
 
     return (
+     
         <>
             <div className="main-menu-content">
                 <nav>
@@ -75,17 +77,16 @@ export default function Navbar() {
                         <li>
                             <Link>listings <FiChevronDown /></Link>
                             <ul className="dropdown-menu-item">
-                                <li><Link to="/listing-list">listing</Link></li>
+                               <li><Link to="/listing-list">listing</Link></li>
                                 <li><Link to="/add-listing">add listing</Link></li>
-                                <li><Link to="/all-categories">listing categories</Link></li>
-                                <li><Link to="/all-locations">listing locations</Link></li>
-
+                                <li><Link to="/categories">listing categories</Link></li>
+                               
                             </ul>
                         </li>
                         <li>
                             <Link>Forums <FiChevronDown /></Link>
                             <ul className="dropdown-menu-item">
-                                <li><Link to="/forum/home">Home</Link></li>
+                               <li><Link to="/forum">Home</Link></li>
                                 <li><Link to="/forum/popular">Popular</Link></li>
                                 <li><Link to="/forum/community">All Community</Link></li>
                                 <li><Link to="/forum/newcommunity">New Community</Link></li>
@@ -95,21 +96,33 @@ export default function Navbar() {
                         <li>
                             <Link>about <FiChevronDown /></Link>
                             <ul className="dropdown-menu-item">
-                                <li><Link to="/about">about</Link></li>
+                            <li><Link to="/about">about</Link></li>
                                 <li><Link to="/faq">faq</Link></li>
-                                <li><Link to="/contact">contact</Link></li>
-                                <li><Link to="/page-404">404 page</Link></li>
-                                <li><Link to="/recover">recover pass </Link></li>
-                            </ul>
+                                <li><Link to="/contact">contact</Link></li>   </ul>
                         </li>
                       
                     </ul>
-                    <div className="side-nav-button">
+                    {
+                        props.isLoggedIn ?  '' : <div className="side-nav-button">
                         <Link to="/login" className="theme-btn">login</Link>
                         <Link to="/sign-up" className="theme-btn">Sign up</Link>
                     </div>
+                    }
+                   
                 </div>
             </div>
         </>
     )
 }
+
+function mapStateToProps(state) {
+    const { isLoggedIn } = state.auth;
+    const { message } = state.message;
+    return {
+      isLoggedIn,
+      message
+    };
+  }
+  export default connect(mapStateToProps)(Navbar);
+
+

@@ -19,6 +19,7 @@ import { Badge } from 'react-bootstrap';
 import EditCommunity from './editCommunity';
 import { Helmet } from 'react-helmet';
 import LoadingOverlay from 'react-loading-overlay';
+import MetaTag from '../metainfo';
 
 class CommunityDashboard extends Component {
     constructor(props) {
@@ -31,7 +32,8 @@ class CommunityDashboard extends Component {
             joined: false,
             member: null,
             img: require('../../assets/images/default.png'),
-            lists: []
+            lists: [],
+            metainfo:null
 
         }
 
@@ -126,6 +128,30 @@ class CommunityDashboard extends Component {
                 this.setState({
                     communitydetail: this.props.communitydetails[0],loading:false
                 })
+                if (this.props.communitydetails[0].meta) 
+                {
+                    this.setState({
+                        metainfo: {
+                            title: `r/${this.props.communitydetails[0].communityName}`,
+                            canonicalURL: `https://www.casualdesi.com${this.props.location.pathname || ''}`,
+                            meta: JSON.parse(this.props.communitydetails[0].meta) 
+                        }
+                    })
+
+                }
+                else{
+                    this.setState({
+                        metainfo: {
+                            title: `r/${this.props.communitydetails[0].communityName}`,
+                            canonicalURL: `https://www.casualdesi.com${this.props.location.pathname || ''}`,
+                            meta: [{
+                                attribute: 'name',
+                                value: 'description',
+                                content: this.props.communitydetails[0].about
+                            }]
+                        }
+                    })
+                }
                 this.props.dispatch(fetchCommunityPost(this.props.communitydetails[0].com_id))
                 this.fetchcommunitymember();
 
@@ -172,20 +198,21 @@ class CommunityDashboard extends Component {
 
     render() {
         const user = this.props.userdetails && this.props.userdetails;
-      
-
+  
         return (
             <LoadingOverlay
             active={this.state.loading}
             spinner
             text='Loading your content...'
         >
+             { this.state.metainfo ? <MetaTag metaTag={this.state.metainfo || this.state.defaultMetaTag}></MetaTag> : ''}
+
             <main className="List-map-view2">
-                <Helmet>
+                {/* <Helmet>
                     <title>{this.state.communitydetail && ('r/' + this.state.communitydetail.communityName)}</title>
                     <meta name="description" content={this.state.communitydetail && this.state.communitydetail.about} />
                     <meta name="keywords" content={this.state.communitydetail && ('r/' + this.state.communitydetail.communityName)} />
-                </Helmet>
+                </Helmet> */}
                 {/* Header */}
                 <GeneralHeader />
                
